@@ -6,5 +6,7 @@ public interface IMainDatabaseRepository
 {
     IUserRepository Users { get; }
 
+    Task SaveAsync();
+    
     void Save();
 }

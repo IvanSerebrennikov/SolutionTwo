@@ -6,28 +6,34 @@ namespace SolutionTwo.Data.Repositories.Base.Interfaces;
 public interface IBaseRepository<TEntity, TId>
     where TEntity : class, IIdentifiablyEntity<TId>
 {
-    TEntity GetById(TId id);
+    Task<TEntity?> GetByIdAsync(TId id, bool asNoTracking = false);
 
-    IReadOnlyList<TEntity> Get(
+    Task<IReadOnlyList<TEntity>> GetAsync(
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
         string? includeProperties = null,
         int? skip = null,
-        int? take = null);
+        int? take = null, 
+        bool asNoTracking = false);
+    
+    Task<IReadOnlyList<TEntity>> GetAsync(
+        Expression<Func<TEntity, bool>> filter,
+        bool asNoTracking);
 
-    IReadOnlyList<TProjection> GetProjections<TProjection>(
+    Task<IReadOnlyList<TProjection>> GetProjectionsAsync<TProjection>(
         Expression<Func<TEntity, TProjection>> projection,
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
         string? includeProperties = null,
         int? skip = null,
-        int? take = null);
+        int? take = null, 
+        bool asNoTracking = false);
 
-    void Create(TEntity entity);
+    Task CreateAsync(TEntity entity);
 
     void Update(TEntity entity);
 
     void Delete(TEntity entity);
 
-    void Delete(TId id);
+    Task DeleteAsync(TId id);
 }

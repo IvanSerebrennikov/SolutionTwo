@@ -1,4 +1,6 @@
 ﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
+using SolutionTwo.Data.Context;
 using SolutionTwo.Data.Entities.Base.Interfaces;
 using SolutionTwo.Data.Repositories.Base.Interfaces;
 
@@ -7,49 +9,120 @@ namespace SolutionTwo.Data.Repositories.Base;
 public class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
     where TEntity : class, IIdentifiablyEntity<TId>
 {
-    public TEntity GetById(TId id)
+    private readonly MainDatabaseContext _context;
+
+    protected BaseRepository(MainDatabaseContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
+    }
+    
+    public async Task<TEntity?> GetByIdAsync(TId id, bool asNoTracking = false)
+    {
+        return await GetQueryable(x => x.Id != null && x.Id.Equals(id), null, null, null, null, asNoTracking)
+            .FirstOrDefaultAsync();
     }
 
-    public IReadOnlyList<TEntity> Get(
+    public async Task<IReadOnlyList<TEntity>> GetAsync(
         Expression<Func<TEntity, bool>>? filter = null,
-        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, 
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
         string? includeProperties = null,
         int? skip = null,
-        int? take = null)
+        int? take = null,
+        bool asNoTracking = false)
     {
-        throw new NotImplementedException();
+        return await GetQueryable(filter, orderBy, includeProperties, skip, take, asNoTracking)
+            .ToListAsync();
     }
 
-    public IReadOnlyList<TProjection> GetProjections<TProjection>(
+    public async Task<IReadOnlyList<TEntity>> GetAsync(
+        Expression<Func<TEntity, bool>> filter, 
+        bool asNoTracking)
+    {
+        return await GetQueryable(filter, null, null, null, null, asNoTracking)
+            .ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<TProjection>> GetProjectionsAsync<TProjection>(
         Expression<Func<TEntity, TProjection>> projection,
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        string? includeProperties = null, 
-        int? skip = null, 
-        int? take = null)
+        string? includeProperties = null,
+        int? skip = null,
+        int? take = null,
+        bool asNoTracking = false)
     {
-        throw new NotImplementedException();
+        return await GetQueryable(filter, orderBy, includeProperties, skip, take, asNoTracking).Select(projection)
+            .ToListAsync();
     }
 
-    public void Create(TEntity entity)
+    public async Task CreateAsync(TEntity entity)
     {
-        throw new NotImplementedException();
+        await _context.Set<TEntity>().AddAsync(entity);
     }
 
     public void Update(TEntity entity)
     {
-        throw new NotImplementedException();
+        _context.Set<TEntity>().Update(entity);
     }
 
     public void Delete(TEntity entity)
     {
-        throw new NotImplementedException();
+        _context.Set<TEntity>().Remove(entity);
     }
 
-    public void Delete(TId id)
+    public async Task DeleteAsync(TId id)
     {
-        throw new NotImplementedException();
+        var entity = await GetByIdAsync(id);
+
+        if (entity != null)
+        {
+            Delete(entity);
+        }
+    }
+    
+    protected virtual IQueryable<TEntity> GetQueryable(
+        Expression<Func<TEntity, bool>>? filter = null,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+        string? includeProperties = null,
+        int? skip = null,
+        int? take = null,
+        bool asNoTracking = false)
+    {
+        IQueryable<TEntity> query = _context.Set<TEntity>();
+
+        if (asNoTracking)
+        {
+            query = query.AsNoTracking();
+        }
+        
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
+        if (!string.IsNullOrEmpty(includeProperties))
+        {
+            query = includeProperties
+                .Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+                .Aggregate(query,
+                    (current, includeProperty) => current.Include(includeProperty.Trim()));
+        }
+
+        if (orderBy != null)
+        {
+            query = orderBy(query);
+        }
+
+        if (skip != null)
+        {
+            query = query.Skip(skip.Value);
+        }
+
+        if (take != null)
+        {
+            query = query.Take(take.Value);
+        }
+
+        return query;
     }
 }
