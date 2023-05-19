@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using SolutionTwo.Data;
 using SolutionTwo.Data.Context;
-using SolutionTwo.Data.Interfaces;
 using SolutionTwo.Data.Repositories;
 using SolutionTwo.Data.Repositories.Interfaces;
+using SolutionTwo.Data.UnitOfWork;
+using SolutionTwo.Data.UnitOfWork.Interfaces;
 using SolutionTwo.Domain.Services;
 using SolutionTwo.Domain.Services.Interfaces;
 
@@ -21,7 +22,7 @@ builder.Services.AddDbContext<MainDatabaseContext>(o => o.UseSqlServer(mainDatab
 
 // Data:
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IMainDatabaseRepository, MainDatabaseRepository>();
+builder.Services.AddScoped<IMainDatabase, MainDatabase>();
 
 // Domain:
 builder.Services.AddScoped<IUserService, UserService>();

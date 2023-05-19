@@ -1,8 +1,8 @@
 ﻿using SolutionTwo.Data.Repositories.Interfaces;
 
-namespace SolutionTwo.Data.Interfaces;
+namespace SolutionTwo.Data.UnitOfWork.Interfaces;
 
-public interface IMainDatabaseRepository
+public interface IMainDatabase
 {
     IUserRepository Users { get; }
 

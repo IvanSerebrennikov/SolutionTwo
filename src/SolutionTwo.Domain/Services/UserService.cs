@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using SolutionTwo.Data.Entities;
-using SolutionTwo.Data.Interfaces;
+using SolutionTwo.Data.UnitOfWork.Interfaces;
 using SolutionTwo.Domain.Models.User;
 using SolutionTwo.Domain.Services.Interfaces;
 
@@ -8,23 +8,23 @@ namespace SolutionTwo.Domain.Services;
 
 public class UserService : IUserService
 {
-    private readonly IMainDatabaseRepository _repository;
+    private readonly IMainDatabase _mainDatabase;
 
-    public UserService(IMainDatabaseRepository repository)
+    public UserService(IMainDatabase mainDatabase)
     {
-        _repository = repository;
+        _mainDatabase = mainDatabase;
     }
 
     public async Task<UserModel?> GetUserAsync(Guid id)
     {
-        var userEntity = await _repository.Users.GetByIdAsync(id);
+        var userEntity = await _mainDatabase.Users.GetByIdAsync(id);
 
         return userEntity != null ? new UserModel(userEntity) : null;
     }
 
     public async Task<IReadOnlyList<UserModel>> GetAllUsersAsync()
     {
-        var userEntities = await _repository.Users.GetAsync();
+        var userEntities = await _mainDatabase.Users.GetAsync();
         var userModels = userEntities.Select(x => new UserModel(x)).ToList();
 
         return userModels;
@@ -41,8 +41,8 @@ public class UserService : IUserService
             FirstName = firstName
         };
 
-        await _repository.Users.CreateAsync(userEntity);
-        await _repository.SaveAsync();
+        await _mainDatabase.Users.CreateAsync(userEntity);
+        await _mainDatabase.SaveAsync();
 
         return new UserModel(userEntity);
     }

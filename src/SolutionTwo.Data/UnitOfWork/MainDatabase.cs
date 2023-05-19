@@ -1,16 +1,16 @@
 ﻿using SolutionTwo.Data.Context;
-using SolutionTwo.Data.Interfaces;
 using SolutionTwo.Data.Repositories.Interfaces;
+using SolutionTwo.Data.UnitOfWork.Interfaces;
 
-namespace SolutionTwo.Data;
+namespace SolutionTwo.Data.UnitOfWork;
 
-public class MainDatabaseRepository : IMainDatabaseRepository
+public class MainDatabase : IMainDatabase
 {
     private readonly MainDatabaseContext _context;
     
     public IUserRepository Users { get; }
 
-    public MainDatabaseRepository(MainDatabaseContext context, IUserRepository userRepository)
+    public MainDatabase(MainDatabaseContext context, IUserRepository userRepository)
     {
         _context = context;
         Users = userRepository;
