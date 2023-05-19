@@ -2,7 +2,7 @@
 
 namespace SolutionTwo.Data.Entities;
 
-public class User : IIdentifiablyEntity<Guid>
+public class UserEntity : IIdentifiablyEntity<Guid>
 {
     public Guid Id { get; set; }
 

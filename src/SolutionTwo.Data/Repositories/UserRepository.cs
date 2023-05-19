@@ -5,7 +5,7 @@ using SolutionTwo.Data.Repositories.Interfaces;
 
 namespace SolutionTwo.Data.Repositories;
 
-public class UserRepository : BaseRepository<User, Guid>, IUserRepository
+public class UserRepository : BaseRepository<UserEntity, Guid>, IUserRepository
 {
     public UserRepository(MainDatabaseContext context) : base(context)
     {

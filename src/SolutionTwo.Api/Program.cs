@@ -4,6 +4,8 @@ using SolutionTwo.Data.Context;
 using SolutionTwo.Data.Interfaces;
 using SolutionTwo.Data.Repositories;
 using SolutionTwo.Data.Repositories.Interfaces;
+using SolutionTwo.Domain.Services;
+using SolutionTwo.Domain.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,8 +19,12 @@ builder.Services.AddSwaggerGen();
 var mainDatabaseConnectionString = builder.Configuration.GetConnectionString("MainDatabaseConnection");
 builder.Services.AddDbContext<MainDatabaseContext>(o => o.UseSqlServer(mainDatabaseConnectionString));
 
+// Data:
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMainDatabaseRepository, MainDatabaseRepository>();
+
+// Domain:
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

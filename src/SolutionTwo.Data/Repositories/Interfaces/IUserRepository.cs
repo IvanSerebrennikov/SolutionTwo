@@ -3,7 +3,7 @@ using SolutionTwo.Data.Repositories.Base.Interfaces;
 
 namespace SolutionTwo.Data.Repositories.Interfaces;
 
-public interface IUserRepository : IBaseRepository<User, Guid>
+public interface IUserRepository : IBaseRepository<UserEntity, Guid>
 {
     
 }

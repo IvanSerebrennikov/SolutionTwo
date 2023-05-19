@@ -9,5 +9,5 @@ public class MainDatabaseContext : DbContext
     {
     }
 
-    public DbSet<User> Users => Set<User>();
+    public DbSet<UserEntity> Users => Set<UserEntity>();
 }
