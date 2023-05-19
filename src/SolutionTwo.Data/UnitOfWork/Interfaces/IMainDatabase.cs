@@ -1,12 +1,8 @@
-﻿using SolutionTwo.Data.Repositories.Interfaces;
-
-namespace SolutionTwo.Data.UnitOfWork.Interfaces;
+﻿namespace SolutionTwo.Data.UnitOfWork.Interfaces;
 
 public interface IMainDatabase
 {
-    IUserRepository Users { get; }
+    Task CommitChangesAsync();
 
-    Task SaveAsync();
-    
-    void Save();
+    void CommitChanges();
 }

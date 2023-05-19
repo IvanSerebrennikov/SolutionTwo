@@ -1,5 +1,4 @@
 ﻿using SolutionTwo.Data.Context;
-using SolutionTwo.Data.Repositories.Interfaces;
 using SolutionTwo.Data.UnitOfWork.Interfaces;
 
 namespace SolutionTwo.Data.UnitOfWork;
@@ -7,21 +6,18 @@ namespace SolutionTwo.Data.UnitOfWork;
 public class MainDatabase : IMainDatabase
 {
     private readonly MainDatabaseContext _context;
-    
-    public IUserRepository Users { get; }
 
-    public MainDatabase(MainDatabaseContext context, IUserRepository userRepository)
+    public MainDatabase(MainDatabaseContext context)
     {
         _context = context;
-        Users = userRepository;
     }
 
-    public async Task SaveAsync()
+    public async Task CommitChangesAsync()
     {
         await _context.SaveChangesAsync();
     }
 
-    public void Save()
+    public void CommitChanges()
     {
         _context.SaveChanges();
     }
