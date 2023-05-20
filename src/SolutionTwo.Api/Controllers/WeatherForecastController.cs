@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SolutionTwo.Api.Controllers;
@@ -18,10 +19,24 @@ public class WeatherForecastController : ControllerBase
         _logger = logger;
     }
 
+    [Authorize]
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()
     {
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            {
+                Date = DateTime.Now.AddDays(index),
+                TemperatureC = Random.Shared.Next(-20, 55),
+                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+            })
+            .ToArray();
+    }
+    
+    [Authorize(Roles = "SuperAdmin")]
+    [HttpGet("{amount}")]
+    public IEnumerable<WeatherForecast> GetMore(int amount)
+    {
+        return Enumerable.Range(1, amount).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
                 TemperatureC = Random.Shared.Next(-20, 55),

@@ -15,14 +15,15 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
     {
         _context = context;
     }
-    
+
     public async Task<TEntity?> GetByIdAsync(TId id, bool asNoTracking = false)
     {
         return await GetQueryable(x => x.Id != null && x.Id.Equals(id), null, null, null, null, asNoTracking)
             .FirstOrDefaultAsync();
     }
 
-    public async Task<IReadOnlyList<TEntity>> GetAsync(Expression<Func<TEntity, bool>>? filter = null,
+    public async Task<IReadOnlyList<TEntity>> GetAsync(
+        Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
         IEnumerable<Expression<Func<TEntity, object>>>? includeProperties = null,
         int? skip = null,
@@ -34,7 +35,7 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
     }
 
     public async Task<IReadOnlyList<TEntity>> GetAsync(
-        Expression<Func<TEntity, bool>> filter, 
+        Expression<Func<TEntity, bool>> filter,
         bool asNoTracking)
     {
         return await GetQueryable(filter, null, null, null, null, asNoTracking)
@@ -73,12 +74,9 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
     {
         var entity = await GetByIdAsync(id);
 
-        if (entity != null)
-        {
-            Delete(entity);
-        }
+        if (entity != null) Delete(entity);
     }
-    
+
     protected virtual IQueryable<TEntity> GetQueryable(
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
@@ -89,37 +87,20 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
     {
         IQueryable<TEntity> query = _context.Set<TEntity>();
 
-        if (asNoTracking)
-        {
-            query = query.AsNoTracking();
-        }
-        
-        if (filter != null)
-        {
-            query = query.Where(filter);
-        }
+        if (asNoTracking) query = query.AsNoTracking();
+
+        if (filter != null) query = query.Where(filter);
 
         if (includeProperties != null)
-        {
             query = includeProperties
                 .Aggregate(query,
                     (current, expression) => current.Include(expression));
-        }
 
-        if (orderBy != null)
-        {
-            query = orderBy(query);
-        }
+        if (orderBy != null) query = orderBy(query);
 
-        if (skip != null)
-        {
-            query = query.Skip(skip.Value);
-        }
+        if (skip != null) query = query.Skip(skip.Value);
 
-        if (take != null)
-        {
-            query = query.Take(take.Value);
-        }
+        if (take != null) query = query.Take(take.Value);
 
         return query;
     }

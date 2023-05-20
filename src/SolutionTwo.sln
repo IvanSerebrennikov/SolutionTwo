@@ -6,6 +6,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Domain", "Solut
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data", "SolutionTwo.Data\SolutionTwo.Data.csproj", "{0D475A0D-A5AF-4160-96EA-8230B031F36A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Identity", "SolutionTwo.Identity\SolutionTwo.Identity.csproj", "{15191604-B935-4E71-BEAB-C05AE82177B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Common", "SolutionTwo.Common\SolutionTwo.Common.csproj", "{C64BE01B-7DAF-4A64-B79C-A242D07F9A46}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{0D475A0D-A5AF-4160-96EA-8230B031F36A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D475A0D-A5AF-4160-96EA-8230B031F36A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D475A0D-A5AF-4160-96EA-8230B031F36A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15191604-B935-4E71-BEAB-C05AE82177B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15191604-B935-4E71-BEAB-C05AE82177B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15191604-B935-4E71-BEAB-C05AE82177B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15191604-B935-4E71-BEAB-C05AE82177B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C64BE01B-7DAF-4A64-B79C-A242D07F9A46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C64BE01B-7DAF-4A64-B79C-A242D07F9A46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C64BE01B-7DAF-4A64-B79C-A242D07F9A46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C64BE01B-7DAF-4A64-B79C-A242D07F9A46}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
