@@ -11,7 +11,7 @@ public interface IBaseRepository<TEntity, TId>
     Task<IReadOnlyList<TEntity>> GetAsync(
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        string? includeProperties = null,
+        IEnumerable<Expression<Func<TEntity, object>>>? includeProperties = null,
         int? skip = null,
         int? take = null, 
         bool asNoTracking = false);
@@ -24,7 +24,7 @@ public interface IBaseRepository<TEntity, TId>
         Expression<Func<TEntity, TProjection>> projection,
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        string? includeProperties = null,
+        IEnumerable<Expression<Func<TEntity, object>>>? includeProperties = null,
         int? skip = null,
         int? take = null, 
         bool asNoTracking = false);

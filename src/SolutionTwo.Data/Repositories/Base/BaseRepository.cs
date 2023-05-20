@@ -6,7 +6,7 @@ using SolutionTwo.Data.Repositories.Base.Interfaces;
 
 namespace SolutionTwo.Data.Repositories.Base;
 
-public class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
+public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
     where TEntity : class, IIdentifiablyEntity<TId>
 {
     private readonly MainDatabaseContext _context;
@@ -22,10 +22,9 @@ public class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
             .FirstOrDefaultAsync();
     }
 
-    public async Task<IReadOnlyList<TEntity>> GetAsync(
-        Expression<Func<TEntity, bool>>? filter = null,
+    public async Task<IReadOnlyList<TEntity>> GetAsync(Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        string? includeProperties = null,
+        IEnumerable<Expression<Func<TEntity, object>>>? includeProperties = null,
         int? skip = null,
         int? take = null,
         bool asNoTracking = false)
@@ -46,7 +45,7 @@ public class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
         Expression<Func<TEntity, TProjection>> projection,
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        string? includeProperties = null,
+        IEnumerable<Expression<Func<TEntity, object>>>? includeProperties = null,
         int? skip = null,
         int? take = null,
         bool asNoTracking = false)
@@ -83,7 +82,7 @@ public class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
     protected virtual IQueryable<TEntity> GetQueryable(
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        string? includeProperties = null,
+        IEnumerable<Expression<Func<TEntity, object>>>? includeProperties = null,
         int? skip = null,
         int? take = null,
         bool asNoTracking = false)
@@ -100,12 +99,11 @@ public class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
             query = query.Where(filter);
         }
 
-        if (!string.IsNullOrEmpty(includeProperties))
+        if (includeProperties != null)
         {
             query = includeProperties
-                .Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
                 .Aggregate(query,
-                    (current, includeProperty) => current.Include(includeProperty.Trim()));
+                    (current, expression) => current.Include(expression));
         }
 
         if (orderBy != null)
