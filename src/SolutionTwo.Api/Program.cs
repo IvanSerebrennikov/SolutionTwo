@@ -54,7 +54,14 @@ builder.Services.AddSwaggerGen(options =>
 // Data:
 var databaseConfiguration = builder.Configuration.GetSection<DatabaseConfiguration>();
 builder.Services.AddDbContext<MainDatabaseContext>(o =>
-    o.UseSqlServer(databaseConfiguration.MainDatabaseConnectionString!));
+    {
+        o.UseSqlServer(databaseConfiguration.MainDatabaseConnectionString!);
+        
+        // Make sure that "Microsoft.EntityFrameworkCore" category is set to "None" 
+        // for all providers except "Debug"
+        o.EnableSensitiveDataLogging();  
+    }
+);
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMainDatabase, MainDatabase>();
 

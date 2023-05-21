@@ -18,7 +18,7 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
 
     public async Task<TEntity?> GetByIdAsync(TId id, bool asNoTracking = false)
     {
-        return await GetQueryable(x => x.Id != null && x.Id.Equals(id), null, null, null, null, asNoTracking)
+        return await GetQueryable(x => x.Id!.Equals(id), null, null, null, null, asNoTracking)
             .FirstOrDefaultAsync();
     }
 

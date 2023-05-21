@@ -29,7 +29,7 @@ public class GlobalErrorHandlingMiddleware
     {
         var errorId = Guid.NewGuid();
         
-        _logger.LogError(exception, $"Error Id: {errorId}.");
+        _logger.LogError(exception, $"ErrorId: {errorId}.");
         
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
