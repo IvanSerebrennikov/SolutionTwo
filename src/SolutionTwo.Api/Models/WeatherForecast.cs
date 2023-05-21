@@ -1,4 +1,4 @@
-namespace SolutionTwo.Api;
+namespace SolutionTwo.Api.Models;
 
 public class WeatherForecast
 {

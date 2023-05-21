@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SolutionTwo.Api.Middlewares;
 using SolutionTwo.Common.Extensions;
+using SolutionTwo.Data.Configuration;
 using SolutionTwo.Data.Context;
 using SolutionTwo.Data.Repositories;
 using SolutionTwo.Data.Repositories.Interfaces;
@@ -50,8 +52,9 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // Data:
-var mainDatabaseConnectionString = builder.Configuration.GetConnectionString("MainDatabaseConnection");
-builder.Services.AddDbContext<MainDatabaseContext>(o => o.UseSqlServer(mainDatabaseConnectionString));
+var databaseConfiguration = builder.Configuration.GetSection<DatabaseConfiguration>();
+builder.Services.AddDbContext<MainDatabaseContext>(o =>
+    o.UseSqlServer(databaseConfiguration.MainDatabaseConnectionString!));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMainDatabase, MainDatabase>();
 
@@ -86,6 +89,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 
 app.UseAuthentication();
 

@@ -4,8 +4,8 @@ using SolutionTwo.Domain.Services.Interfaces;
 
 namespace SolutionTwo.Api.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
+[ApiController]
 public class UserController : ControllerBase
 {
     private readonly ILogger<WeatherForecastController> _logger;

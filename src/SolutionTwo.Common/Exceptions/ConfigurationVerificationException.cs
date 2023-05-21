@@ -8,7 +8,7 @@ public class ConfigurationVerificationException : Exception
     }
     
     public ConfigurationVerificationException(string sectionName, IEnumerable<string> invalidProperties) : base(
-        $"Next properties from {sectionName} section has empty or incorrect values: {string.Join(", ", invalidProperties)}")
+        $"Next properties from {sectionName} section has empty or incorrect value: {string.Join(", ", invalidProperties)}")
     {
     }
 }
