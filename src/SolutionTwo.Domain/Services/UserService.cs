@@ -31,7 +31,7 @@ public class UserService : IUserService
 
     public async Task<UserAuthModel?> GetUserWithRolesAsync(string username)
     {
-        var userEntity = await _userRepository.GetOneAsync(
+        var userEntity = await _userRepository.GetSingleAsync(
             x => x.Username == username,
             includeProperties: "Roles", asNoTracking: true);
 

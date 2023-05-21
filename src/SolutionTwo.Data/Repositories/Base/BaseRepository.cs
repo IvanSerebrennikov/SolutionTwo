@@ -22,11 +22,13 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
             .FirstOrDefaultAsync();
     }
 
-    public async Task<TEntity?> GetOneAsync(Expression<Func<TEntity, bool>>? filter = null,
-        string? includeProperties = null, bool asNoTracking = false)
+    public async Task<TEntity?> GetSingleAsync(
+        Expression<Func<TEntity, bool>> filter,
+        string? includeProperties = null, 
+        bool asNoTracking = false)
     {
         return await GetQueryable(filter, null, includeProperties, null, null, asNoTracking)
-            .FirstOrDefaultAsync();
+            .SingleOrDefaultAsync();
     }
 
     public async Task<IReadOnlyList<TEntity>> GetAsync(
@@ -38,14 +40,6 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         bool asNoTracking = false)
     {
         return await GetQueryable(filter, orderBy, includeProperties, skip, take, asNoTracking)
-            .ToListAsync();
-    }
-
-    public async Task<IReadOnlyList<TEntity>> GetAsync(
-        Expression<Func<TEntity, bool>> filter,
-        bool asNoTracking)
-    {
-        return await GetQueryable(filter, null, null, null, null, asNoTracking)
             .ToListAsync();
     }
 
