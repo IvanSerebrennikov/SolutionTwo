@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SolutionTwo.Api.Models;
+using SolutionTwo.Domain.Constants;
 
 namespace SolutionTwo.Api.Controllers;
 
@@ -33,7 +34,7 @@ public class WeatherForecastController : ControllerBase
             .ToArray();
     }
     
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = UserRoles.SuperAdmin)]
     [HttpGet("{amount}")]
     public IEnumerable<WeatherForecast> GetMore(int amount)
     {

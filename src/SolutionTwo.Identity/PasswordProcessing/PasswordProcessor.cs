@@ -12,14 +12,14 @@ public class PasswordProcessor : IPasswordProcessor
         _passwordHasher = passwordHasher;
     }
 
-    public string HashPassword(object user, string password)
+    public string HashPassword(Guid userId, string password)
     {
-        return _passwordHasher.HashPassword(user, password);
+        return _passwordHasher.HashPassword(new { Id = userId }, password);
     }
 
-    public bool VerifyHashedPassword(object user, string hashedPassword, string providedPassword)
+    public bool VerifyHashedPassword(Guid userId, string hashedPassword, string providedPassword)
     {
-        var verificationResult = _passwordHasher.VerifyHashedPassword(user, hashedPassword, providedPassword);
+        var verificationResult = _passwordHasher.VerifyHashedPassword(new { Id = userId }, hashedPassword, providedPassword);
 
         return verificationResult != PasswordVerificationResult.Failed;
     }

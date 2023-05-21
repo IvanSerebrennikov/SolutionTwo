@@ -22,10 +22,17 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
             .FirstOrDefaultAsync();
     }
 
+    public async Task<TEntity?> GetOneAsync(Expression<Func<TEntity, bool>>? filter = null,
+        string? includeProperties = null, bool asNoTracking = false)
+    {
+        return await GetQueryable(filter, null, includeProperties, null, null, asNoTracking)
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<IReadOnlyList<TEntity>> GetAsync(
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        IEnumerable<Expression<Func<TEntity, object>>>? includeProperties = null,
+        string? includeProperties = null,
         int? skip = null,
         int? take = null,
         bool asNoTracking = false)
@@ -46,7 +53,7 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         Expression<Func<TEntity, TProjection>> projection,
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        IEnumerable<Expression<Func<TEntity, object>>>? includeProperties = null,
+        string? includeProperties = null,
         int? skip = null,
         int? take = null,
         bool asNoTracking = false)
@@ -80,7 +87,7 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
     protected virtual IQueryable<TEntity> GetQueryable(
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        IEnumerable<Expression<Func<TEntity, object>>>? includeProperties = null,
+        string? includeProperties = null,
         int? skip = null,
         int? take = null,
         bool asNoTracking = false)
@@ -91,10 +98,13 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
 
         if (filter != null) query = query.Where(filter);
 
-        if (includeProperties != null)
+        if (!string.IsNullOrEmpty(includeProperties))
+        {
             query = includeProperties
+                .Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
                 .Aggregate(query,
-                    (current, expression) => current.Include(expression));
+                    (current, includeProperty) => current.Include(includeProperty.Trim()));
+        }
 
         if (orderBy != null) query = orderBy(query);
 

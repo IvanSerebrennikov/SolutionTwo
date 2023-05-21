@@ -8,10 +8,15 @@ public interface IBaseRepository<TEntity, TId>
 {
     Task<TEntity?> GetByIdAsync(TId id, bool asNoTracking = false);
 
+    Task<TEntity?> GetOneAsync(
+        Expression<Func<TEntity, bool>>? filter = null,
+        string? includeProperties = null,
+        bool asNoTracking = false);
+    
     Task<IReadOnlyList<TEntity>> GetAsync(
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        IEnumerable<Expression<Func<TEntity, object>>>? includeProperties = null,
+        string? includeProperties = null,
         int? skip = null,
         int? take = null, 
         bool asNoTracking = false);
@@ -24,7 +29,7 @@ public interface IBaseRepository<TEntity, TId>
         Expression<Func<TEntity, TProjection>> projection,
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        IEnumerable<Expression<Func<TEntity, object>>>? includeProperties = null,
+        string? includeProperties = null,
         int? skip = null,
         int? take = null, 
         bool asNoTracking = false);

@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using SolutionTwo.Api.Models;
 
 namespace SolutionTwo.Api.Middlewares;
 
@@ -33,14 +34,7 @@ public class GlobalErrorHandlingMiddleware
         
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-        await context.Response.WriteAsJsonAsync(new
-        {
-            error = new
-            {
-                message = $"Something went wrong.",
-                errorId = errorId,
-                errorType = exception.GetType().ToString()
-            }
-        });
+        var errorResponse = new ErrorResponse("Something went wrong.", errorId, exception.GetType().ToString());
+        await context.Response.WriteAsJsonAsync(errorResponse);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SolutionTwo.Api.Models;
 using SolutionTwo.Domain.Models.User;
 using SolutionTwo.Domain.Services.Interfaces;
 
@@ -43,6 +44,12 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> AddUser(UserCreationModel userCreationModel)
     {
+        if (!userCreationModel.IsValid(out string errorMessage))
+        {
+            var errorResponse = new ErrorResponse(errorMessage);
+            return BadRequest(errorResponse);
+        }
+        
         var userModel = await _userService.AddUserAsync(userCreationModel);
         
         return CreatedAtAction(nameof(GetById), new { id = userModel.Id }, userModel);

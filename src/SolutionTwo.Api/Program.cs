@@ -52,10 +52,10 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // Data:
-var databaseConfiguration = builder.Configuration.GetSection<DatabaseConfiguration>();
+var connectionStrings = builder.Configuration.GetSection<ConnectionStrings>();
 builder.Services.AddDbContext<MainDatabaseContext>(o =>
     {
-        o.UseSqlServer(databaseConfiguration.MainDatabaseConnectionString!);
+        o.UseSqlServer(connectionStrings.MainDatabaseConnection!);
         
         // Make sure that "Microsoft.EntityFrameworkCore" category is set to "None" 
         // for all providers except "Debug"

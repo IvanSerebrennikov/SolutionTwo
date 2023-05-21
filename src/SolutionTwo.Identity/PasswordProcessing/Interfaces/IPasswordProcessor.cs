@@ -2,7 +2,7 @@
 
 public interface IPasswordProcessor
 {
-    string HashPassword(object user, string password);
+    string HashPassword(Guid userId, string password);
 
-    bool VerifyHashedPassword(object user, string hashedPassword, string providedPassword);
+    bool VerifyHashedPassword(Guid userId, string hashedPassword, string providedPassword);
 }

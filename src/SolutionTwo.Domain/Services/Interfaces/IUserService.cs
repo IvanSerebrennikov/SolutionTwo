@@ -6,6 +6,8 @@ public interface IUserService
 {
     Task<UserModel?> GetUserAsync(Guid id);
 
+    Task<UserAuthModel?> GetUserWithRolesAsync(string username);
+
     Task<IReadOnlyList<UserModel>> GetAllUsersAsync();
 
     Task<UserModel> AddUserAsync(UserCreationModel userCreationModel);

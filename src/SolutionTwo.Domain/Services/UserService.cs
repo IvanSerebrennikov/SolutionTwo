@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Linq.Expressions;
+using SolutionTwo.Common.Extensions;
 using SolutionTwo.Data.Entities;
 using SolutionTwo.Data.Repositories.Interfaces;
 using SolutionTwo.Data.UnitOfWork.Interfaces;
@@ -28,6 +29,15 @@ public class UserService : IUserService
         return userEntity != null ? new UserModel(userEntity) : null;
     }
 
+    public async Task<UserAuthModel?> GetUserWithRolesAsync(string username)
+    {
+        var userEntity = await _userRepository.GetOneAsync(
+            x => x.Username == username,
+            includeProperties: "Roles", asNoTracking: true);
+
+        return userEntity != null ? new UserAuthModel(userEntity) : null;
+    }
+
     public async Task<IReadOnlyList<UserModel>> GetAllUsersAsync()
     {
         var userEntities = await _userRepository.GetAsync();
@@ -38,31 +48,27 @@ public class UserService : IUserService
 
     public async Task<UserModel> AddUserAsync(UserCreationModel userCreationModel)
     {
-        var hashedPassword = _passwordProcessor.HashPassword(userCreationModel, userCreationModel.Password!);
+        userCreationModel.FirstName.AssertValueIsNotNull(nameof(userCreationModel.FirstName));
+        userCreationModel.LastName.AssertValueIsNotNull(nameof(userCreationModel.LastName));
+        userCreationModel.Username.AssertValueIsNotNull(nameof(userCreationModel.Username));
+        userCreationModel.Password.AssertValueIsNotNull(nameof(userCreationModel.Password));
+
+        var userId = Guid.NewGuid();
+        var hashedPassword = _passwordProcessor.HashPassword(userId, userCreationModel.Password!);
 
         var userEntity = new UserEntity
         {
-            Id = Guid.NewGuid(),
-            FirstName = userCreationModel.FirstName!
+            Id = userId,
+            FirstName = userCreationModel.FirstName!,
+            LastName = userCreationModel.LastName!,
+            Username = userCreationModel.Username!,
+            PasswordHash = hashedPassword,
+            CreatedDateTimeUtc = DateTime.UtcNow
         };
 
         await _userRepository.CreateAsync(userEntity);
         await _mainDatabase.CommitChangesAsync();
 
         return new UserModel(userEntity);
-    }
-
-    /// <summary>
-    ///     Usage: AssertValueIsNotNull(nameof(model.SomeProperty), model.SomeProperty);
-    ///     Result: Assertion failed in SomeMethod. Value of SomeProperty is null.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="value"></param>
-    /// <param name="caller"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <exception cref="ArgumentException"></exception>
-    private static void AssertValueIsNotNull<T>(string name, T value, [CallerMemberName] string caller = "")
-    {
-        if (value == null) throw new ArgumentException($"Assertion failed in {caller}. Value of {name} is null.");
     }
 }
