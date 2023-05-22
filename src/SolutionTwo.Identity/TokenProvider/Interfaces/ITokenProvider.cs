@@ -2,5 +2,5 @@
 
 public interface ITokenProvider
 {
-    string GenerateAuthToken(params (string, string)[] claims);
+    string GenerateAuthToken(List<(string, string)> claims);
 }

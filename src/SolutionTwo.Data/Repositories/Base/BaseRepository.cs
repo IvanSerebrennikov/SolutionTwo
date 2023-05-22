@@ -16,9 +16,12 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         _context = context;
     }
 
-    public async Task<TEntity?> GetByIdAsync(TId id, bool asNoTracking = false)
+    public async Task<TEntity?> GetByIdAsync(
+        TId id, 
+        string? includeProperties = null,
+        bool asNoTracking = false)
     {
-        return await GetQueryable(x => x.Id!.Equals(id), null, null, null, null, asNoTracking)
+        return await GetQueryable(x => x.Id!.Equals(id), null, includeProperties, null, null, asNoTracking)
             .FirstOrDefaultAsync();
     }
 

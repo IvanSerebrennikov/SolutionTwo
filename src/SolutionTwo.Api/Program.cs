@@ -63,6 +63,7 @@ builder.Services.AddDbContext<MainDatabaseContext>(o =>
     }
 );
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IMainDatabase, MainDatabase>();
 
 // Identity
@@ -85,6 +86,7 @@ builder.Services.AddAuthorization();
 
 // Domain:
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 

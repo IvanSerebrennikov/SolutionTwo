@@ -17,7 +17,7 @@ public class JwtProvider : ITokenProvider
         _identityConfiguration = configuration.GetSection<IdentityConfiguration>();
     }
 
-    public string GenerateAuthToken(params (string, string)[] claims)
+    public string GenerateAuthToken(List<(string, string)> claims)
     {
         var claimsList = claims.Select(x => new Claim(x.Item1, x.Item2)).ToList();
 

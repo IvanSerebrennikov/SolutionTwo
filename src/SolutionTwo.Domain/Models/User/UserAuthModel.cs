@@ -6,14 +6,11 @@ public class UserAuthModel
 {
     public UserAuthModel(UserEntity userEntity)
     {
-        UserData = new UserModel(userEntity);
-        Roles = userEntity.Roles.Select(x => x.Name).ToList();
+        UserData = new UserWithRolesModel(userEntity);
         PasswordHash = userEntity.PasswordHash;
     }
 
-    public UserModel UserData { get; private set; }
+    public UserWithRolesModel UserData { get; private set; }
 
     public string PasswordHash { get; private set; }
-
-    public List<string> Roles { get; private set; }
 }

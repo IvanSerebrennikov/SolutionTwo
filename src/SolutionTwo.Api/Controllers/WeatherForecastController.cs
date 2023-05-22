@@ -34,11 +34,24 @@ public class WeatherForecastController : ControllerBase
             .ToArray();
     }
     
-    [Authorize(Roles = UserRoles.SuperAdmin)]
+    [Authorize(Roles = UserRoles.Admin)]
     [HttpGet("{amount}")]
     public IEnumerable<WeatherForecast> GetMore(int amount)
     {
         return Enumerable.Range(1, amount).Select(index => new WeatherForecast
+            {
+                Date = DateTime.Now.AddDays(index),
+                TemperatureC = Random.Shared.Next(-20, 55),
+                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+            })
+            .ToArray();
+    }
+    
+    [Authorize(Roles = $"{UserRoles.SuperAdmin}, {UserRoles.Admin}")]
+    [HttpGet("doubled/{amount}")]
+    public IEnumerable<WeatherForecast> GetDoubled(int amount)
+    {
+        return Enumerable.Range(1, amount * 2).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
                 TemperatureC = Random.Shared.Next(-20, 55),

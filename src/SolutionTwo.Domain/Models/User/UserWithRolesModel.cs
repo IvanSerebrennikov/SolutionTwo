@@ -2,14 +2,16 @@
 
 namespace SolutionTwo.Domain.Models.User;
 
-public class UserModel
+public class UserWithRolesModel
 {
-    public UserModel(UserEntity userEntity)
+    public UserWithRolesModel(UserEntity userEntity)
     {
         Id = userEntity.Id;
         FirstName = userEntity.FirstName;
         LastName = userEntity.LastName;
         CreatedDateTimeUtc = userEntity.CreatedDateTimeUtc;
+        Username = userEntity.Username;
+        Roles = userEntity.Roles.Select(x => x.Name).ToList();
     }
 
     public Guid Id { get; private set; }
@@ -18,5 +20,9 @@ public class UserModel
     
     public string LastName { get; private set; }
     
+    public string Username { get; private set; }
+    
     public DateTime CreatedDateTimeUtc { get; private set; }
+    
+    public List<string> Roles { get; private set; }
 }

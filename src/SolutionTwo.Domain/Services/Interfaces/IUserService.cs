@@ -4,11 +4,11 @@ namespace SolutionTwo.Domain.Services.Interfaces;
 
 public interface IUserService
 {
-    Task<UserModel?> GetUserAsync(Guid id);
+    Task<UserWithRolesModel?> GetUserWithRolesByIdAsync(Guid id);
 
     Task<UserAuthModel?> GetUserWithRolesAsync(string username);
 
-    Task<IReadOnlyList<UserModel>> GetAllUsersAsync();
+    Task<IReadOnlyList<UserWithRolesModel>> GetAllUsersWithRolesAsync();
 
-    Task<UserModel> AddUserAsync(UserCreationModel userCreationModel);
+    Task<UserWithRolesModel> AddUserAsync(UserCreationModel userCreationModel);
 }

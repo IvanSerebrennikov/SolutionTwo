@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SolutionTwo.Api.Models;
+using SolutionTwo.Domain.Constants;
 using SolutionTwo.Domain.Models.User;
 using SolutionTwo.Domain.Services.Interfaces;
 
@@ -9,27 +11,27 @@ namespace SolutionTwo.Api.Controllers;
 [ApiController]
 public class UserController : ControllerBase
 {
-    private readonly ILogger<WeatherForecastController> _logger;
     private readonly IUserService _userService;
 
-    public UserController(ILogger<WeatherForecastController> logger, IUserService userService)
+    public UserController(IUserService userService)
     {
-        _logger = logger;
         _userService = userService;
     }
 
+    [Authorize(Roles = UserRoles.SuperAdmin)]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserModel>>> GetAll()
+    public async Task<ActionResult<IEnumerable<UserWithRolesModel>>> GetAll()
     {
-        var userModels = await _userService.GetAllUsersAsync();
+        var userModels = await _userService.GetAllUsersWithRolesAsync();
 
         return Ok(userModels);
     }
     
+    [Authorize(Roles = UserRoles.SuperAdmin)]
     [HttpGet("{id}")]
-    public async Task<ActionResult<UserModel>> GetById(Guid id)
+    public async Task<ActionResult<UserWithRolesModel>> GetById(Guid id)
     {
-        var userModel = await _userService.GetUserAsync(id);
+        var userModel = await _userService.GetUserWithRolesByIdAsync(id);
 
         if (userModel != null)
         {
@@ -41,6 +43,7 @@ public class UserController : ControllerBase
         }
     }
 
+    [Authorize(Roles = UserRoles.SuperAdmin)]
     [HttpPost]
     public async Task<ActionResult> AddUser(UserCreationModel userCreationModel)
     {

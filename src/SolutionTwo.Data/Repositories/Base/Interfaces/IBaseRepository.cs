@@ -6,7 +6,10 @@ namespace SolutionTwo.Data.Repositories.Base.Interfaces;
 public interface IBaseRepository<TEntity, TId>
     where TEntity : class, IIdentifiablyEntity<TId>
 {
-    Task<TEntity?> GetByIdAsync(TId id, bool asNoTracking = false);
+    Task<TEntity?> GetByIdAsync(
+        TId id, 
+        string? includeProperties = null,
+        bool asNoTracking = false);
 
     Task<TEntity?> GetSingleAsync(
         Expression<Func<TEntity, bool>> filter,
