@@ -10,5 +10,5 @@ public interface IAuthService
 
     Task<string> MarkRefreshTokenAsUsedAndCreateNewAsync(Guid tokenId);
 
-    Task RevokeProvidedAndAllActiveRefreshTokensForUser(Guid tokenId, Guid userId);
+    Task RevokeProvidedAndAllActiveRefreshTokensForUserAsync(Guid tokenId, Guid userId);
 }

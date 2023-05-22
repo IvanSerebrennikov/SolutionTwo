@@ -33,7 +33,7 @@ public interface IBaseRepository<TEntity, TId>
         int? take = null, 
         bool asNoTracking = false);
 
-    Task CreateAsync(TEntity entity);
+    void Create(TEntity entity);
 
     void Update(TEntity entity);
 

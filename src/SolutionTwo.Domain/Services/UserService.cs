@@ -67,7 +67,7 @@ public class UserService : IUserService
             CreatedDateTimeUtc = DateTime.UtcNow
         };
 
-        await _userRepository.CreateAsync(userEntity);
+        _userRepository.Create(userEntity);
         await _mainDatabase.CommitChangesAsync();
 
         return new UserWithRolesModel(userEntity);

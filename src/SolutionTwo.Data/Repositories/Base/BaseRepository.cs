@@ -59,9 +59,9 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
             .ToListAsync();
     }
 
-    public async Task CreateAsync(TEntity entity)
+    public void Create(TEntity entity)
     {
-        await _context.Set<TEntity>().AddAsync(entity);
+        _context.Set<TEntity>().Add(entity);
     }
 
     public void Update(TEntity entity)

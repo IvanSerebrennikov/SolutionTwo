@@ -19,7 +19,7 @@ public class AuthService : IAuthService
 
     public async Task<string> CreateRefreshTokenForUserAsync(Guid userId)
     {
-        var refreshTokenValue = await CreateRefreshToken(userId);
+        var refreshTokenValue = CreateRefreshToken(userId);
         await _mainDatabase.CommitChangesAsync();
 
         return refreshTokenValue;
@@ -40,7 +40,7 @@ public class AuthService : IAuthService
         {
             tokenEntity.IsUsed = true;
             
-            var newRefreshTokenValue = await CreateRefreshToken(tokenEntity.UserId);
+            var newRefreshTokenValue = CreateRefreshToken(tokenEntity.UserId);
             
             await _mainDatabase.CommitChangesAsync();
 
@@ -50,7 +50,7 @@ public class AuthService : IAuthService
         return "";
     }
 
-    public async Task RevokeProvidedAndAllActiveRefreshTokensForUser(Guid tokenId, Guid userId)
+    public async Task RevokeProvidedAndAllActiveRefreshTokensForUserAsync(Guid tokenId, Guid userId)
     {
         var tokenEntities = await _refreshTokenRepository.GetAsync(
             x => x.Id == tokenId || (
@@ -65,7 +65,7 @@ public class AuthService : IAuthService
         await _mainDatabase.CommitChangesAsync();
     }
 
-    private async Task<string> CreateRefreshToken(Guid userId)
+    private string CreateRefreshToken(Guid userId)
     {
         var refreshToken = new RefreshTokenEntity
         {
@@ -76,7 +76,7 @@ public class AuthService : IAuthService
             ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(7)
         };
 
-        await _refreshTokenRepository.CreateAsync(refreshToken);
+        _refreshTokenRepository.Create(refreshToken);
 
         return refreshToken.Value;
     }

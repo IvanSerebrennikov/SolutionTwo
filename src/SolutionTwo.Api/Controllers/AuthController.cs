@@ -81,7 +81,7 @@ public class AuthController : ControllerBase
         {
             _logger.LogWarning(
                 $"Someone is trying to refresh already used token. RefreshTokenId: {refreshToken.Id}, UserId: {refreshToken.UserId}.");
-            await _authService.RevokeProvidedAndAllActiveRefreshTokensForUser(refreshToken.Id, refreshToken.UserId);
+            await _authService.RevokeProvidedAndAllActiveRefreshTokensForUserAsync(refreshToken.Id, refreshToken.UserId);
             return Unauthorized("Provided Refresh token already used");
         }
         
