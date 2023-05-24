@@ -2,6 +2,7 @@
 using SolutionTwo.Data.Repositories.Interfaces;
 using SolutionTwo.Data.UnitOfWork.Interfaces;
 using SolutionTwo.Domain.Models.Auth;
+using SolutionTwo.Domain.Models.Auth.Read;
 using SolutionTwo.Domain.Services.Interfaces;
 
 namespace SolutionTwo.Domain.Services;
@@ -32,7 +33,7 @@ public class AuthService : IAuthService
         return tokenEntity != null ? new RefreshTokenModel(tokenEntity) : null;
     }
 
-    public async Task<string> MarkRefreshTokenAsUsedAndCreateNewAsync(Guid tokenId)
+    public async Task<string> MarkRefreshTokenAsUsedAndCreateNewOneAsync(Guid tokenId)
     {
         var tokenEntity = await _refreshTokenRepository.GetByIdAsync(tokenId);
 

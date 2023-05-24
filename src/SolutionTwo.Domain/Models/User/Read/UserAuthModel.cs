@@ -1,6 +1,6 @@
 ﻿using SolutionTwo.Data.Entities;
 
-namespace SolutionTwo.Domain.Models.User;
+namespace SolutionTwo.Domain.Models.User.Read;
 
 public class UserAuthModel
 {

@@ -3,6 +3,8 @@ using SolutionTwo.Data.Entities;
 using SolutionTwo.Data.Repositories.Interfaces;
 using SolutionTwo.Data.UnitOfWork.Interfaces;
 using SolutionTwo.Domain.Models.User;
+using SolutionTwo.Domain.Models.User.Read;
+using SolutionTwo.Domain.Models.User.Write;
 using SolutionTwo.Domain.Services.Interfaces;
 using SolutionTwo.Identity.PasswordManaging.Interfaces;
 
@@ -48,21 +50,21 @@ public class UserService : IUserService
         return userModels;
     }
 
-    public async Task<UserWithRolesModel> AddUserAsync(UserCreationModel userCreationModel)
+    public async Task<UserWithRolesModel> AddUserAsync(CreateUserModel createUserModel)
     {
-        userCreationModel.FirstName.AssertValueIsNotNull(nameof(userCreationModel.FirstName));
-        userCreationModel.LastName.AssertValueIsNotNull(nameof(userCreationModel.LastName));
-        userCreationModel.Username.AssertValueIsNotNull(nameof(userCreationModel.Username));
-        userCreationModel.Password.AssertValueIsNotNull(nameof(userCreationModel.Password));
+        createUserModel.FirstName.AssertValueIsNotNull();
+        createUserModel.LastName.AssertValueIsNotNull();
+        createUserModel.Username.AssertValueIsNotNull();
+        createUserModel.Password.AssertValueIsNotNull();
 
-        var hashedPassword = _passwordManager.HashPassword(userCreationModel.Password!);
+        var hashedPassword = _passwordManager.HashPassword(createUserModel.Password!);
 
         var userEntity = new UserEntity
         {
             Id = Guid.NewGuid(),
-            FirstName = userCreationModel.FirstName!,
-            LastName = userCreationModel.LastName!,
-            Username = userCreationModel.Username!,
+            FirstName = createUserModel.FirstName!,
+            LastName = createUserModel.LastName!,
+            Username = createUserModel.Username!,
             PasswordHash = hashedPassword,
             CreatedDateTimeUtc = DateTime.UtcNow
         };

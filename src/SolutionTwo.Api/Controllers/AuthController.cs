@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SolutionTwo.Api.Models;
 using SolutionTwo.Api.Models.Auth;
 using SolutionTwo.Domain.Models.User;
+using SolutionTwo.Domain.Models.User.Read;
 using SolutionTwo.Domain.Services.Interfaces;
 using SolutionTwo.Identity.PasswordManaging.Interfaces;
 using SolutionTwo.Identity.TokenProvider.Interfaces;
@@ -91,7 +92,7 @@ public class AuthController : ControllerBase
         
         var authToken = CreateAuthToken(user);
 
-        var newRefreshTokenValue = await _authService.MarkRefreshTokenAsUsedAndCreateNewAsync(refreshToken.Id);
+        var newRefreshTokenValue = await _authService.MarkRefreshTokenAsUsedAndCreateNewOneAsync(refreshToken.Id);
 
         var authResponse = new AuthResponse(authToken, newRefreshTokenValue);
 

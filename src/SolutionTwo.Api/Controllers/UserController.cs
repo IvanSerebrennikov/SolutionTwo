@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using SolutionTwo.Api.Models;
 using SolutionTwo.Domain.Constants;
 using SolutionTwo.Domain.Models.User;
+using SolutionTwo.Domain.Models.User.Read;
+using SolutionTwo.Domain.Models.User.Write;
 using SolutionTwo.Domain.Services.Interfaces;
 
 namespace SolutionTwo.Api.Controllers;
@@ -45,15 +47,15 @@ public class UserController : ControllerBase
 
     [Authorize(Roles = UserRoles.SuperAdmin)]
     [HttpPost]
-    public async Task<ActionResult> AddUser(UserCreationModel userCreationModel)
+    public async Task<ActionResult> AddUser(CreateUserModel createUserModel)
     {
-        if (!userCreationModel.IsValid(out string errorMessage))
+        if (!createUserModel.IsValid(out string errorMessage))
         {
             var errorResponse = new ErrorResponse(errorMessage);
             return BadRequest(errorResponse);
         }
         
-        var userModel = await _userService.AddUserAsync(userCreationModel);
+        var userModel = await _userService.AddUserAsync(createUserModel);
         
         return CreatedAtAction(nameof(GetById), new { id = userModel.Id }, userModel);
     }

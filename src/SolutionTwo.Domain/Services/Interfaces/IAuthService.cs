@@ -1,4 +1,5 @@
 ﻿using SolutionTwo.Domain.Models.Auth;
+using SolutionTwo.Domain.Models.Auth.Read;
 
 namespace SolutionTwo.Domain.Services.Interfaces;
 
@@ -8,7 +9,7 @@ public interface IAuthService
 
     Task<RefreshTokenModel?> GetRefreshTokenAsync(string tokenValue);
 
-    Task<string> MarkRefreshTokenAsUsedAndCreateNewAsync(Guid tokenId);
+    Task<string> MarkRefreshTokenAsUsedAndCreateNewOneAsync(Guid tokenId);
 
     Task RevokeProvidedAndAllActiveRefreshTokensForUserAsync(Guid tokenId, Guid userId);
 }

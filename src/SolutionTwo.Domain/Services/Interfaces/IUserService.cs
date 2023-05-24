@@ -1,4 +1,6 @@
 ﻿using SolutionTwo.Domain.Models.User;
+using SolutionTwo.Domain.Models.User.Read;
+using SolutionTwo.Domain.Models.User.Write;
 
 namespace SolutionTwo.Domain.Services.Interfaces;
 
@@ -10,5 +12,5 @@ public interface IUserService
 
     Task<IReadOnlyList<UserWithRolesModel>> GetAllUsersWithRolesAsync();
 
-    Task<UserWithRolesModel> AddUserAsync(UserCreationModel userCreationModel);
+    Task<UserWithRolesModel> AddUserAsync(CreateUserModel createUserModel);
 }
