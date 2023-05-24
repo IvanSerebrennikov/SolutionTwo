@@ -7,25 +7,19 @@ using SolutionTwo.Api.Middlewares;
 using SolutionTwo.Common.Extensions;
 using SolutionTwo.Data.Configuration;
 using SolutionTwo.Data.Context;
-using SolutionTwo.Data.Repositories;
-using SolutionTwo.Data.Repositories.Interfaces;
-using SolutionTwo.Data.UnitOfWork;
-using SolutionTwo.Data.UnitOfWork.Interfaces;
-using SolutionTwo.Domain.Services;
-using SolutionTwo.Domain.Services.Interfaces;
+using SolutionTwo.Data.DI;
+using SolutionTwo.Domain.DI;
 using SolutionTwo.Identity.Configuration;
 using SolutionTwo.Identity.DI;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// Api DI
 builder.Services.AddControllers();
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    // https://aka.ms/aspnetcore/swashbuckle
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Scheme = "Bearer",
@@ -51,24 +45,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Data:
-var connectionStrings = builder.Configuration.GetSection<ConnectionStrings>();
-builder.Services.AddDbContext<MainDatabaseContext>(o =>
-    {
-        o.UseSqlServer(connectionStrings.MainDatabaseConnection!);
-        
-        // Make sure that "Microsoft.EntityFrameworkCore" category is set to "None" 
-        // for all providers except "Debug"
-        o.EnableSensitiveDataLogging();  
-    }
-);
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-builder.Services.AddScoped<IMainDatabase, MainDatabase>();
-
-// Identity
+// Identity DI
 var identityConfiguration = builder.Configuration.GetSection<IdentityConfiguration>();
-builder.Services.AddIdentityServices();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters()
@@ -83,11 +61,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 builder.Services.AddAuthorization();
+builder.Services.AddIdentityServices();
 
-// Domain:
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
+// Domain DI
+builder.Services.AddDomainServices();
 
+// Data DI
+var connectionStrings = builder.Configuration.GetSection<ConnectionStrings>();
+builder.Services.AddDbContext<MainDatabaseContext>(o =>
+    {
+        o.UseSqlServer(connectionStrings.MainDatabaseConnection!);
+        
+        // Make sure that "Microsoft.EntityFrameworkCore" category is set to "None" 
+        // for all providers except "Debug"
+        o.EnableSensitiveDataLogging();  
+    }
+);
+builder.Services.AddDataServices();
+
+// Build WebApp
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
