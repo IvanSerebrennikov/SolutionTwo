@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Domain.Models.User.Input;
+﻿namespace SolutionTwo.Domain.Models.User.Inbound;
 
 public class CreateUserModel
 {

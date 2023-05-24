@@ -1,5 +1,5 @@
 ﻿using SolutionTwo.Domain.Models.Auth;
-using SolutionTwo.Domain.Models.Auth.Output;
+using SolutionTwo.Domain.Models.Auth.Outgoing;
 
 namespace SolutionTwo.Domain.Services.Interfaces;
 

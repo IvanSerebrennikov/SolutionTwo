@@ -1,6 +1,6 @@
 ﻿using SolutionTwo.Data.Entities;
 
-namespace SolutionTwo.Domain.Models.Auth.Output;
+namespace SolutionTwo.Domain.Models.Auth.Outgoing;
 
 public class RefreshTokenModel
 {
