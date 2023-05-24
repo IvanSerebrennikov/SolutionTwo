@@ -1,5 +1,5 @@
 ﻿using SolutionTwo.Domain.Models.Auth;
-using SolutionTwo.Domain.Models.Auth.Read;
+using SolutionTwo.Domain.Models.Auth.Output;
 
 namespace SolutionTwo.Domain.Services.Interfaces;
 

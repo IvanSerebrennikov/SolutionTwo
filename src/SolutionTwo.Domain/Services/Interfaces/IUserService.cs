@@ -1,6 +1,6 @@
 ﻿using SolutionTwo.Domain.Models.User;
-using SolutionTwo.Domain.Models.User.Read;
-using SolutionTwo.Domain.Models.User.Write;
+using SolutionTwo.Domain.Models.User.Input;
+using SolutionTwo.Domain.Models.User.Output;
 
 namespace SolutionTwo.Domain.Services.Interfaces;
 

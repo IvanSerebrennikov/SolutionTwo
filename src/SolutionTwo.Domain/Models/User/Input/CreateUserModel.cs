@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Domain.Models.User.Write;
+﻿namespace SolutionTwo.Domain.Models.User.Input;
 
 public class CreateUserModel
 {

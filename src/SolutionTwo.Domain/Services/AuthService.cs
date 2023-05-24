@@ -2,7 +2,7 @@
 using SolutionTwo.Data.Repositories.Interfaces;
 using SolutionTwo.Data.UnitOfWork.Interfaces;
 using SolutionTwo.Domain.Models.Auth;
-using SolutionTwo.Domain.Models.Auth.Read;
+using SolutionTwo.Domain.Models.Auth.Output;
 using SolutionTwo.Domain.Services.Interfaces;
 
 namespace SolutionTwo.Domain.Services;

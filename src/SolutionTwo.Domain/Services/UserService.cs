@@ -3,8 +3,8 @@ using SolutionTwo.Data.Entities;
 using SolutionTwo.Data.Repositories.Interfaces;
 using SolutionTwo.Data.UnitOfWork.Interfaces;
 using SolutionTwo.Domain.Models.User;
-using SolutionTwo.Domain.Models.User.Read;
-using SolutionTwo.Domain.Models.User.Write;
+using SolutionTwo.Domain.Models.User.Input;
+using SolutionTwo.Domain.Models.User.Output;
 using SolutionTwo.Domain.Services.Interfaces;
 using SolutionTwo.Identity.PasswordManaging.Interfaces;
 

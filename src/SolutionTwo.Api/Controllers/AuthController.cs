@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SolutionTwo.Api.Models;
 using SolutionTwo.Api.Models.Auth;
 using SolutionTwo.Domain.Models.User;
-using SolutionTwo.Domain.Models.User.Read;
+using SolutionTwo.Domain.Models.User.Output;
 using SolutionTwo.Domain.Services.Interfaces;
 using SolutionTwo.Identity.PasswordManaging.Interfaces;
 using SolutionTwo.Identity.TokenProvider.Interfaces;

@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using SolutionTwo.Api.Models;
 using SolutionTwo.Domain.Constants;
 using SolutionTwo.Domain.Models.User;
-using SolutionTwo.Domain.Models.User.Read;
-using SolutionTwo.Domain.Models.User.Write;
+using SolutionTwo.Domain.Models.User.Input;
+using SolutionTwo.Domain.Models.User.Output;
 using SolutionTwo.Domain.Services.Interfaces;
 
 namespace SolutionTwo.Api.Controllers;
