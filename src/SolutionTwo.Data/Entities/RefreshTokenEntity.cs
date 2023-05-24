@@ -1,14 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-using SolutionTwo.Data.Entities.Base.Interfaces;
+﻿using SolutionTwo.Data.Entities.Base.Interfaces;
 
 namespace SolutionTwo.Data.Entities;
 
 public class RefreshTokenEntity : IIdentifiablyEntity<Guid>
 {
     public Guid Id { get; set; }
-
-    [MaxLength(256)]
-    public string Value { get; set; } = null!;
+    
+    public Guid AuthTokenId { get; set; }
 
     public bool IsUsed { get; set; }
 

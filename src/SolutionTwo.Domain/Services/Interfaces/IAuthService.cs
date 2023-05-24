@@ -5,11 +5,11 @@ namespace SolutionTwo.Domain.Services.Interfaces;
 
 public interface IAuthService
 {
-    Task<string> CreateRefreshTokenForUserAsync(Guid userId);
+    Task<Guid> CreateRefreshTokenForUserAsync(Guid userId, Guid authTokenId);
 
-    Task<RefreshTokenModel?> GetRefreshTokenAsync(string tokenValue);
+    Task<RefreshTokenModel?> GetRefreshTokenAsync(Guid tokenId);
 
-    Task<string> MarkRefreshTokenAsUsedAndCreateNewOneAsync(Guid tokenId);
+    Task<Guid> MarkRefreshTokenAsUsedAndCreateNewOneAsync(Guid tokenId, Guid authTokenId);
 
     Task RevokeProvidedAndAllActiveRefreshTokensForUserAsync(Guid tokenId, Guid userId);
 }

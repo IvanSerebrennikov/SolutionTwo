@@ -1,9 +1,9 @@
 ﻿using SolutionTwo.Data.Entities;
 using SolutionTwo.Data.Repositories.Interfaces;
 using SolutionTwo.Data.UnitOfWork.Interfaces;
-using SolutionTwo.Domain.Models.Auth;
 using SolutionTwo.Domain.Models.Auth.Outgoing;
 using SolutionTwo.Domain.Services.Interfaces;
+using SolutionTwo.Identity.TokenManaging.Interfaces;
 
 namespace SolutionTwo.Domain.Services;
 
@@ -11,44 +11,49 @@ public class AuthService : IAuthService
 {
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IMainDatabase _mainDatabase;
+    private readonly ITokenManager _tokenManager;
 
-    public AuthService(IRefreshTokenRepository refreshTokenRepository, IMainDatabase mainDatabase)
+    public AuthService(
+        IRefreshTokenRepository refreshTokenRepository, 
+        IMainDatabase mainDatabase, 
+        ITokenManager tokenManager)
     {
         _refreshTokenRepository = refreshTokenRepository;
         _mainDatabase = mainDatabase;
+        _tokenManager = tokenManager;
     }
 
-    public async Task<string> CreateRefreshTokenForUserAsync(Guid userId)
+    public async Task<Guid> CreateRefreshTokenForUserAsync(Guid userId, Guid authTokenId)
     {
-        var refreshTokenValue = CreateRefreshToken(userId);
+        var refreshTokenValue = CreateRefreshToken(userId, authTokenId);
         await _mainDatabase.CommitChangesAsync();
 
         return refreshTokenValue;
     }
 
-    public async Task<RefreshTokenModel?> GetRefreshTokenAsync(string tokenValue)
+    public async Task<RefreshTokenModel?> GetRefreshTokenAsync(Guid tokenId)
     {
-        var tokenEntity = await _refreshTokenRepository.GetSingleAsync(x => x.Value == tokenValue);
+        var tokenEntity = await _refreshTokenRepository.GetByIdAsync(tokenId);
 
         return tokenEntity != null ? new RefreshTokenModel(tokenEntity) : null;
     }
 
-    public async Task<string> MarkRefreshTokenAsUsedAndCreateNewOneAsync(Guid tokenId)
+    public async Task<Guid> MarkRefreshTokenAsUsedAndCreateNewOneAsync(Guid tokenId, Guid authTokenId)
     {
         var tokenEntity = await _refreshTokenRepository.GetByIdAsync(tokenId);
 
-        if (tokenEntity != null)
+        if (tokenEntity == null)
         {
-            tokenEntity.IsUsed = true;
-            
-            var newRefreshTokenValue = CreateRefreshToken(tokenEntity.UserId);
-            
-            await _mainDatabase.CommitChangesAsync();
-
-            return newRefreshTokenValue;
+            throw new ApplicationException($"Refresh token with id {tokenId} was not found.");
         }
+        
+        tokenEntity.IsUsed = true;
+            
+        var newRefreshTokenId = CreateRefreshToken(tokenEntity.UserId, authTokenId);
+            
+        await _mainDatabase.CommitChangesAsync();
 
-        return "";
+        return newRefreshTokenId;
     }
 
     public async Task RevokeProvidedAndAllActiveRefreshTokensForUserAsync(Guid tokenId, Guid userId)
@@ -59,19 +64,18 @@ public class AuthService : IAuthService
 
         foreach (var tokenEntity in tokenEntities)
         {
-            tokenEntity.IsRevoked = true;
-            _refreshTokenRepository.Update(tokenEntity);
+            RevokeToken(tokenEntity);
         }
 
         await _mainDatabase.CommitChangesAsync();
     }
 
-    private string CreateRefreshToken(Guid userId)
+    private Guid CreateRefreshToken(Guid userId, Guid authTokenId)
     {
         var refreshToken = new RefreshTokenEntity
         {
             Id = Guid.NewGuid(),
-            Value = $"{Guid.NewGuid()}-{Guid.NewGuid()}",
+            AuthTokenId = authTokenId,
             UserId = userId,
             CreatedDateTimeUtc = DateTime.UtcNow,
             ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(7)
@@ -79,6 +83,13 @@ public class AuthService : IAuthService
 
         _refreshTokenRepository.Create(refreshToken);
 
-        return refreshToken.Value;
+        return refreshToken.Id;
+    }
+
+    private void RevokeToken(RefreshTokenEntity refreshTokenEntity)
+    {
+        refreshTokenEntity.IsRevoked = true;
+        _refreshTokenRepository.Update(refreshTokenEntity);
+        _tokenManager.DeactivateToken(refreshTokenEntity.AuthTokenId);
     }
 }

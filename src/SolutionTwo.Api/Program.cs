@@ -11,8 +11,11 @@ using SolutionTwo.Data.DI;
 using SolutionTwo.Domain.DI;
 using SolutionTwo.Identity.Configuration;
 using SolutionTwo.Identity.DI;
+using SolutionTwo.Identity.TokenManaging.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddMemoryCache();
 
 // Api DI
 builder.Services.AddControllers();
@@ -58,6 +61,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidIssuer = identityConfiguration.JwtIssuer,
         ValidAudience = identityConfiguration.JwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(identityConfiguration.JwtKey!))
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = ctx =>
+        {
+            var id = ctx.SecurityToken.Id;
+            var tokenManager = ctx.HttpContext.RequestServices.GetRequiredService<ITokenManager>();
+
+            if (!Guid.TryParse(id, out var authTokenId) || tokenManager.IsTokenDeactivated(authTokenId))
+            {
+                ctx.Fail("Access was revoked.");
+            }
+            
+            return Task.CompletedTask;
+        }
     };
 });
 builder.Services.AddAuthorization();

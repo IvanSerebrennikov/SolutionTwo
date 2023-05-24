@@ -7,7 +7,6 @@ public class RefreshTokenModel
     public RefreshTokenModel(RefreshTokenEntity refreshTokenEntity)
     {
         Id = refreshTokenEntity.Id;
-        Value = refreshTokenEntity.Value;
         IsUsed = refreshTokenEntity.IsUsed;
         IsRevoked = refreshTokenEntity.IsRevoked;
         IsExpired = refreshTokenEntity.ExpiresDateTimeUtc <= DateTime.UtcNow;
@@ -16,8 +15,6 @@ public class RefreshTokenModel
     
     public Guid Id { get; private set; }
     
-    public string Value { get; private set; }
-
     public bool IsUsed { get; private set; }
 
     public bool IsRevoked { get; private set; }

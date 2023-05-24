@@ -2,8 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using SolutionTwo.Identity.PasswordManaging;
 using SolutionTwo.Identity.PasswordManaging.Interfaces;
-using SolutionTwo.Identity.TokenProvider;
-using SolutionTwo.Identity.TokenProvider.Interfaces;
+using SolutionTwo.Identity.TokenManaging;
+using SolutionTwo.Identity.TokenManaging.Interfaces;
 
 namespace SolutionTwo.Identity.DI;
 
@@ -21,6 +21,6 @@ public static class IdentityServicesRegistrationExtensions
 
         services.AddSingleton<IPasswordManager, PasswordManager>();
 
-        services.AddSingleton<ITokenProvider, JwtProvider>();
+        services.AddSingleton<ITokenManager, JwtManager>();
     }
 }

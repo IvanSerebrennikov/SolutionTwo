@@ -2,7 +2,6 @@
 using SolutionTwo.Data.Entities;
 using SolutionTwo.Data.Repositories.Interfaces;
 using SolutionTwo.Data.UnitOfWork.Interfaces;
-using SolutionTwo.Domain.Models.User;
 using SolutionTwo.Domain.Models.User.Incoming;
 using SolutionTwo.Domain.Models.User.Outgoing;
 using SolutionTwo.Domain.Services.Interfaces;
