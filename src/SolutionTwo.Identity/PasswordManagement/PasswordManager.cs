@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using SolutionTwo.Identity.PasswordManaging.Interfaces;
+using SolutionTwo.Identity.PasswordManagement.Interfaces;
 
-namespace SolutionTwo.Identity.PasswordManaging;
+namespace SolutionTwo.Identity.PasswordManagement;
 
 public class PasswordManager : IPasswordManager
 {

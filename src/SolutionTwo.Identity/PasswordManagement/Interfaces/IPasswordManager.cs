@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Identity.PasswordManaging.Interfaces;
+﻿namespace SolutionTwo.Identity.PasswordManagement.Interfaces;
 
 public interface IPasswordManager
 {

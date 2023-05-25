@@ -5,9 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SolutionTwo.Common.Extensions;
 using SolutionTwo.Identity.Configuration;
-using SolutionTwo.Identity.TokenManaging.Interfaces;
+using SolutionTwo.Identity.TokenManagement.Interfaces;
 
-namespace SolutionTwo.Identity.TokenManaging;
+namespace SolutionTwo.Identity.TokenManagement;
 
 public class JwtManager : ITokenManager
 {
@@ -47,14 +47,14 @@ public class JwtManager : ITokenManager
 
     public bool IsTokenDeactivated(Guid authTokenId)
     {
-        return _memoryCache.TryGetValue(GetKey(authTokenId), out int _);
+        return _memoryCache.TryGetValue(GetDeactivatedTokenKey(authTokenId), out int _);
     }
 
     public void DeactivateToken(Guid authTokenId)
     {
-        _memoryCache.Set(GetKey(authTokenId), 1, TimeSpan.FromMinutes(_identityConfiguration.JwtExpiresMinutes!.Value));
+        _memoryCache.Set(GetDeactivatedTokenKey(authTokenId), 1, TimeSpan.FromMinutes(_identityConfiguration.JwtExpiresMinutes!.Value));
     }
     
-    private static string GetKey(Guid authTokenId)
+    private static string GetDeactivatedTokenKey(Guid authTokenId)
         => $"auth-tokens:{authTokenId}:deactivated";
 }

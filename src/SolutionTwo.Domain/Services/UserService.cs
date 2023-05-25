@@ -5,7 +5,7 @@ using SolutionTwo.Data.UnitOfWork.Interfaces;
 using SolutionTwo.Domain.Models.User.Incoming;
 using SolutionTwo.Domain.Models.User.Outgoing;
 using SolutionTwo.Domain.Services.Interfaces;
-using SolutionTwo.Identity.PasswordManaging.Interfaces;
+using SolutionTwo.Identity.PasswordManagement.Interfaces;
 
 namespace SolutionTwo.Domain.Services;
 
@@ -32,13 +32,13 @@ public class UserService : IUserService
         return userEntity != null ? new UserWithRolesModel(userEntity) : null;
     }
 
-    public async Task<UserAuthModel?> GetUserWithRolesAsync(string username)
+    public async Task<UserWithRolesModel?> GetUserWithRolesAsync(string username)
     {
         var userEntity = await _userRepository.GetSingleAsync(
             x => x.Username == username,
             includeProperties: "Roles", asNoTracking: true);
 
-        return userEntity != null ? new UserAuthModel(userEntity) : null;
+        return userEntity != null ? new UserWithRolesModel(userEntity) : null;
     }
 
     public async Task<IReadOnlyList<UserWithRolesModel>> GetAllUsersWithRolesAsync()

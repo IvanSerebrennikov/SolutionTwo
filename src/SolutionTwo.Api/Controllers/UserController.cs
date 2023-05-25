@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SolutionTwo.Api.Models;
+using SolutionTwo.Api.Controllers.Base;
 using SolutionTwo.Domain.Constants;
 using SolutionTwo.Domain.Models.User.Incoming;
 using SolutionTwo.Domain.Models.User.Outgoing;
@@ -10,7 +11,7 @@ namespace SolutionTwo.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UserController : ControllerBase
+public class UserController : ApiControllerBase
 {
     private readonly IUserService _userService;
 
@@ -19,6 +20,26 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<ActionResult<UserWithRolesModel>> GetMe()
+    {
+        var username = GetUsernameFromClaims();
+        if (string.IsNullOrEmpty(username))
+            return BadRequest("Name claim was not found");
+        
+        var userModel = await _userService.GetUserWithRolesAsync(username);
+
+        if (userModel != null)
+        {
+            return Ok(userModel);
+        }
+        else
+        {
+            return NotFound();
+        }
+    }
+    
     [Authorize(Roles = UserRoles.SuperAdmin)]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserWithRolesModel>>> GetAll()
@@ -48,10 +69,12 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> AddUser(CreateUserModel createUserModel)
     {
-        if (!createUserModel.IsValid(out string errorMessage))
+        if (string.IsNullOrEmpty(createUserModel.FirstName) ||
+            string.IsNullOrEmpty(createUserModel.LastName) ||
+            string.IsNullOrEmpty(createUserModel.Username) ||
+            string.IsNullOrEmpty(createUserModel.Password))
         {
-            var errorResponse = new ErrorResponse(errorMessage);
-            return BadRequest(errorResponse);
+            return BadRequest("Passed data is invalid. All properties are required.");
         }
         
         var userModel = await _userService.AddUserAsync(createUserModel);

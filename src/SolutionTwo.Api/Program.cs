@@ -11,7 +11,7 @@ using SolutionTwo.Data.DI;
 using SolutionTwo.Domain.DI;
 using SolutionTwo.Identity.Configuration;
 using SolutionTwo.Identity.DI;
-using SolutionTwo.Identity.TokenManaging.Interfaces;
+using SolutionTwo.Identity.TokenManagement.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

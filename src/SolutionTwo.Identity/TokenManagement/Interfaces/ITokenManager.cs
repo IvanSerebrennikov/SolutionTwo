@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Identity.TokenManaging.Interfaces;
+﻿namespace SolutionTwo.Identity.TokenManagement.Interfaces;
 
 public interface ITokenManager
 {

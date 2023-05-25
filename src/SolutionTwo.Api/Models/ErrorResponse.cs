@@ -4,13 +4,13 @@ public class ErrorResponse
 {
     public class ErrorData
     {
-        public string Message { get; private set; }
+        public string? Message { get; }
         
-        public Guid? ErrorId { get; private set; }
+        public Guid? ErrorId { get; }
         
-        public string? ErrorType { get; private set; }
+        public string? ErrorType { get; }
 
-        public ErrorData(string message, Guid? errorId = null, string? errorType = null)
+        public ErrorData(string? message, Guid? errorId = null, string? errorType = null)
         {
             Message = message;
             ErrorId = errorId;
@@ -18,9 +18,9 @@ public class ErrorResponse
         }
     }
 
-    public ErrorData Error { get; private set; }
+    public ErrorData Error { get; }
 
-    public ErrorResponse(string message, Guid? errorId = null, string? errorType = null)
+    public ErrorResponse(string? message, Guid? errorId = null, string? errorType = null)
     {
         Error = new ErrorData(message, errorId, errorType);
     }

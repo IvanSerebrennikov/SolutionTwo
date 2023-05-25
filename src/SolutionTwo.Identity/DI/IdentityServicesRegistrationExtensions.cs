@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using SolutionTwo.Identity.PasswordManaging;
-using SolutionTwo.Identity.PasswordManaging.Interfaces;
-using SolutionTwo.Identity.TokenManaging;
-using SolutionTwo.Identity.TokenManaging.Interfaces;
+using SolutionTwo.Identity.PasswordManagement;
+using SolutionTwo.Identity.PasswordManagement.Interfaces;
+using SolutionTwo.Identity.TokenManagement;
+using SolutionTwo.Identity.TokenManagement.Interfaces;
 
 namespace SolutionTwo.Identity.DI;
 

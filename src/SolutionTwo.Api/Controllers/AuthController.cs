@@ -1,110 +1,56 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using SolutionTwo.Api.Controllers.Base;
 using SolutionTwo.Api.Models;
-using SolutionTwo.Api.Models.Auth;
-using SolutionTwo.Domain.Models.User.Outgoing;
+using SolutionTwo.Domain.Models.Auth.Incoming;
+using SolutionTwo.Domain.Models.Auth.Outgoing;
 using SolutionTwo.Domain.Services.Interfaces;
-using SolutionTwo.Identity.PasswordManaging.Interfaces;
-using SolutionTwo.Identity.TokenManaging.Interfaces;
 
 namespace SolutionTwo.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController : ControllerBase
+public class AuthController : ApiControllerBase
 {
     private readonly IAuthService _authService;
-    private readonly IUserService _userService;
-    private readonly ITokenManager _tokenManager;
-    private readonly IPasswordManager _passwordManager;
-    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(
-        IAuthService authService, 
-        ITokenManager tokenManager, 
-        IPasswordManager passwordManager, 
-        IUserService userService, 
-        ILogger<AuthController> logger)
+    public AuthController(IAuthService authService)
     {
         _authService = authService;
-        _tokenManager = tokenManager;
-        _passwordManager = passwordManager;
-        _userService = userService;
-        _logger = logger;
     }
 
     [HttpPost]
-    public async Task<ActionResult<AuthResponse>> Auth(AuthRequest authRequest)
+    public async Task<ActionResult<TokensPairModel>> Auth(UserCredentialsModel userCredentials)
     {
-        if (!authRequest.IsValid())
-            return BadRequest(
-                new ErrorResponse($"Invalid {nameof(authRequest.Username)} or {nameof(authRequest.Password)}"));
+        if (string.IsNullOrWhiteSpace(userCredentials.Username) || string.IsNullOrWhiteSpace(userCredentials.Password))
+            return BadRequest("Invalid credentials");
 
-        const string userNotFoundMessage =
-            $"User with provided {nameof(authRequest.Username)} and {nameof(authRequest.Password)} was not found";
+        var serviceResult = await _authService.CreateTokensPairAsync(userCredentials);
 
-        var user = await _userService.GetUserWithRolesAsync(authRequest.Username!);
-        if (user == null)
-            return NotFound(new ErrorResponse(userNotFoundMessage));
-
-        if (!_passwordManager.VerifyHashedPassword(user.PasswordHash,
-                authRequest.Password!))
-            return NotFound(new ErrorResponse(userNotFoundMessage));
-
-        var authToken = CreateAuthToken(user.UserData, out var authTokenId);
-        
-        var refreshTokenId = await _authService.CreateRefreshTokenForUserAsync(user.UserData.Id, authTokenId);
-        
-        var authResponse = new AuthResponse(authToken, refreshTokenId.ToString());
-        
-        return Ok(authResponse);
+        if (serviceResult.IsSucceeded)
+        {
+            return Ok(serviceResult.Data);
+        }
+        else
+        {
+            return BadRequest(serviceResult.Message);
+        }
     }
 
     [HttpPost("refresh-token")]
-    public async Task<ActionResult<AuthResponse>> RefreshToken([FromBody]string refreshTokenValue)
+    public async Task<ActionResult<TokensPairModel>> RefreshToken([FromBody]string refreshTokenValue)
     {
         if (string.IsNullOrEmpty(refreshTokenValue) || !Guid.TryParse(refreshTokenValue, out var refreshTokenId))
             return BadRequest("Invalid Refresh token");
 
-        var refreshToken = await _authService.GetRefreshTokenAsync(refreshTokenId);
+        var serviceResult = await _authService.RefreshTokensPairAsync(refreshTokenId);
 
-        if (refreshToken == null)
-            return BadRequest("Provided Refresh token was not found");
-
-        if (refreshToken.IsExpired)
-            return BadRequest("Provided Refresh token expired");
-
-        if (refreshToken.IsRevoked)
-            return BadRequest("Provided Refresh token was revoked");
-
-        if (refreshToken.IsUsed)
+        if (serviceResult.IsSucceeded)
         {
-            _logger.LogWarning(
-                $"Someone is trying to refresh already used token. RefreshTokenId: {refreshToken.Id}, UserId: {refreshToken.UserId}.");
-            await _authService.RevokeProvidedAndAllActiveRefreshTokensForUserAsync(refreshToken.Id, refreshToken.UserId);
-            return BadRequest("Provided Refresh token already used");
+            return Ok(serviceResult.Data);
         }
-        
-        var user = await _userService.GetUserWithRolesByIdAsync(refreshToken.UserId);
-        if (user == null)
-            return BadRequest("Associated User was not found");
-        
-        var authToken = CreateAuthToken(user, out var authTokenId);
-
-        var newRefreshTokenId =
-            await _authService.MarkRefreshTokenAsUsedAndCreateNewOneAsync(refreshToken.Id, authTokenId);
-
-        var authResponse = new AuthResponse(authToken, newRefreshTokenId.ToString());
-        
-        return Ok(authResponse);
-    }
-    
-    private string CreateAuthToken(UserWithRolesModel user, out Guid authTokenId)
-    {
-        var claims = user.Roles.Select(x => (ClaimTypes.Role, x)).ToList();
-        claims.Add((ClaimTypes.Name, user.Username));
-        var authToken =
-            _tokenManager.GenerateAuthToken(claims, out authTokenId);
-        return authToken;
+        else
+        {
+            return BadRequest(serviceResult.Message);
+        }
     }
 }
