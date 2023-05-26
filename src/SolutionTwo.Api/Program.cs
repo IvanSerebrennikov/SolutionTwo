@@ -1,7 +1,4 @@
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SolutionTwo.Api.Middlewares;
 using SolutionTwo.Common.Extensions;
@@ -9,9 +6,7 @@ using SolutionTwo.Data.Configuration;
 using SolutionTwo.Data.Context;
 using SolutionTwo.Data.DI;
 using SolutionTwo.Domain.DI;
-using SolutionTwo.Identity.Configuration;
 using SolutionTwo.Identity.DI;
-using SolutionTwo.Identity.TokenManagement.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,36 +44,38 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // Identity DI
-var identityConfiguration = builder.Configuration.GetSection<IdentityConfiguration>();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters()
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = identityConfiguration.JwtIssuer,
-        ValidAudience = identityConfiguration.JwtAudience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(identityConfiguration.JwtKey!))
-    };
-    options.Events = new JwtBearerEvents
-    {
-        OnTokenValidated = ctx =>
-        {
-            var id = ctx.SecurityToken.Id;
-            var tokenManager = ctx.HttpContext.RequestServices.GetRequiredService<ITokenManager>();
-
-            if (!Guid.TryParse(id, out var authTokenId) || tokenManager.IsTokenDeactivated(authTokenId))
-            {
-                ctx.Fail("Access was revoked.");
-            }
-            
-            return Task.CompletedTask;
-        }
-    };
-});
-builder.Services.AddAuthorization();
+// Used custom TokenBasedAuthenticationMiddleware
+// var identityConfiguration = builder.Configuration.GetSection<IdentityConfiguration>();
+// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+// {
+//     options.TokenValidationParameters = new TokenValidationParameters()
+//     {
+//         ValidateIssuer = true,
+//         ValidateAudience = true,
+//         ValidateLifetime = true,
+//         ValidateIssuerSigningKey = true,
+//         ValidIssuer = identityConfiguration.JwtIssuer,
+//         ValidAudience = identityConfiguration.JwtAudience,
+//         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(identityConfiguration.JwtKey!))
+//     };
+//     options.Events = new JwtBearerEvents
+//     {
+//         OnTokenValidated = ctx =>
+//         {
+//             var id = ctx.SecurityToken.Id;
+//             var tokenManager = ctx.HttpContext.RequestServices.GetRequiredService<ITokenManager>();
+//
+//             if (!Guid.TryParse(id, out var authTokenId) || tokenManager.IsTokenDeactivated(authTokenId))
+//             {
+//                 ctx.Fail("Access was revoked.");
+//             }
+//             
+//             return Task.CompletedTask;
+//         }
+//     };
+// });
+// Used custom RoleBasedAuthorizationMiddleware
+// builder.Services.AddAuthorization();
 builder.Services.AddIdentityServices();
 
 // Domain DI
@@ -110,10 +107,14 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseMiddleware<GlobalErrorHandlingMiddleware>();
+app.UseMiddleware<TokenBasedAuthenticationMiddleware>();
+app.UseMiddleware<RoleBasedAuthorizationMiddleware>();
 
-app.UseAuthentication();
+// Used custom TokenBasedAuthenticationMiddleware
+// app.UseAuthentication();
 
-app.UseAuthorization();
+// Used custom RoleBasedAuthorizationMiddleware
+// app.UseAuthorization();
 
 app.MapControllers();
 

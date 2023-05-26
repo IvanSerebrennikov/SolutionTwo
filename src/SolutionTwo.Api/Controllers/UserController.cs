@@ -1,6 +1,6 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SolutionTwo.Api.Attributes;
 using SolutionTwo.Api.Controllers.Base;
 using SolutionTwo.Domain.Constants;
 using SolutionTwo.Domain.Models.User.Incoming;
@@ -20,7 +20,7 @@ public class UserController : ApiControllerBase
         _userService = userService;
     }
 
-    [Authorize]
+    [RoleBasedAuthorize]
     [HttpGet("me")]
     public async Task<ActionResult<UserWithRolesModel>> GetMe()
     {
@@ -40,7 +40,7 @@ public class UserController : ApiControllerBase
         }
     }
     
-    [Authorize(Roles = UserRoles.SuperAdmin)]
+    [RoleBasedAuthorize(UserRoles.SuperAdmin)]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserWithRolesModel>>> GetAll()
     {
@@ -49,7 +49,7 @@ public class UserController : ApiControllerBase
         return Ok(userModels);
     }
     
-    [Authorize(Roles = UserRoles.SuperAdmin)]
+    [RoleBasedAuthorize(UserRoles.SuperAdmin)]
     [HttpGet("{id}")]
     public async Task<ActionResult<UserWithRolesModel>> GetById(Guid id)
     {
@@ -65,7 +65,7 @@ public class UserController : ApiControllerBase
         }
     }
 
-    [Authorize(Roles = UserRoles.SuperAdmin)]
+    [RoleBasedAuthorize(UserRoles.SuperAdmin)]
     [HttpPost]
     public async Task<ActionResult> AddUser(CreateUserModel createUserModel)
     {

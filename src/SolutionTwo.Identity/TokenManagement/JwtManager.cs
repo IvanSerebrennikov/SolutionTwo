@@ -27,8 +27,8 @@ public class JwtManager : ITokenManager
         authTokenId = Guid.NewGuid();
         claimsList.Add(new Claim(JwtRegisteredClaimNames.Jti, authTokenId.ToString()));
 
-        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-            _identityConfiguration.JwtKey!));
+        var key = GetSymmetricSecurityKey();
+        var tokenHandler = new JwtSecurityTokenHandler();
 
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
@@ -39,10 +39,38 @@ public class JwtManager : ITokenManager
             expires: DateTime.UtcNow.AddMinutes(_identityConfiguration.JwtExpiresMinutes!.Value),
             notBefore: DateTime.UtcNow,
             signingCredentials: credentials);
+        
+        var tokenString = tokenHandler.WriteToken(token);
 
-        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+        return tokenString;
+    }
+    
+    public ClaimsPrincipal? ValidateTokenAndGetPrincipal(string tokenString, out SecurityToken? securityToken)
+    {
+        var key = GetSymmetricSecurityKey();
+        var tokenHandler = new JwtSecurityTokenHandler();
+        
+        try
+        {
+            var principal = tokenHandler.ValidateToken(tokenString, new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = _identityConfiguration.JwtIssuer,
+                ValidAudience = _identityConfiguration.JwtAudience,
+                IssuerSigningKey = key
+            }, out var validatedToken);
 
-        return jwt;
+            securityToken = validatedToken;
+            return validatedToken != null ? principal : null;
+        }
+        catch
+        {
+            securityToken = null;
+            return null;
+        }
     }
 
     public bool IsTokenDeactivated(Guid authTokenId)
@@ -57,4 +85,10 @@ public class JwtManager : ITokenManager
     
     private static string GetDeactivatedTokenKey(Guid authTokenId)
         => $"auth-tokens:{authTokenId}:deactivated";
+
+    private SymmetricSecurityKey GetSymmetricSecurityKey()
+    {
+        return new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+            _identityConfiguration.JwtKey!));
+    }
 }
