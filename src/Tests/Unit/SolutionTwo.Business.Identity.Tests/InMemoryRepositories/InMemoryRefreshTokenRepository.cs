@@ -1,6 +1,6 @@
 ﻿using SolutionTwo.Business.Tests.InMemoryRepositories.Base;
-using SolutionTwo.Data.Entities;
-using SolutionTwo.Data.Repositories.Interfaces;
+using SolutionTwo.Data.MainDatabase.Entities;
+using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
 
 namespace SolutionTwo.Business.Tests.InMemoryRepositories;
 

@@ -9,9 +9,9 @@ using SolutionTwo.Business.Identity.Services.Interfaces;
 using SolutionTwo.Business.Identity.TokenManager;
 using SolutionTwo.Business.Identity.TokenManager.Interfaces;
 using SolutionTwo.Business.Tests.InMemoryRepositories;
-using SolutionTwo.Data.Entities;
-using SolutionTwo.Data.Repositories.Interfaces;
-using SolutionTwo.Data.UnitOfWork.Interfaces;
+using SolutionTwo.Data.MainDatabase.Entities;
+using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
+using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
 namespace SolutionTwo.Business.Tests;
 

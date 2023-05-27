@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Api", "Solution
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Business.Core", "SolutionTwo.Business.Core\SolutionTwo.Business.Core.csproj", "{EFC0C386-B84F-48F1-B28F-533766CD317D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data", "SolutionTwo.Data\SolutionTwo.Data.csproj", "{0D475A0D-A5AF-4160-96EA-8230B031F36A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data.MainDatabase", "SolutionTwo.Data.MainDatabase\SolutionTwo.Data.MainDatabase.csproj", "{0D475A0D-A5AF-4160-96EA-8230B031F36A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Business.Identity", "SolutionTwo.Business.Identity\SolutionTwo.Business.Identity.csproj", "{15191604-B935-4E71-BEAB-C05AE82177B8}"
 EndProject

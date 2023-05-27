@@ -15,7 +15,7 @@
     <ItemGroup>
         <ProjectReference Include="..\SolutionTwo.Business.Common\SolutionTwo.Business.Common.csproj" />
         <ProjectReference Include="..\SolutionTwo.Common\SolutionTwo.Common.csproj" />
-        <ProjectReference Include="..\SolutionTwo.Data\SolutionTwo.Data.csproj" />
+        <ProjectReference Include="..\SolutionTwo.Data.MainDatabase\SolutionTwo.Data.MainDatabase.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,8 +1,8 @@
 using SolutionTwo.Api.DI;
 using SolutionTwo.Api.Middlewares;
-using SolutionTwo.Data.DI;
 using SolutionTwo.Business.Core.DI;
 using SolutionTwo.Business.Identity.DI;
+using SolutionTwo.Data.MainDatabase.DI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,7 +50,7 @@ builder.Services.AddBusinessIdentityServices(builder.Configuration);
 builder.Services.AddBusinessCoreServices(builder.Configuration);
 
 // Data DI
-builder.Services.AddDataServices(builder.Configuration);
+builder.Services.AddDataMainDatabaseServices(builder.Configuration);
 
 // Build WebApp
 var app = builder.Build();

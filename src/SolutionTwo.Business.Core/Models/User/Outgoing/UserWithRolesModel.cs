@@ -1,4 +1,4 @@
-﻿using SolutionTwo.Data.Entities;
+﻿using SolutionTwo.Data.MainDatabase.Entities;
 
 namespace SolutionTwo.Business.Core.Models.User.Outgoing;
 

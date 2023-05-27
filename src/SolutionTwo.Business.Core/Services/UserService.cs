@@ -3,9 +3,9 @@ using SolutionTwo.Business.Core.Models.User.Incoming;
 using SolutionTwo.Business.Core.Models.User.Outgoing;
 using SolutionTwo.Business.Core.Services.Interfaces;
 using SolutionTwo.Common.Extensions;
-using SolutionTwo.Data.Entities;
-using SolutionTwo.Data.Repositories.Interfaces;
-using SolutionTwo.Data.UnitOfWork.Interfaces;
+using SolutionTwo.Data.MainDatabase.Entities;
+using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
+using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
 namespace SolutionTwo.Business.Core.Services;
 
