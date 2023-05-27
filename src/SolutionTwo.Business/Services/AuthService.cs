@@ -1,5 +1,7 @@
 ﻿using System.Security.Claims;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SolutionTwo.Business.Configuration;
 using SolutionTwo.Business.Models;
 using SolutionTwo.Business.Models.Auth.Incoming;
 using SolutionTwo.Business.Models.Auth.Outgoing;
@@ -15,6 +17,7 @@ namespace SolutionTwo.Business.Services;
 
 public class AuthService : IAuthService
 {
+    private readonly AuthConfiguration _authConfiguration;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IUserRepository _userRepository;
     private readonly IMainDatabase _mainDatabase;
@@ -23,6 +26,7 @@ public class AuthService : IAuthService
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
+        AuthConfiguration authConfiguration,
         IRefreshTokenRepository refreshTokenRepository,
         IUserRepository userRepository,
         IMainDatabase mainDatabase, 
@@ -30,6 +34,7 @@ public class AuthService : IAuthService
         IPasswordManager passwordManager, 
         ILogger<AuthService> logger)
     {
+        _authConfiguration = authConfiguration;
         _refreshTokenRepository = refreshTokenRepository;
         _userRepository = userRepository;
         _mainDatabase = mainDatabase;
@@ -98,23 +103,16 @@ public class AuthService : IAuthService
         if (userEntity == null)
             return ServiceResult<TokensPairModel>.Error("Associated User was not found");
         
+        refreshTokenEntity.IsUsed = true;
+        
         var authToken = CreateAuthToken(userEntity, out var authTokenId);
-        var newRefreshToken = MarkRefreshTokenAsUsedAndCreateNewOneAsync(refreshTokenEntity, authTokenId);
+        var newRefreshToken = CreateRefreshToken(refreshTokenEntity.UserId, authTokenId);
         
         await _mainDatabase.CommitChangesAsync();
         
         var tokensPair = new TokensPairModel(authToken, newRefreshToken);
 
         return ServiceResult<TokensPairModel>.Success(tokensPair);
-    }
-
-    private string MarkRefreshTokenAsUsedAndCreateNewOneAsync(RefreshTokenEntity refreshTokenEntity, Guid authTokenId)
-    {
-        refreshTokenEntity.IsUsed = true;
-            
-        var newRefreshToken = CreateRefreshToken(refreshTokenEntity.UserId, authTokenId);
-
-        return newRefreshToken;
     }
 
     private async Task RevokeProvidedAndAllActiveRefreshTokensForUserAsync(Guid tokenId, Guid userId)
@@ -125,7 +123,7 @@ public class AuthService : IAuthService
 
         foreach (var tokenEntity in tokenEntities)
         {
-            RevokeToken(tokenEntity);
+            RevokeTokens(tokenEntity);
         }
     }
 
@@ -137,7 +135,7 @@ public class AuthService : IAuthService
             AuthTokenId = authTokenId,
             UserId = userId,
             CreatedDateTimeUtc = DateTime.UtcNow,
-            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(7)
+            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(_authConfiguration.RefreshTokenExpiresDays!.Value)
         };
 
         _refreshTokenRepository.Create(refreshToken);
@@ -154,10 +152,10 @@ public class AuthService : IAuthService
         return authToken;
     }
     
-    private void RevokeToken(RefreshTokenEntity refreshTokenEntity)
+    private void RevokeTokens(RefreshTokenEntity refreshTokenEntity)
     {
         refreshTokenEntity.IsRevoked = true;
         _refreshTokenRepository.Update(refreshTokenEntity);
-        _tokenManager.DeactivateToken(refreshTokenEntity.AuthTokenId);
+        _tokenManager.RevokeAuthToken(refreshTokenEntity.AuthTokenId);
     }
 }

@@ -4,7 +4,7 @@ namespace SolutionTwo.Api.DI;
 
 public static class ApiServicesRegistrationExtensions
 {
-    public static void AddApiServices(this IServiceCollection services)
+    public static void AddApiServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllers();
         services.AddEndpointsApiExplorer();

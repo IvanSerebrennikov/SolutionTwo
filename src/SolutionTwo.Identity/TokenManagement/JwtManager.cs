@@ -11,13 +11,13 @@ namespace SolutionTwo.Identity.TokenManagement;
 
 public class JwtManager : ITokenManager
 {
-    private readonly IdentityConfiguration _identityConfiguration;
+    private readonly JwtConfiguration _jwtConfiguration;
     private readonly IMemoryCache _memoryCache;
 
-    public JwtManager(IConfiguration configuration, IMemoryCache memoryCache)
+    public JwtManager(JwtConfiguration jwtConfiguration, IMemoryCache memoryCache)
     {
         _memoryCache = memoryCache;
-        _identityConfiguration = configuration.GetSection<IdentityConfiguration>();
+        _jwtConfiguration = jwtConfiguration;
     }
 
     public string GenerateAuthToken(List<(string, string)> claims, out Guid authTokenId)
@@ -33,10 +33,10 @@ public class JwtManager : ITokenManager
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
         var token = new JwtSecurityToken(
-            issuer: _identityConfiguration.JwtIssuer,
-            audience: _identityConfiguration.JwtAudience,
+            issuer: _jwtConfiguration.JwtIssuer,
+            audience: _jwtConfiguration.JwtAudience,
             claims: claimsList,
-            expires: DateTime.UtcNow.AddMinutes(_identityConfiguration.JwtExpiresMinutes!.Value),
+            expires: DateTime.UtcNow.AddMinutes(_jwtConfiguration.JwtExpiresMinutes!.Value),
             notBefore: DateTime.UtcNow,
             signingCredentials: credentials);
         
@@ -45,7 +45,7 @@ public class JwtManager : ITokenManager
         return tokenString;
     }
     
-    public ClaimsPrincipal? ValidateTokenAndGetPrincipal(string tokenString, out SecurityToken? securityToken)
+    public ClaimsPrincipal? ValidateAuthTokenAndGetPrincipal(string tokenString, out SecurityToken? securityToken)
     {
         var key = GetSymmetricSecurityKey();
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -58,8 +58,8 @@ public class JwtManager : ITokenManager
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = _identityConfiguration.JwtIssuer,
-                ValidAudience = _identityConfiguration.JwtAudience,
+                ValidIssuer = _jwtConfiguration.JwtIssuer,
+                ValidAudience = _jwtConfiguration.JwtAudience,
                 IssuerSigningKey = key
             }, out var validatedToken);
 
@@ -73,25 +73,25 @@ public class JwtManager : ITokenManager
         }
     }
 
-    public bool IsTokenDeactivated(Guid authTokenId)
+    public bool IsAuthTokenRevoked(Guid authTokenId)
     {
         return _memoryCache.TryGetValue(GetDeactivatedTokenKey(authTokenId), out int _);
     }
 
-    public void DeactivateToken(Guid authTokenId)
+    public void RevokeAuthToken(Guid authTokenId)
     {
         _memoryCache.Set(GetDeactivatedTokenKey(authTokenId), 1,
-            TimeSpan.FromMinutes(_identityConfiguration.JwtExpiresMinutes!.Value));
+            TimeSpan.FromMinutes(_jwtConfiguration.JwtExpiresMinutes!.Value));
     }
     
     private static string GetDeactivatedTokenKey(Guid authTokenId)
     {
-        return $"auth-tokens:{authTokenId}:deactivated";
+        return $"auth-tokens:{authTokenId}:revoked";
     }
 
     private SymmetricSecurityKey GetSymmetricSecurityKey()
     {
         return new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-            _identityConfiguration.JwtKey!));
+            _jwtConfiguration.JwtKey!));
     }
 }

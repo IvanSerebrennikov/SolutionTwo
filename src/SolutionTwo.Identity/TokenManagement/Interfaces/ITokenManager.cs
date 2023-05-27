@@ -7,9 +7,9 @@ public interface ITokenManager
 {
     string GenerateAuthToken(List<(string, string)> claims, out Guid authTokenId);
 
-    ClaimsPrincipal? ValidateTokenAndGetPrincipal(string tokenString, out SecurityToken? securityToken);
+    ClaimsPrincipal? ValidateAuthTokenAndGetPrincipal(string tokenString, out SecurityToken? securityToken);
     
-    bool IsTokenDeactivated(Guid authTokenId);
+    bool IsAuthTokenRevoked(Guid authTokenId);
     
-    void DeactivateToken(Guid authTokenId);
+    void RevokeAuthToken(Guid authTokenId);
 }

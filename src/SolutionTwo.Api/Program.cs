@@ -1,7 +1,5 @@
 using SolutionTwo.Api.DI;
 using SolutionTwo.Api.Middlewares;
-using SolutionTwo.Common.Extensions;
-using SolutionTwo.Data.Configuration;
 using SolutionTwo.Data.DI;
 using SolutionTwo.Business.DI;
 using SolutionTwo.Identity.DI;
@@ -11,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMemoryCache();
 
 // Api DI
-builder.Services.AddApiServices();
+builder.Services.AddApiServices(builder.Configuration);
 
 // Identity DI
 // Used custom TokenBasedAuthenticationMiddleware
@@ -46,14 +44,13 @@ builder.Services.AddApiServices();
 // });
 // Used custom RoleBasedAuthorizationMiddleware
 // builder.Services.AddAuthorization();
-builder.Services.AddIdentityServices();
+builder.Services.AddIdentityServices(builder.Configuration);
 
 // Business DI
-builder.Services.AddBusinessServices();
+builder.Services.AddBusinessServices(builder.Configuration);
 
 // Data DI
-var connectionStrings = builder.Configuration.GetSection<ConnectionStrings>();
-builder.Services.AddDataServices(connectionStrings);
+builder.Services.AddDataServices(builder.Configuration);
 
 // Build WebApp
 var app = builder.Build();

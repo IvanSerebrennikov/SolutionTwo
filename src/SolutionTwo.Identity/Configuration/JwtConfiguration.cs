@@ -2,7 +2,7 @@
 
 namespace SolutionTwo.Identity.Configuration;
 
-public class IdentityConfiguration : IVerifiableConfiguration
+public class JwtConfiguration : IVerifiableConfiguration
 {
     public string? JwtKey { get; set; }
 

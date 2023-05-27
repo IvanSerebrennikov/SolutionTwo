@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SolutionTwo.Common.Extensions;
+using SolutionTwo.Identity.Configuration;
 using SolutionTwo.Identity.PasswordManagement;
 using SolutionTwo.Identity.PasswordManagement.Interfaces;
 using SolutionTwo.Identity.TokenManagement;
@@ -9,8 +12,12 @@ namespace SolutionTwo.Identity.DI;
 
 public static class IdentityServicesRegistrationExtensions
 {
-    public static void AddIdentityServices(this IServiceCollection services)
+    public static void AddIdentityServices(this IServiceCollection services, IConfiguration configuration)
     {
+        var jwtConfiguration = configuration.GetSection<JwtConfiguration>();
+
+        services.AddSingleton(jwtConfiguration);
+        
         services.AddSingleton<IPasswordHasher<object>, PasswordHasher<object>>();
 
         services.Configure<PasswordHasherOptions>(options =>

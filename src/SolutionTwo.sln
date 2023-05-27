@@ -10,6 +10,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Identity", "Sol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Common", "SolutionTwo.Common\SolutionTwo.Common.csproj", "{C64BE01B-7DAF-4A64-B79C-A242D07F9A46}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C3814B18-592C-448A-A732-4BD75B581390}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit", "Unit", "{2E4C39F0-142B-461A-9FB0-42A3800F9BAE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Business.Tests", "Tests\Unit\SolutionTwo.Business.Tests\SolutionTwo.Business.Tests.csproj", "{383E32B2-434F-4424-908B-70FEA197303A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +42,13 @@ Global
 		{C64BE01B-7DAF-4A64-B79C-A242D07F9A46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C64BE01B-7DAF-4A64-B79C-A242D07F9A46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C64BE01B-7DAF-4A64-B79C-A242D07F9A46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{383E32B2-434F-4424-908B-70FEA197303A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{383E32B2-434F-4424-908B-70FEA197303A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{383E32B2-434F-4424-908B-70FEA197303A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{383E32B2-434F-4424-908B-70FEA197303A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2E4C39F0-142B-461A-9FB0-42A3800F9BAE} = {C3814B18-592C-448A-A732-4BD75B581390}
+		{383E32B2-434F-4424-908B-70FEA197303A} = {2E4C39F0-142B-461A-9FB0-42A3800F9BAE}
 	EndGlobalSection
 EndGlobal

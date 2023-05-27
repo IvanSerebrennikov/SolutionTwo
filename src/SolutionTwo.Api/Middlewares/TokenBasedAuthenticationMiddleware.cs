@@ -46,12 +46,12 @@ public class TokenBasedAuthenticationMiddleware
             return;
         }
 
-        var claimsPrincipal = _tokenManager.ValidateTokenAndGetPrincipal(tokenString, out var securityToken);
+        var claimsPrincipal = _tokenManager.ValidateAuthTokenAndGetPrincipal(tokenString, out var securityToken);
         
         if (claimsPrincipal == null || 
             securityToken == null || 
             !Guid.TryParse(securityToken.Id, out var authTokenId) || 
-            _tokenManager.IsTokenDeactivated(authTokenId))
+            _tokenManager.IsAuthTokenRevoked(authTokenId))
         {
             context.Response.StatusCode = BadResultStatusCode;
             return;
