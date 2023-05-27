@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SolutionTwo.Api.Controllers.Base;
-using SolutionTwo.Domain.Models.Auth.Incoming;
-using SolutionTwo.Domain.Models.Auth.Outgoing;
-using SolutionTwo.Domain.Services.Interfaces;
+using SolutionTwo.Business.Models.Auth.Incoming;
+using SolutionTwo.Business.Models.Auth.Outgoing;
+using SolutionTwo.Business.Services.Interfaces;
 
 namespace SolutionTwo.Api.Controllers;
 

@@ -1,11 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+using SolutionTwo.Api.DI;
 using SolutionTwo.Api.Middlewares;
 using SolutionTwo.Common.Extensions;
 using SolutionTwo.Data.Configuration;
-using SolutionTwo.Data.Context;
 using SolutionTwo.Data.DI;
-using SolutionTwo.Domain.DI;
+using SolutionTwo.Business.DI;
 using SolutionTwo.Identity.DI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,35 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMemoryCache();
 
 // Api DI
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    // https://aka.ms/aspnetcore/swashbuckle
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Name = "Authorization",
-        Description = "Bearer Authentication with JWT",
-        Type = SecuritySchemeType.Http
-    });
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Id = "Bearer",
-                    Type = ReferenceType.SecurityScheme
-                }
-            },
-            new List<string>()
-        }
-    });
-});
+builder.Services.AddApiServices();
 
 // Identity DI
 // Used custom TokenBasedAuthenticationMiddleware
@@ -78,30 +48,23 @@ builder.Services.AddSwaggerGen(options =>
 // builder.Services.AddAuthorization();
 builder.Services.AddIdentityServices();
 
-// Domain DI
-builder.Services.AddDomainServices();
+// Business DI
+builder.Services.AddBusinessServices();
 
 // Data DI
 var connectionStrings = builder.Configuration.GetSection<ConnectionStrings>();
-builder.Services.AddDbContext<MainDatabaseContext>(o =>
-    {
-        o.UseSqlServer(connectionStrings.MainDatabaseConnection!);
-        
-        // Make sure that "Microsoft.EntityFrameworkCore" category is set to "None" 
-        // for all providers except "Debug"
-        o.EnableSensitiveDataLogging();  
-    }
-);
-builder.Services.AddDataServices();
+builder.Services.AddDataServices(connectionStrings);
 
 // Build WebApp
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI();
+
+if (!app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();

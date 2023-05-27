@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Domain.Constants;
+﻿namespace SolutionTwo.Business.Constants;
 
 public static class UserRoles
 {

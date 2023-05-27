@@ -1,17 +1,17 @@
 ﻿using System.Security.Claims;
 using Microsoft.Extensions.Logging;
+using SolutionTwo.Business.Models;
+using SolutionTwo.Business.Models.Auth.Incoming;
+using SolutionTwo.Business.Models.Auth.Outgoing;
+using SolutionTwo.Business.Services.Interfaces;
 using SolutionTwo.Common.Extensions;
 using SolutionTwo.Data.Entities;
 using SolutionTwo.Data.Repositories.Interfaces;
 using SolutionTwo.Data.UnitOfWork.Interfaces;
-using SolutionTwo.Domain.Models;
-using SolutionTwo.Domain.Models.Auth.Incoming;
-using SolutionTwo.Domain.Models.Auth.Outgoing;
-using SolutionTwo.Domain.Services.Interfaces;
 using SolutionTwo.Identity.PasswordManagement.Interfaces;
 using SolutionTwo.Identity.TokenManagement.Interfaces;
 
-namespace SolutionTwo.Domain.Services;
+namespace SolutionTwo.Business.Services;
 
 public class AuthService : IAuthService
 {

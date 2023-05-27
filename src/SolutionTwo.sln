@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Api", "SolutionTwo.Api\SolutionTwo.Api.csproj", "{BDB1F911-B9C3-4159-B3C0-54F98F334C0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Domain", "SolutionTwo.Domain\SolutionTwo.Domain.csproj", "{EFC0C386-B84F-48F1-B28F-533766CD317D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Business", "SolutionTwo.Business\SolutionTwo.Business.csproj", "{EFC0C386-B84F-48F1-B28F-533766CD317D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data", "SolutionTwo.Data\SolutionTwo.Data.csproj", "{0D475A0D-A5AF-4160-96EA-8230B031F36A}"
 EndProject

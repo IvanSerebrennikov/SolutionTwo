@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Domain.Models.Auth.Outgoing;
+﻿namespace SolutionTwo.Business.Models.Auth.Outgoing;
 
 public class TokensPairModel
 {

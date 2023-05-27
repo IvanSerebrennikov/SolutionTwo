@@ -1,8 +1,8 @@
-﻿using SolutionTwo.Domain.Models;
-using SolutionTwo.Domain.Models.Auth.Incoming;
-using SolutionTwo.Domain.Models.Auth.Outgoing;
+﻿using SolutionTwo.Business.Models;
+using SolutionTwo.Business.Models.Auth.Incoming;
+using SolutionTwo.Business.Models.Auth.Outgoing;
 
-namespace SolutionTwo.Domain.Services.Interfaces;
+namespace SolutionTwo.Business.Services.Interfaces;
 
 public interface IAuthService
 {

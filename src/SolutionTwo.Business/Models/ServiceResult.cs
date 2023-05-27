@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Domain.Models;
+﻿namespace SolutionTwo.Business.Models;
 
 public class ServiceResult<T> : IServiceResult<T>
 {

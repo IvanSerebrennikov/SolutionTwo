@@ -1,7 +1,7 @@
-﻿using SolutionTwo.Domain.Models.User.Incoming;
-using SolutionTwo.Domain.Models.User.Outgoing;
+﻿using SolutionTwo.Business.Models.User.Incoming;
+using SolutionTwo.Business.Models.User.Outgoing;
 
-namespace SolutionTwo.Domain.Services.Interfaces;
+namespace SolutionTwo.Business.Services.Interfaces;
 
 public interface IUserService
 {

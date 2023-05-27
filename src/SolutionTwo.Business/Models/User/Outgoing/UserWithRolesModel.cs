@@ -1,6 +1,6 @@
 ﻿using SolutionTwo.Data.Entities;
 
-namespace SolutionTwo.Domain.Models.User.Outgoing;
+namespace SolutionTwo.Business.Models.User.Outgoing;
 
 public class UserWithRolesModel
 {

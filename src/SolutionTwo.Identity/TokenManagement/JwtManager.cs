@@ -80,11 +80,14 @@ public class JwtManager : ITokenManager
 
     public void DeactivateToken(Guid authTokenId)
     {
-        _memoryCache.Set(GetDeactivatedTokenKey(authTokenId), 1, TimeSpan.FromMinutes(_identityConfiguration.JwtExpiresMinutes!.Value));
+        _memoryCache.Set(GetDeactivatedTokenKey(authTokenId), 1,
+            TimeSpan.FromMinutes(_identityConfiguration.JwtExpiresMinutes!.Value));
     }
     
     private static string GetDeactivatedTokenKey(Guid authTokenId)
-        => $"auth-tokens:{authTokenId}:deactivated";
+    {
+        return $"auth-tokens:{authTokenId}:deactivated";
+    }
 
     private SymmetricSecurityKey GetSymmetricSecurityKey()
     {

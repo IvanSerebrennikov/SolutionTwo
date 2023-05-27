@@ -1,13 +1,13 @@
-﻿using SolutionTwo.Common.Extensions;
+﻿using SolutionTwo.Business.Models.User.Incoming;
+using SolutionTwo.Business.Models.User.Outgoing;
+using SolutionTwo.Business.Services.Interfaces;
+using SolutionTwo.Common.Extensions;
 using SolutionTwo.Data.Entities;
 using SolutionTwo.Data.Repositories.Interfaces;
 using SolutionTwo.Data.UnitOfWork.Interfaces;
-using SolutionTwo.Domain.Models.User.Incoming;
-using SolutionTwo.Domain.Models.User.Outgoing;
-using SolutionTwo.Domain.Services.Interfaces;
 using SolutionTwo.Identity.PasswordManagement.Interfaces;
 
-namespace SolutionTwo.Domain.Services;
+namespace SolutionTwo.Business.Services;
 
 public class UserService : IUserService
 {
