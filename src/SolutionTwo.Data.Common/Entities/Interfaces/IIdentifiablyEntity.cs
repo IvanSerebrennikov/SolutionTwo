@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Data.Entities.Base.Interfaces;
+﻿namespace SolutionTwo.Data.Common.Entities.Interfaces;
 
 public interface IIdentifiablyEntity<TId>
 {

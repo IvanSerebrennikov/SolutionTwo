@@ -1,5 +1,5 @@
-﻿using SolutionTwo.Data.Entities;
-using SolutionTwo.Data.Repositories.Base.Interfaces;
+﻿using SolutionTwo.Data.Common.Repositories.Interfaces;
+using SolutionTwo.Data.Entities;
 
 namespace SolutionTwo.Data.Repositories.Interfaces;
 

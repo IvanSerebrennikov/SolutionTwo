@@ -1,17 +1,16 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using SolutionTwo.Data.Context;
-using SolutionTwo.Data.Entities.Base.Interfaces;
-using SolutionTwo.Data.Repositories.Base.Interfaces;
+using SolutionTwo.Data.Common.Entities.Interfaces;
+using SolutionTwo.Data.Common.Repositories.Interfaces;
 
-namespace SolutionTwo.Data.Repositories.Base;
+namespace SolutionTwo.Data.Common.Repositories;
 
 public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
     where TEntity : class, IIdentifiablyEntity<TId>
 {
-    private readonly MainDatabaseContext _context;
+    private readonly DbContext _context;
 
-    protected BaseRepository(MainDatabaseContext context)
+    protected BaseRepository(DbContext context)
     {
         _context = context;
     }

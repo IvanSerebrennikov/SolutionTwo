@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using SolutionTwo.Business.Tests.InMemoryRepositories.EntityComparer;
-using SolutionTwo.Data.Entities.Base.Interfaces;
-using SolutionTwo.Data.Repositories.Base.Interfaces;
+using SolutionTwo.Data.Common.Entities.Interfaces;
+using SolutionTwo.Data.Common.Repositories.Interfaces;
 
 namespace SolutionTwo.Business.Tests.InMemoryRepositories.Base;
 

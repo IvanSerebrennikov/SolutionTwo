@@ -7,12 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.16"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.16"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.16" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.16" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SolutionTwo.Common\SolutionTwo.Common.csproj"/>
+        <ProjectReference Include="..\SolutionTwo.Common\SolutionTwo.Common.csproj" />
+        <ProjectReference Include="..\SolutionTwo.Data.Common\SolutionTwo.Data.Common.csproj" />
     </ItemGroup>
 
 </Project>

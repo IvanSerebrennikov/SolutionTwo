@@ -1,4 +1,4 @@
-﻿using SolutionTwo.Data.Entities.Base.Interfaces;
+﻿using SolutionTwo.Data.Common.Entities.Interfaces;
 
 namespace SolutionTwo.Business.Tests.InMemoryRepositories.EntityComparer;
 

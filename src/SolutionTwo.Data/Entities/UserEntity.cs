@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SolutionTwo.Data.Entities.Base.Interfaces;
+using SolutionTwo.Data.Common.Entities.Interfaces;
 
 namespace SolutionTwo.Data.Entities;
 

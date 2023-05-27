@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
-using SolutionTwo.Data.Entities.Base.Interfaces;
+using SolutionTwo.Data.Common.Entities.Interfaces;
 
-namespace SolutionTwo.Data.Repositories.Base.Interfaces;
+namespace SolutionTwo.Data.Common.Repositories.Interfaces;
 
 public interface IBaseRepository<TEntity, TId>
     where TEntity : class, IIdentifiablyEntity<TId>

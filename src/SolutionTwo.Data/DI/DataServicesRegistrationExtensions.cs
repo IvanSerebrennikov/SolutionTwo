@@ -24,7 +24,7 @@ public static class DataServicesRegistrationExtensions
         services.AddDbContext<MainDatabaseContext>(o =>
             {
                 o.UseSqlServer(connectionStrings.MainDatabaseConnection!,
-                    op => op.CommandTimeout(databaseConfiguration.CommandTimeOutInSeconds));
+                    x => x.CommandTimeout(databaseConfiguration.CommandTimeOutInSeconds));
 
                 // Make sure that "Microsoft.EntityFrameworkCore" category is set to "None" 
                 // for all providers except "Debug"
