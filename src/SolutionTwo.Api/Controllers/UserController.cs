@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SolutionTwo.Api.Attributes;
 using SolutionTwo.Api.Controllers.Base;
-using SolutionTwo.Business.Constants;
-using SolutionTwo.Business.Models.User.Incoming;
-using SolutionTwo.Business.Models.User.Outgoing;
-using SolutionTwo.Business.Services.Interfaces;
+using SolutionTwo.Business.Core.Constants;
+using SolutionTwo.Business.Core.Models.User.Incoming;
+using SolutionTwo.Business.Core.Models.User.Outgoing;
+using SolutionTwo.Business.Core.Services.Interfaces;
 
 namespace SolutionTwo.Api.Controllers;
 
@@ -27,19 +26,14 @@ public class UserController : ApiControllerBase
         var username = GetUsernameFromClaims();
         if (string.IsNullOrEmpty(username))
             return BadRequest("Name claim was not found");
-        
+
         var userModel = await _userService.GetUserWithRolesAsync(username);
 
         if (userModel != null)
-        {
             return Ok(userModel);
-        }
-        else
-        {
-            return NotFound();
-        }
+        return NotFound();
     }
-    
+
     [RoleBasedAuthorize(UserRoles.SuperAdmin)]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserWithRolesModel>>> GetAll()
@@ -48,7 +42,7 @@ public class UserController : ApiControllerBase
 
         return Ok(userModels);
     }
-    
+
     [RoleBasedAuthorize(UserRoles.SuperAdmin)]
     [HttpGet("{id}")]
     public async Task<ActionResult<UserWithRolesModel>> GetById(Guid id)
@@ -56,13 +50,8 @@ public class UserController : ApiControllerBase
         var userModel = await _userService.GetUserWithRolesByIdAsync(id);
 
         if (userModel != null)
-        {
             return Ok(userModel);
-        }
-        else
-        {
-            return NotFound();
-        }
+        return NotFound();
     }
 
     [RoleBasedAuthorize(UserRoles.SuperAdmin)]
@@ -73,12 +62,10 @@ public class UserController : ApiControllerBase
             string.IsNullOrEmpty(createUserModel.LastName) ||
             string.IsNullOrEmpty(createUserModel.Username) ||
             string.IsNullOrEmpty(createUserModel.Password))
-        {
             return BadRequest("Passed data is invalid. All properties are required.");
-        }
-        
+
         var userModel = await _userService.AddUserAsync(createUserModel);
-        
+
         return CreatedAtAction(nameof(GetById), new { id = userModel.Id }, userModel);
     }
 }

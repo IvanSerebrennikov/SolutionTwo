@@ -13,7 +13,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SolutionTwo.Business\SolutionTwo.Business.csproj" />
+        <ProjectReference Include="..\SolutionTwo.Business.Identity\SolutionTwo.Business.Identity.csproj" />
+        <ProjectReference Include="..\SolutionTwo.Business.Core\SolutionTwo.Business.Core.csproj" />
     </ItemGroup>
 
 </Project>

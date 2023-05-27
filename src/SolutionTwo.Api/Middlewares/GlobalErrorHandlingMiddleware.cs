@@ -29,9 +29,9 @@ public class GlobalErrorHandlingMiddleware
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         var errorId = Guid.NewGuid();
-        
+
         _logger.LogError(exception, $"ErrorId: {errorId}.");
-        
+
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
         var errorResponse = new ErrorResponse("Something went wrong.", errorId, exception.GetType().ToString());

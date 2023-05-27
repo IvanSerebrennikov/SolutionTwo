@@ -1,8 +1,8 @@
 using SolutionTwo.Api.DI;
 using SolutionTwo.Api.Middlewares;
 using SolutionTwo.Data.DI;
-using SolutionTwo.Business.DI;
-using SolutionTwo.Identity.DI;
+using SolutionTwo.Business.Core.DI;
+using SolutionTwo.Business.Identity.DI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +11,7 @@ builder.Services.AddMemoryCache();
 // Api DI
 builder.Services.AddApiServices(builder.Configuration);
 
-// Identity DI
+// Business.Identity DI
 // Used custom TokenBasedAuthenticationMiddleware
 // var identityConfiguration = builder.Configuration.GetSection<IdentityConfiguration>();
 // builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -44,10 +44,10 @@ builder.Services.AddApiServices(builder.Configuration);
 // });
 // Used custom RoleBasedAuthorizationMiddleware
 // builder.Services.AddAuthorization();
-builder.Services.AddIdentityServices(builder.Configuration);
+builder.Services.AddBusinessIdentityServices(builder.Configuration);
 
-// Business DI
-builder.Services.AddBusinessServices(builder.Configuration);
+// Business.Core DI
+builder.Services.AddBusinessCoreServices(builder.Configuration);
 
 // Data DI
 builder.Services.AddDataServices(builder.Configuration);

@@ -7,6 +7,6 @@ public class RoleBasedAuthorizeAttribute : Attribute
     {
         Roles = roles;
     }
-    
+
     public string[] Roles { get; }
 }

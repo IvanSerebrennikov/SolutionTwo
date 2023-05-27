@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SolutionTwo.Api.Controllers.Base;
-using SolutionTwo.Business.Models.Auth.Incoming;
-using SolutionTwo.Business.Models.Auth.Outgoing;
-using SolutionTwo.Business.Services.Interfaces;
+using SolutionTwo.Business.Identity.Models.Auth.Incoming;
+using SolutionTwo.Business.Identity.Models.Auth.Outgoing;
+using SolutionTwo.Business.Identity.Services.Interfaces;
 
 namespace SolutionTwo.Api.Controllers;
 
@@ -26,17 +26,12 @@ public class AuthController : ApiControllerBase
         var serviceResult = await _authService.CreateTokensPairAsync(userCredentials);
 
         if (serviceResult.IsSucceeded)
-        {
             return Ok(serviceResult.Data);
-        }
-        else
-        {
-            return BadRequest(serviceResult.Message);
-        }
+        return BadRequest(serviceResult.Message);
     }
 
     [HttpPost("refresh-token")]
-    public async Task<ActionResult<TokensPairModel>> RefreshToken([FromBody]string refreshTokenValue)
+    public async Task<ActionResult<TokensPairModel>> RefreshToken([FromBody] string refreshTokenValue)
     {
         if (string.IsNullOrEmpty(refreshTokenValue) || !Guid.TryParse(refreshTokenValue, out var refreshTokenId))
             return BadRequest("Invalid Refresh token");
@@ -44,12 +39,7 @@ public class AuthController : ApiControllerBase
         var serviceResult = await _authService.RefreshTokensPairAsync(refreshTokenId);
 
         if (serviceResult.IsSucceeded)
-        {
             return Ok(serviceResult.Data);
-        }
-        else
-        {
-            return BadRequest(serviceResult.Message);
-        }
+        return BadRequest(serviceResult.Message);
     }
 }

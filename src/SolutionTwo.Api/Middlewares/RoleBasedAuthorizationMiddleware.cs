@@ -7,15 +7,14 @@ namespace SolutionTwo.Api.Middlewares;
 
 public class RoleBasedAuthorizationMiddleware
 {
-    private readonly RequestDelegate _next;
-    
     private const int BadResultStatusCode = (int)HttpStatusCode.Forbidden;
-    
+    private readonly RequestDelegate _next;
+
     public RoleBasedAuthorizationMiddleware(RequestDelegate next)
     {
         _next = next;
     }
- 
+
     public async Task InvokeAsync(HttpContext context)
     {
         if (UnauthorizedAccessAllowed(context, out var roles) || roles == null || roles.Length == 0)
@@ -23,7 +22,7 @@ public class RoleBasedAuthorizationMiddleware
             await _next(context);
             return;
         }
-        
+
         var authorized = roles.Any(x => context.User.IsInRole(x));
         if (!authorized)
         {
@@ -41,7 +40,7 @@ public class RoleBasedAuthorizationMiddleware
         var allowAnonymousAttribute = endpoint?.Metadata.GetMetadata<AllowAnonymousAttribute>();
 
         roles = authorizeAttribute?.Roles;
-        
+
         return authorizeAttribute == null || allowAnonymousAttribute != null;
     }
 }
