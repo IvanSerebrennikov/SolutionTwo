@@ -12,7 +12,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SolutionTwo.Common\SolutionTwo.Common.csproj" />
         <ProjectReference Include="..\SolutionTwo.Data.Common\SolutionTwo.Data.Common.csproj" />
     </ItemGroup>
 

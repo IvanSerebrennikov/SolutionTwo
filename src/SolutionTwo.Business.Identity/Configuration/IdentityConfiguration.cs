@@ -1,8 +1,6 @@
-﻿using SolutionTwo.Common.Interfaces;
+﻿namespace SolutionTwo.Business.Identity.Configuration;
 
-namespace SolutionTwo.Business.Identity.Configuration;
-
-public class IdentityConfiguration : IVerifiableConfiguration
+public class IdentityConfiguration
 {
     public string? JwtKey { get; set; }
 

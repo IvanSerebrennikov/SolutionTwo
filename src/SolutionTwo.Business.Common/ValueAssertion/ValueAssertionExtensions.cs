@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-using SolutionTwo.Common.Exceptions;
+using SolutionTwo.Business.Common.ValueAssertion;
 
 namespace SolutionTwo.Common.Extensions;
 

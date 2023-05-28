@@ -1,8 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using SolutionTwo.Common.Exceptions;
-using SolutionTwo.Common.Interfaces;
+﻿using SolutionTwo.Api.Exceptions;
 
-namespace SolutionTwo.Common.Extensions;
+namespace SolutionTwo.Api.Extensions;
 
 public static class ConfigurationExtensions
 {
@@ -14,7 +12,7 @@ public static class ConfigurationExtensions
     /// <returns></returns>
     /// <exception cref="ConfigurationVerificationException">Throws if any property of T is null or empty</exception>
     public static T GetSection<T>(this IConfiguration configuration)
-        where T : class, IVerifiableConfiguration
+        where T : class
     {
         var type = typeof(T);
         var configurationSection = configuration.GetSection(type.Name).Get(type) as T;

@@ -1,23 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using SolutionTwo.Common.Extensions;
 using SolutionTwo.Data.Common.Configuration;
 using SolutionTwo.Data.MainDatabase.Configuration;
 using SolutionTwo.Data.MainDatabase.Context;
 using SolutionTwo.Data.MainDatabase.Repositories;
 using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
+using SolutionTwo.Data.MainDatabase.UnitOfWork;
 using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
-namespace SolutionTwo.Data.MainDatabase.DI;
+namespace SolutionTwo.Api.DI;
 
 public static class DataMainDatabaseServicesRegistrationExtensions
 {
-    public static void AddDataMainDatabaseServices(this IServiceCollection services, IConfiguration configuration)
+    public static void AddDataMainDatabaseServices(this IServiceCollection services,
+        ConnectionStrings connectionStrings, MainDatabaseConfiguration databaseConfiguration)
     {
-        var connectionStrings = configuration.GetSection<ConnectionStrings>();
-        var databaseConfiguration = configuration.GetSection<MainDatabaseConfiguration>();
-        
         services.AddSingleton(databaseConfiguration);
 
         services.AddDbContext<MainDatabaseContext>(o =>
@@ -30,9 +26,9 @@ public static class DataMainDatabaseServicesRegistrationExtensions
                 o.EnableSensitiveDataLogging();
             }
         );
-        
+
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-        services.AddScoped<IMainDatabase, UnitOfWork.MainDatabase>();
+        services.AddScoped<IMainDatabase, MainDatabase>();
     }
 }

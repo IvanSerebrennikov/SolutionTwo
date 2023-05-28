@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Common.Exceptions;
+﻿namespace SolutionTwo.Api.Exceptions;
 
 public class ConfigurationVerificationException : Exception
 {

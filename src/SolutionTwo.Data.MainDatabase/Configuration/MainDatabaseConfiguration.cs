@@ -1,8 +1,6 @@
-﻿using SolutionTwo.Common.Interfaces;
+﻿namespace SolutionTwo.Data.MainDatabase.Configuration;
 
-namespace SolutionTwo.Data.MainDatabase.Configuration;
-
-public class MainDatabaseConfiguration : IVerifiableConfiguration
+public class MainDatabaseConfiguration
 {
     public int? CommandTimeOutInSeconds { get; set; }
 }

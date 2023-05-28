@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Common.Exceptions;
+﻿namespace SolutionTwo.Business.Common.ValueAssertion;
 
 public class ValueAssertionException : Exception
 {
