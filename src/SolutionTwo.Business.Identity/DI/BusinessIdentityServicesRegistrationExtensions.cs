@@ -16,9 +16,9 @@ public static class BusinessIdentityServicesRegistrationExtensions
 {
     public static void AddBusinessIdentityServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var jwtConfiguration = configuration.GetSection<IdentityConfiguration>();
+        var identityConfiguration = configuration.GetSection<IdentityConfiguration>();
 
-        services.AddSingleton(jwtConfiguration);
+        services.AddSingleton(identityConfiguration);
         
         services.AddSingleton<IPasswordHasher<object>, PasswordHasher<object>>();
 
