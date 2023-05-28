@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SolutionTwo.Business.Common.PasswordManager;
 using SolutionTwo.Business.Identity.Configuration;
-using SolutionTwo.Business.Identity.Models.Auth.Outgoing;
 using SolutionTwo.Business.Identity.Services;
 using SolutionTwo.Business.Identity.Services.Interfaces;
 using SolutionTwo.Business.Identity.TokenManager;
@@ -103,6 +102,38 @@ public class AuthServiceTests
             Is.GreaterThan(DateTime.UtcNow.AddDays(RefreshTokenExpiresDays).AddMinutes(-1)));
     }
 
+    [Test]
+    public async Task RefreshTokensPairAsyncReturnsSuccessAndMarksProvidedActiveRefreshTokenAsUsed()
+    {
+        var user = new UserEntity
+        {
+            Id = Guid.NewGuid(),
+            FirstName = "FirstName",
+            LastName = "LastName",
+            Username = "Username",
+            PasswordHash = "PasswordHash",
+            CreatedDateTimeUtc = DateTime.UtcNow
+        };
+        var providedActiveRefreshToken = new RefreshTokenEntity
+        {
+            Id = Guid.NewGuid(),
+            AuthTokenId = Guid.NewGuid(),
+            UserId = user.Id,
+            CreatedDateTimeUtc = DateTime.UtcNow.AddDays(-1),
+            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(6)
+        };
+        _userRepository.Create(user);
+        _refreshTokenRepository.Create(providedActiveRefreshToken);
+
+        var result = await _authService.RefreshTokensPairAsync(providedActiveRefreshToken.Id);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsSucceeded, Is.True);
+            Assert.That(providedActiveRefreshToken.IsUsed, Is.True);
+        });
+    }
+    
     [Test]
     public async Task RefreshTokensPairAsyncReturnsErrorAndRevokesProvidedActiveTokenForUserWhenCalledTwiceForSameRefreshToken()
     {
