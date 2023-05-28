@@ -12,6 +12,9 @@ builder.Services.AddMemoryCache();
 // Api DI
 builder.Services.AddApiServices(builder.Configuration);
 
+// Business.Common DI
+builder.Services.AddBusinessCommonServices();
+
 // Business.Identity DI
 var identityConfiguration = builder.Configuration.GetSection<IdentityConfiguration>();
 builder.Services.AddSingleton(identityConfiguration);
