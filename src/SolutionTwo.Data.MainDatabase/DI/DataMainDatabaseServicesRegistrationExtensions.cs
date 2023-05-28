@@ -17,8 +17,7 @@ public static class DataMainDatabaseServicesRegistrationExtensions
     {
         var connectionStrings = configuration.GetSection<ConnectionStrings>();
         var databaseConfiguration = configuration.GetSection<MainDatabaseConfiguration>();
-
-        services.AddSingleton(connectionStrings);
+        
         services.AddSingleton(databaseConfiguration);
 
         services.AddDbContext<MainDatabaseContext>(o =>
