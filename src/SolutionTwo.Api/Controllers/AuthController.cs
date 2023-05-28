@@ -21,13 +21,14 @@ public class AuthController : ApiControllerBase
     public async Task<ActionResult<TokensPairModel>> Auth(UserCredentialsModel userCredentials)
     {
         if (string.IsNullOrWhiteSpace(userCredentials.Username) || string.IsNullOrWhiteSpace(userCredentials.Password))
-            return BadRequest("Invalid credentials");
+            return BadRequest("Credentials can't be empty");
 
         var serviceResult = await _authService.CreateTokensPairAsync(userCredentials);
 
-        if (serviceResult.IsSucceeded)
-            return Ok(serviceResult.Data);
-        return BadRequest(serviceResult.Message);
+        if (!serviceResult.IsSucceeded)
+            return BadRequest(serviceResult);
+        
+        return Ok(serviceResult.Data);
     }
 
     [HttpPost("refresh-token")]
@@ -38,8 +39,9 @@ public class AuthController : ApiControllerBase
 
         var serviceResult = await _authService.RefreshTokensPairAsync(refreshTokenId);
 
-        if (serviceResult.IsSucceeded)
-            return Ok(serviceResult.Data);
-        return BadRequest(serviceResult.Message);
+        if (!serviceResult.IsSucceeded)
+            return BadRequest(serviceResult);
+        
+        return Ok(serviceResult.Data);
     }
 }

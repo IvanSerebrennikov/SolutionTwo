@@ -28,13 +28,13 @@ public class GlobalErrorHandlingMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        var errorId = Guid.NewGuid();
+        var traceId = Guid.NewGuid();
 
-        _logger.LogError(exception, $"ErrorId: {errorId}.");
+        _logger.LogError(exception, $"TraceId: {traceId}.");
 
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-        var errorResponse = new ErrorResponse("Something went wrong.", errorId, exception.GetType().ToString());
+        var errorResponse = new ErrorResponse("Something went wrong.", traceId, exception.GetType().ToString());
         await context.Response.WriteAsJsonAsync(errorResponse);
     }
 }

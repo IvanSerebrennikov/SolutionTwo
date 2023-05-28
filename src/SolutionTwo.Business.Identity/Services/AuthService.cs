@@ -55,6 +55,12 @@ public class AuthService : IAuthService
         if (userEntity == null || 
             !_passwordManager.VerifyHashedPassword(userEntity.PasswordHash, userCredentials.Password!))
         {
+            var traceId = Guid.NewGuid();
+            var incorrectProperty =
+                userEntity == null ? nameof(userCredentials.Username) : nameof(userCredentials.Password);
+            _logger.LogWarning($"Incorrect {incorrectProperty} was provided during CreateTokensPair. " +
+                               $"{nameof(userCredentials.Username)}: {userCredentials.Username}. " +
+                               $"TraceId: {traceId}.");
             return ServiceResult<TokensPairModel>.Error(
                 "User with provided credentials was not found");
         }
@@ -75,15 +81,24 @@ public class AuthService : IAuthService
 
         string? refreshTokenValidationError = null;
         if (refreshTokenEntity == null)
+        {
+            _logger.LogWarning(
+                $"Attempt to refresh token that doesn't exist. " +
+                $"Provided Refresh Token value: {refreshToken}.");
             refreshTokenValidationError = "Provided Refresh token was not found";
+        }
         else if (refreshTokenEntity.ExpiresDateTimeUtc <= DateTime.UtcNow)
+        {
             refreshTokenValidationError = "Provided Refresh token expired";
+        }
         else if (refreshTokenEntity.IsRevoked)
+        {
             refreshTokenValidationError = "Provided Refresh token was revoked";
+        }
         else if (refreshTokenEntity.IsUsed)
         {
             _logger.LogWarning(
-                $"Someone is trying to refresh already used token. " +
+                $"Attempt to refresh already used token. " +
                 $"RefreshTokenId: {refreshTokenEntity.Id}, UserId: {refreshTokenEntity.UserId}.");
             await RevokeProvidedAndAllActiveRefreshTokensForUserAsync(refreshTokenEntity.Id, refreshTokenEntity.UserId);
             
