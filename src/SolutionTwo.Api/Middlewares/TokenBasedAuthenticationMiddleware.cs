@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using SolutionTwo.Api.Attributes;
-using SolutionTwo.Business.Identity.TokenManager.Interfaces;
+using SolutionTwo.Business.Identity.Services.Interfaces;
+using SolutionTwo.Business.Identity.TokenProvider.Interfaces;
 
 namespace SolutionTwo.Api.Middlewares;
 
@@ -12,12 +13,14 @@ public class TokenBasedAuthenticationMiddleware
     private const string AuthenticationScheme = JwtBearerDefaults.AuthenticationScheme;
     private const int BadResultStatusCode = (int)HttpStatusCode.Unauthorized;
     private readonly RequestDelegate _next;
-    private readonly ITokenManager _tokenManager;
+    private readonly ITokenProvider _tokenProvider;
+    private readonly IAuthService _authService;
 
-    public TokenBasedAuthenticationMiddleware(RequestDelegate next, ITokenManager tokenManager)
+    public TokenBasedAuthenticationMiddleware(RequestDelegate next, ITokenProvider tokenProvider, IAuthService authService)
     {
         _next = next;
-        _tokenManager = tokenManager;
+        _tokenProvider = tokenProvider;
+        _authService = authService;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -45,12 +48,12 @@ public class TokenBasedAuthenticationMiddleware
             return;
         }
 
-        var claimsPrincipal = _tokenManager.ValidateAuthTokenAndGetPrincipal(tokenString, out var securityToken);
+        var claimsPrincipal = _tokenProvider.ValidateAuthTokenAndGetPrincipal(tokenString, out var securityToken);
 
         if (claimsPrincipal == null ||
             securityToken == null ||
             !Guid.TryParse(securityToken.Id, out var authTokenId) ||
-            _tokenManager.IsAuthTokenRevoked(authTokenId))
+            _authService.IsAuthTokenRevoked(authTokenId))
         {
             context.Response.StatusCode = BadResultStatusCode;
             return;

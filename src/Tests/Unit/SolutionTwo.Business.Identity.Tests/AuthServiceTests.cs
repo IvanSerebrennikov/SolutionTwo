@@ -6,8 +6,8 @@ using SolutionTwo.Business.Common.PasswordManager;
 using SolutionTwo.Business.Identity.Configuration;
 using SolutionTwo.Business.Identity.Services;
 using SolutionTwo.Business.Identity.Services.Interfaces;
-using SolutionTwo.Business.Identity.TokenManager;
-using SolutionTwo.Business.Identity.TokenManager.Interfaces;
+using SolutionTwo.Business.Identity.TokenProvider;
+using SolutionTwo.Business.Identity.TokenProvider.Interfaces;
 using SolutionTwo.Business.Tests.InMemoryRepositories;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
@@ -19,7 +19,7 @@ public class AuthServiceTests
 {
     private IAuthService _authService = null!;
     
-    private ITokenManager _tokenManager = null!;
+    private ITokenProvider _tokenProvider = null!;
     private IRefreshTokenRepository _refreshTokenRepository = null!;
     private IUserRepository _userRepository = null!;
     private const int RefreshTokenExpiresDays = 7;
@@ -42,9 +42,8 @@ public class AuthServiceTests
         
         var mainDatabaseMock = new Mock<IMainDatabase>();
         var mainDatabase = mainDatabaseMock.Object;
-
-        var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        _tokenManager = new JwtManager(identityConfiguration, memoryCache);
+        
+        _tokenProvider = new JwtProvider(identityConfiguration);
 
         var passwordHasher = new PasswordHasher<object>();
         var passwordManager = new PasswordManager(passwordHasher);
@@ -52,8 +51,10 @@ public class AuthServiceTests
         var loggerMock = new Mock<ILogger<AuthService>>();
         var logger = loggerMock.Object;
 
+        var memoryCache = new MemoryCache(new MemoryCacheOptions());
+        
         _authService = new AuthService(identityConfiguration, _refreshTokenRepository, _userRepository, mainDatabase,
-            _tokenManager, passwordManager, logger);
+            _tokenProvider, passwordManager, memoryCache, logger);
     }
 
     [Test]
@@ -166,7 +167,7 @@ public class AuthServiceTests
             Assert.That(secondCallResult.IsSucceeded, Is.False);
             Assert.That(secondCallResult.Data, Is.Null);
             Assert.That(providedActiveRefreshToken.IsRevoked, Is.True);
-            Assert.That(_tokenManager.IsAuthTokenRevoked(providedActiveRefreshToken.AuthTokenId), Is.True);
+            Assert.That(_authService.IsAuthTokenRevoked(providedActiveRefreshToken.AuthTokenId), Is.True);
         });
     }
     
@@ -222,9 +223,9 @@ public class AuthServiceTests
             Assert.That(newActiveRefreshToken!.IsRevoked, Is.True);
             Assert.That(activeRefreshToken2.IsRevoked, Is.True);
             Assert.That(activeRefreshToken3.IsRevoked, Is.True);
-            Assert.That(_tokenManager.IsAuthTokenRevoked(newActiveRefreshToken!.AuthTokenId), Is.True);
-            Assert.That(_tokenManager.IsAuthTokenRevoked(activeRefreshToken2.AuthTokenId), Is.True);
-            Assert.That(_tokenManager.IsAuthTokenRevoked(activeRefreshToken3.AuthTokenId), Is.True);
+            Assert.That(_authService.IsAuthTokenRevoked(newActiveRefreshToken!.AuthTokenId), Is.True);
+            Assert.That(_authService.IsAuthTokenRevoked(activeRefreshToken2.AuthTokenId), Is.True);
+            Assert.That(_authService.IsAuthTokenRevoked(activeRefreshToken3.AuthTokenId), Is.True);
         });
     }
     
@@ -277,8 +278,8 @@ public class AuthServiceTests
         {
             Assert.That(alreadyUsedRefreshToken.IsRevoked, Is.False);
             Assert.That(expiredRefreshToken.IsRevoked, Is.False);
-            Assert.That(_tokenManager.IsAuthTokenRevoked(alreadyUsedRefreshToken.AuthTokenId), Is.False);
-            Assert.That(_tokenManager.IsAuthTokenRevoked(expiredRefreshToken.AuthTokenId), Is.False);
+            Assert.That(_authService.IsAuthTokenRevoked(alreadyUsedRefreshToken.AuthTokenId), Is.False);
+            Assert.That(_authService.IsAuthTokenRevoked(expiredRefreshToken.AuthTokenId), Is.False);
         });
     }
     
@@ -350,8 +351,8 @@ public class AuthServiceTests
         {
             Assert.That(activeRefreshTokenForOtherUser1.IsRevoked, Is.False);
             Assert.That(activeRefreshTokenForOtherUser2.IsRevoked, Is.False);
-            Assert.That(_tokenManager.IsAuthTokenRevoked(activeRefreshTokenForOtherUser1.AuthTokenId), Is.False);
-            Assert.That(_tokenManager.IsAuthTokenRevoked(activeRefreshTokenForOtherUser2.AuthTokenId), Is.False);
+            Assert.That(_authService.IsAuthTokenRevoked(activeRefreshTokenForOtherUser1.AuthTokenId), Is.False);
+            Assert.That(_authService.IsAuthTokenRevoked(activeRefreshTokenForOtherUser2.AuthTokenId), Is.False);
         });
     }
 }

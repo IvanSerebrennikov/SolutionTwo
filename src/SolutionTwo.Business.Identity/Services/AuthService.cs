@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SolutionTwo.Business.Common.Models;
 using SolutionTwo.Business.Common.PasswordManager.Interfaces;
@@ -6,7 +7,7 @@ using SolutionTwo.Business.Identity.Configuration;
 using SolutionTwo.Business.Identity.Models.Auth.Incoming;
 using SolutionTwo.Business.Identity.Models.Auth.Outgoing;
 using SolutionTwo.Business.Identity.Services.Interfaces;
-using SolutionTwo.Business.Identity.TokenManager.Interfaces;
+using SolutionTwo.Business.Identity.TokenProvider.Interfaces;
 using SolutionTwo.Common.Extensions;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
@@ -20,8 +21,9 @@ public class AuthService : IAuthService
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IUserRepository _userRepository;
     private readonly IMainDatabase _mainDatabase;
-    private readonly ITokenManager _tokenManager;
+    private readonly ITokenProvider _tokenProvider;
     private readonly IPasswordManager _passwordManager;
+    private readonly IMemoryCache _memoryCache;
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
@@ -29,17 +31,19 @@ public class AuthService : IAuthService
         IRefreshTokenRepository refreshTokenRepository,
         IUserRepository userRepository,
         IMainDatabase mainDatabase, 
-        ITokenManager tokenManager, 
+        ITokenProvider tokenProvider, 
         IPasswordManager passwordManager, 
+        IMemoryCache memoryCache,
         ILogger<AuthService> logger)
     {
         _identityConfiguration = identityConfiguration;
         _refreshTokenRepository = refreshTokenRepository;
         _userRepository = userRepository;
         _mainDatabase = mainDatabase;
-        _tokenManager = tokenManager;
+        _tokenProvider = tokenProvider;
         _passwordManager = passwordManager;
         _logger = logger;
+        _memoryCache = memoryCache;
     }
 
     public async Task<IServiceResult<TokensPairModel>> CreateTokensPairAsync(UserCredentialsModel userCredentials)
@@ -129,18 +133,20 @@ public class AuthService : IAuthService
         return ServiceResult<TokensPairModel>.Success(tokensPair);
     }
 
-    private async Task RevokeProvidedAndAllActiveRefreshTokensForUserAsync(Guid tokenId, Guid userId)
+    public bool IsAuthTokenRevoked(Guid authTokenId)
     {
-        var tokenEntities = await _refreshTokenRepository.GetAsync(
-            x => x.Id == tokenId || (
-                x.UserId == userId && !x.IsUsed && x.ExpiresDateTimeUtc > DateTime.UtcNow));
-
-        foreach (var tokenEntity in tokenEntities)
-        {
-            RevokeTokens(tokenEntity);
-        }
+        return _memoryCache.TryGetValue(GetRevokedAuthTokenKey(authTokenId), out int _);
     }
 
+    private string CreateAuthToken(UserEntity user, out Guid authTokenId)
+    {
+        var claims = user.Roles.Select(x => (ClaimTypes.Role, x.Name)).ToList();
+        claims.Add((ClaimTypes.Name, user.Username));
+        var authToken =
+            _tokenProvider.GenerateAuthToken(claims, out authTokenId);
+        return authToken;
+    }
+    
     private string CreateRefreshToken(Guid userId, Guid authTokenId)
     {
         var refreshToken = new RefreshTokenEntity
@@ -156,20 +162,34 @@ public class AuthService : IAuthService
 
         return refreshToken.Id.ToString();
     }
-
-    private string CreateAuthToken(UserEntity user, out Guid authTokenId)
-    {
-        var claims = user.Roles.Select(x => (ClaimTypes.Role, x.Name)).ToList();
-        claims.Add((ClaimTypes.Name, user.Username));
-        var authToken =
-            _tokenManager.GenerateAuthToken(claims, out authTokenId);
-        return authToken;
-    }
     
+    private async Task RevokeProvidedAndAllActiveRefreshTokensForUserAsync(Guid tokenId, Guid userId)
+    {
+        var tokenEntities = await _refreshTokenRepository.GetAsync(
+            x => x.Id == tokenId || (
+                x.UserId == userId && !x.IsUsed && x.ExpiresDateTimeUtc > DateTime.UtcNow));
+
+        foreach (var tokenEntity in tokenEntities)
+        {
+            RevokeTokens(tokenEntity);
+        }
+    }
+
     private void RevokeTokens(RefreshTokenEntity refreshTokenEntity)
     {
         refreshTokenEntity.IsRevoked = true;
         _refreshTokenRepository.Update(refreshTokenEntity);
-        _tokenManager.RevokeAuthToken(refreshTokenEntity.AuthTokenId);
+        RevokeAuthToken(refreshTokenEntity.AuthTokenId);
+    }
+    
+    private void RevokeAuthToken(Guid authTokenId)
+    {
+        _memoryCache.Set(GetRevokedAuthTokenKey(authTokenId), 1,
+            TimeSpan.FromMinutes(_identityConfiguration.JwtExpiresMinutes!.Value));
+    }
+    
+    private static string GetRevokedAuthTokenKey(Guid authTokenId)
+    {
+        return $"auth-tokens:{authTokenId}:revoked";
     }
 }

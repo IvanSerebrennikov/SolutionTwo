@@ -9,4 +9,6 @@ public interface IAuthService
     Task<IServiceResult<TokensPairModel>> CreateTokensPairAsync(UserCredentialsModel userCredentials);
     
     Task<IServiceResult<TokensPairModel>> RefreshTokensPairAsync(Guid refreshToken);
+    
+    bool IsAuthTokenRevoked(Guid authTokenId);
 }

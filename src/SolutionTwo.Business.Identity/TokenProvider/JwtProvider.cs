@@ -1,20 +1,17 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using SolutionTwo.Business.Identity.Configuration;
-using SolutionTwo.Business.Identity.TokenManager.Interfaces;
+using SolutionTwo.Business.Identity.TokenProvider.Interfaces;
 
-namespace SolutionTwo.Business.Identity.TokenManager;
+namespace SolutionTwo.Business.Identity.TokenProvider;
 
-public class JwtManager : ITokenManager
+public class JwtProvider : ITokenProvider
 {
     private readonly IdentityConfiguration _identityConfiguration;
-    private readonly IMemoryCache _memoryCache;
 
-    public JwtManager(IdentityConfiguration identityConfiguration, IMemoryCache memoryCache)
+    public JwtProvider(IdentityConfiguration identityConfiguration)
     {
-        _memoryCache = memoryCache;
         _identityConfiguration = identityConfiguration;
     }
 
@@ -69,22 +66,6 @@ public class JwtManager : ITokenManager
             securityToken = null;
             return null;
         }
-    }
-
-    public bool IsAuthTokenRevoked(Guid authTokenId)
-    {
-        return _memoryCache.TryGetValue(GetDeactivatedTokenKey(authTokenId), out int _);
-    }
-
-    public void RevokeAuthToken(Guid authTokenId)
-    {
-        _memoryCache.Set(GetDeactivatedTokenKey(authTokenId), 1,
-            TimeSpan.FromMinutes(_identityConfiguration.JwtExpiresMinutes!.Value));
-    }
-    
-    private static string GetDeactivatedTokenKey(Guid authTokenId)
-    {
-        return $"auth-tokens:{authTokenId}:revoked";
     }
 
     private SymmetricSecurityKey GetSymmetricSecurityKey()
