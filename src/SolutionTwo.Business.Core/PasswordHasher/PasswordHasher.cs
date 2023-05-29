@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using SolutionTwo.Business.Common.PasswordManager.Interfaces;
+using SolutionTwo.Business.Core.PasswordHasher.Interfaces;
 
-namespace SolutionTwo.Business.Common.PasswordManager;
+namespace SolutionTwo.Business.Core.PasswordHasher;
 
-public class PasswordManager : IPasswordManager
+public class PasswordHasher : IPasswordHasher
 {
     private readonly IPasswordHasher<object> _passwordHasher;
     
     // IPasswordHasher need it, but do nothing with it
     private readonly object _dummyUser = new();
 
-    public PasswordManager(IPasswordHasher<object> passwordHasher)
+    public PasswordHasher(IPasswordHasher<object> passwordHasher)
     {
         _passwordHasher = passwordHasher;
     }

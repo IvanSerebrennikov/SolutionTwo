@@ -1,6 +1,8 @@
-﻿using SolutionTwo.Business.Common.PasswordManager.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using SolutionTwo.Business.Common.Models;
 using SolutionTwo.Business.Core.Models.User.Incoming;
 using SolutionTwo.Business.Core.Models.User.Outgoing;
+using SolutionTwo.Business.Core.PasswordHasher.Interfaces;
 using SolutionTwo.Business.Core.Services.Interfaces;
 using SolutionTwo.Common.Extensions;
 using SolutionTwo.Data.MainDatabase.Entities;
@@ -13,16 +15,19 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IMainDatabase _mainDatabase;
-    private readonly IPasswordManager _passwordManager;
+    private readonly IPasswordHasher _passwordHasher;
+    private readonly ILogger<UserService> _logger;
 
     public UserService(
         IMainDatabase mainDatabase, 
         IUserRepository userRepository, 
-        IPasswordManager passwordManager)
+        IPasswordHasher passwordHasher, 
+        ILogger<UserService> logger)
     {
         _mainDatabase = mainDatabase;
         _userRepository = userRepository;
-        _passwordManager = passwordManager;
+        _passwordHasher = passwordHasher;
+        _logger = logger;
     }
 
     public async Task<UserWithRolesModel?> GetUserWithRolesByIdAsync(Guid id)
@@ -36,9 +41,36 @@ public class UserService : IUserService
     {
         var userEntity = await _userRepository.GetSingleAsync(
             x => x.Username == username,
-            includeProperties: "Roles", asNoTracking: true);
+            includeProperties: "Roles", 
+            asNoTracking: true);
 
         return userEntity != null ? new UserWithRolesModel(userEntity) : null;
+    }
+
+    public async Task<IServiceResult<UserWithRolesModel>> GetUserWithRolesByCredentialsAsync(UserCredentialsModel userCredentials)
+    {
+        userCredentials.Username.AssertValueIsNotNull();
+        userCredentials.Password.AssertValueIsNotNull();
+        
+        var userEntity = await _userRepository.GetSingleAsync(
+            x => x.Username == userCredentials.Username,
+            includeProperties: "Roles", 
+            asNoTracking: true);
+        
+        if (userEntity == null || 
+            !_passwordHasher.VerifyHashedPassword(userEntity.PasswordHash, userCredentials.Password!))
+        {
+            var traceId = Guid.NewGuid();
+            var incorrectProperty =
+                userEntity == null ? nameof(userCredentials.Username) : nameof(userCredentials.Password);
+            _logger.LogWarning($"Incorrect {incorrectProperty} was provided during User's credentials verification. " +
+                               $"Provided {nameof(userCredentials.Username)}: {userCredentials.Username}. " +
+                               $"TraceId: {traceId}.");
+            return ServiceResult<UserWithRolesModel>.Error(
+                "User with provided credentials was not found");
+        }
+
+        return ServiceResult<UserWithRolesModel>.Success(new UserWithRolesModel(userEntity));
     }
 
     public async Task<IReadOnlyList<UserWithRolesModel>> GetAllUsersWithRolesAsync()
@@ -56,7 +88,7 @@ public class UserService : IUserService
         createUserModel.Username.AssertValueIsNotNull();
         createUserModel.Password.AssertValueIsNotNull();
 
-        var hashedPassword = _passwordManager.HashPassword(createUserModel.Password!);
+        var hashedPassword = _passwordHasher.HashPassword(createUserModel.Password!);
 
         var userEntity = new UserEntity
         {

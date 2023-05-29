@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Business.Identity.Models.Auth.Incoming;
+﻿namespace SolutionTwo.Business.Core.Models.User.Incoming;
 
 public class UserCredentialsModel
 {

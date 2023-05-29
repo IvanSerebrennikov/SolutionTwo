@@ -14,16 +14,14 @@ public class TokenBasedAuthenticationMiddleware
     private const int BadResultStatusCode = (int)HttpStatusCode.Unauthorized;
     private readonly RequestDelegate _next;
     private readonly ITokenProvider _tokenProvider;
-    private readonly IAuthService _authService;
 
-    public TokenBasedAuthenticationMiddleware(RequestDelegate next, ITokenProvider tokenProvider, IAuthService authService)
+    public TokenBasedAuthenticationMiddleware(RequestDelegate next, ITokenProvider tokenProvider)
     {
         _next = next;
         _tokenProvider = tokenProvider;
-        _authService = authService;
     }
 
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context, IAuthService authService)
     {
         if (UnauthorizedAccessAllowed(context))
         {
@@ -53,7 +51,7 @@ public class TokenBasedAuthenticationMiddleware
         if (claimsPrincipal == null ||
             securityToken == null ||
             !Guid.TryParse(securityToken.Id, out var authTokenId) ||
-            _authService.IsAuthTokenRevoked(authTokenId))
+            authService.IsAuthTokenRevoked(authTokenId))
         {
             context.Response.StatusCode = BadResultStatusCode;
             return;

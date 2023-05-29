@@ -1,6 +1,6 @@
-﻿namespace SolutionTwo.Business.Common.PasswordManager.Interfaces;
+﻿namespace SolutionTwo.Business.Core.PasswordHasher.Interfaces;
 
-public interface IPasswordManager
+public interface IPasswordHasher
 {
     string HashPassword(string password);
 

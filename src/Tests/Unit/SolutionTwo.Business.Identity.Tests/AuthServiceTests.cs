@@ -1,8 +1,6 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SolutionTwo.Business.Common.PasswordManager;
 using SolutionTwo.Business.Identity.Configuration;
 using SolutionTwo.Business.Identity.Services;
 using SolutionTwo.Business.Identity.Services.Interfaces;
@@ -45,16 +43,13 @@ public class AuthServiceTests
         
         _tokenProvider = new JwtProvider(identityConfiguration);
 
-        var passwordHasher = new PasswordHasher<object>();
-        var passwordManager = new PasswordManager(passwordHasher);
-
         var loggerMock = new Mock<ILogger<AuthService>>();
         var logger = loggerMock.Object;
 
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
         
         _authService = new AuthService(identityConfiguration, _refreshTokenRepository, _userRepository, mainDatabase,
-            _tokenProvider, passwordManager, memoryCache, logger);
+            _tokenProvider, memoryCache, logger);
     }
 
     [Test]

@@ -2,13 +2,10 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SolutionTwo.Business.Common.Models;
-using SolutionTwo.Business.Common.PasswordManager.Interfaces;
 using SolutionTwo.Business.Identity.Configuration;
-using SolutionTwo.Business.Identity.Models.Auth.Incoming;
 using SolutionTwo.Business.Identity.Models.Auth.Outgoing;
 using SolutionTwo.Business.Identity.Services.Interfaces;
 using SolutionTwo.Business.Identity.TokenProvider.Interfaces;
-using SolutionTwo.Common.Extensions;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
 using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
@@ -22,7 +19,6 @@ public class AuthService : IAuthService
     private readonly IUserRepository _userRepository;
     private readonly IMainDatabase _mainDatabase;
     private readonly ITokenProvider _tokenProvider;
-    private readonly IPasswordManager _passwordManager;
     private readonly IMemoryCache _memoryCache;
     private readonly ILogger<AuthService> _logger;
 
@@ -32,7 +28,6 @@ public class AuthService : IAuthService
         IUserRepository userRepository,
         IMainDatabase mainDatabase, 
         ITokenProvider tokenProvider, 
-        IPasswordManager passwordManager, 
         IMemoryCache memoryCache,
         ILogger<AuthService> logger)
     {
@@ -41,33 +36,15 @@ public class AuthService : IAuthService
         _userRepository = userRepository;
         _mainDatabase = mainDatabase;
         _tokenProvider = tokenProvider;
-        _passwordManager = passwordManager;
         _logger = logger;
         _memoryCache = memoryCache;
     }
 
-    public async Task<IServiceResult<TokensPairModel>> CreateTokensPairAsync(UserCredentialsModel userCredentials)
+    public async Task<IServiceResult<TokensPairModel>> CreateTokensPairAsync(Guid userId)
     {
-        userCredentials.Username.AssertValueIsNotNull();
-        userCredentials.Password.AssertValueIsNotNull();
-        
-        var userEntity = await _userRepository.GetSingleAsync(
-            x => x.Username == userCredentials.Username,
-            includeProperties: "Roles", 
-            asNoTracking: true);
-        
-        if (userEntity == null || 
-            !_passwordManager.VerifyHashedPassword(userEntity.PasswordHash, userCredentials.Password!))
-        {
-            var traceId = Guid.NewGuid();
-            var incorrectProperty =
-                userEntity == null ? nameof(userCredentials.Username) : nameof(userCredentials.Password);
-            _logger.LogWarning($"Incorrect {incorrectProperty} was provided during CreateTokensPair. " +
-                               $"{nameof(userCredentials.Username)}: {userCredentials.Username}. " +
-                               $"TraceId: {traceId}.");
-            return ServiceResult<TokensPairModel>.Error(
-                "User with provided credentials was not found");
-        }
+        var userEntity = await GetUserWithRolesAsync(userId);
+        if (userEntity == null)
+            return ServiceResult<TokensPairModel>.Error("User was not found");
         
         var authToken = CreateAuthToken(userEntity, out var authTokenId);
         var refreshToken = CreateRefreshToken(userEntity.Id, authTokenId);
@@ -114,10 +91,7 @@ public class AuthService : IAuthService
         if (!string.IsNullOrEmpty(refreshTokenValidationError))
             return ServiceResult<TokensPairModel>.Error(refreshTokenValidationError);
 
-        var userEntity = await _userRepository.GetByIdAsync(
-            refreshTokenEntity!.UserId, 
-            includeProperties: "Roles",
-            asNoTracking: true);
+        var userEntity = await GetUserWithRolesAsync(refreshTokenEntity!.UserId);
         if (userEntity == null)
             return ServiceResult<TokensPairModel>.Error("Associated User was not found");
         
@@ -136,6 +110,16 @@ public class AuthService : IAuthService
     public bool IsAuthTokenRevoked(Guid authTokenId)
     {
         return _memoryCache.TryGetValue(GetRevokedAuthTokenKey(authTokenId), out int _);
+    }
+
+    private async Task<UserEntity?> GetUserWithRolesAsync(Guid userId)
+    {
+        var userEntity = await _userRepository.GetByIdAsync(
+            userId, 
+            includeProperties: "Roles",
+            asNoTracking: true);
+
+        return userEntity;
     }
 
     private string CreateAuthToken(UserEntity user, out Guid authTokenId)
