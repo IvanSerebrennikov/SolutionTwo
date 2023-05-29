@@ -5,7 +5,6 @@ using SolutionTwo.Business.Identity.Configuration;
 using SolutionTwo.Business.Identity.Services;
 using SolutionTwo.Business.Identity.Services.Interfaces;
 using SolutionTwo.Business.Identity.TokenProvider;
-using SolutionTwo.Business.Identity.TokenProvider.Interfaces;
 using SolutionTwo.Business.Tests.InMemoryRepositories;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
@@ -16,11 +15,12 @@ namespace SolutionTwo.Business.Tests;
 public class AuthServiceTests
 {
     private IAuthService _authService = null!;
-    
-    private ITokenProvider _tokenProvider = null!;
     private IRefreshTokenRepository _refreshTokenRepository = null!;
-    private IUserRepository _userRepository = null!;
     private const int RefreshTokenExpiresDays = 7;
+
+    private readonly Guid _user1Id = Guid.NewGuid();
+    private readonly Guid _user2Id = Guid.NewGuid();
+    private readonly Guid _user3Id = Guid.NewGuid();
 
     [SetUp]
     public void Setup()
@@ -36,47 +36,65 @@ public class AuthServiceTests
 
         _refreshTokenRepository = new InMemoryRefreshTokenRepository();
 
-        _userRepository = new InMemoryUserRepository();
+        var userRepository = new InMemoryUserRepository();
         
         var mainDatabaseMock = new Mock<IMainDatabase>();
         var mainDatabase = mainDatabaseMock.Object;
         
-        _tokenProvider = new JwtProvider(identityConfiguration);
+        var tokenProvider = new JwtProvider(identityConfiguration);
 
         var loggerMock = new Mock<ILogger<AuthService>>();
         var logger = loggerMock.Object;
 
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
         
-        _authService = new AuthService(identityConfiguration, _refreshTokenRepository, _userRepository, mainDatabase,
-            _tokenProvider, memoryCache, logger);
-    }
-
-    [Test]
-    public async Task RefreshTokensPairAsyncReturnsSuccessAndCreatesNewActiveRefreshTokenForUser()
-    {
-        var user = new UserEntity
+        _authService = new AuthService(identityConfiguration, _refreshTokenRepository, userRepository, mainDatabase,
+            tokenProvider, memoryCache, logger);
+        
+        var user1 = new UserEntity
         {
-            Id = Guid.NewGuid(),
+            Id = _user1Id,
             FirstName = "FirstName",
             LastName = "LastName",
             Username = "Username",
             PasswordHash = "PasswordHash",
             CreatedDateTimeUtc = DateTime.UtcNow
         };
-        var providedActiveRefreshToken = new RefreshTokenEntity
+        var user2 = new UserEntity
         {
-            Id = Guid.NewGuid(),
-            AuthTokenId = Guid.NewGuid(),
-            UserId = user.Id,
-            CreatedDateTimeUtc = DateTime.UtcNow.AddDays(-1),
-            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(6)
+            Id = _user2Id,
+            FirstName = "FirstName",
+            LastName = "LastName",
+            Username = "Username",
+            PasswordHash = "PasswordHash",
+            CreatedDateTimeUtc = DateTime.UtcNow
         };
-        _userRepository.Create(user);
-        _refreshTokenRepository.Create(providedActiveRefreshToken);
+        var user3 = new UserEntity
+        {
+            Id = _user3Id,
+            FirstName = "FirstName",
+            LastName = "LastName",
+            Username = "Username",
+            PasswordHash = "PasswordHash",
+            CreatedDateTimeUtc = DateTime.UtcNow
+        };
+        userRepository.Create(user1);
+        userRepository.Create(user2);
+        userRepository.Create(user3);
+    }
 
-        var result = await _authService.RefreshTokensPairAsync(providedActiveRefreshToken.Id);
-        var newTokensPair = result.Data;
+    // TODO: CreateTokensPairAsync tests
+    
+    // TODO: ValidateAuthTokenAndGetPrincipal tests
+    
+    [Test]
+    public async Task RefreshTokensPairAsyncReturnsSuccessAndCreatesNewActiveRefreshTokenForUser()
+    {
+        var createTokensResult = await _authService.CreateTokensPairAsync(_user1Id);
+        var tokensPair = createTokensResult.Data;
+        
+        var refreshTokensResult = await _authService.RefreshTokensPairAsync(tokensPair!.RefreshToken);
+        var newTokensPair = refreshTokensResult.Data;
         var newActiveRefreshToken = (newTokensPair != null
             ? await _refreshTokenRepository.GetSingleAsync(x =>
                 x.Id.ToString() == newTokensPair.RefreshToken)
@@ -84,270 +102,152 @@ public class AuthServiceTests
         
         Assert.Multiple(() =>
         {
-            Assert.That(result.IsSucceeded, Is.True);
+            Assert.That(refreshTokensResult.IsSucceeded, Is.True);
             Assert.That(newActiveRefreshToken, Is.Not.Null);
         });
         Assert.Multiple(() =>
         {
-            Assert.That(newActiveRefreshToken?.IsRevoked, Is.False);
-            Assert.That(newActiveRefreshToken?.IsUsed, Is.False);
-            Assert.That(newActiveRefreshToken?.ExpiresDateTimeUtc, Is.Not.Null);
-            Assert.That(newActiveRefreshToken?.UserId, Is.EqualTo(user.Id));
+            Assert.That(newActiveRefreshToken!.IsRevoked, Is.False);
+            Assert.That(newActiveRefreshToken.IsUsed, Is.False);
+            Assert.That(newActiveRefreshToken.UserId, Is.EqualTo(_user1Id));
+            Assert.That(newActiveRefreshToken.ExpiresDateTimeUtc,
+                Is.GreaterThan(DateTime.UtcNow.AddDays(RefreshTokenExpiresDays).AddMinutes(-1)));
         });
-        Assert.That(newActiveRefreshToken?.ExpiresDateTimeUtc,
-            Is.GreaterThan(DateTime.UtcNow.AddDays(RefreshTokenExpiresDays).AddMinutes(-1)));
     }
 
     [Test]
     public async Task RefreshTokensPairAsyncReturnsSuccessAndMarksProvidedActiveRefreshTokenAsUsed()
     {
-        var user = new UserEntity
-        {
-            Id = Guid.NewGuid(),
-            FirstName = "FirstName",
-            LastName = "LastName",
-            Username = "Username",
-            PasswordHash = "PasswordHash",
-            CreatedDateTimeUtc = DateTime.UtcNow
-        };
-        var providedActiveRefreshToken = new RefreshTokenEntity
-        {
-            Id = Guid.NewGuid(),
-            AuthTokenId = Guid.NewGuid(),
-            UserId = user.Id,
-            CreatedDateTimeUtc = DateTime.UtcNow.AddDays(-1),
-            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(6)
-        };
-        _userRepository.Create(user);
-        _refreshTokenRepository.Create(providedActiveRefreshToken);
+        var createTokensResult = await _authService.CreateTokensPairAsync(_user1Id);
+        var tokensPair = createTokensResult.Data;
 
-        var result = await _authService.RefreshTokensPairAsync(providedActiveRefreshToken.Id);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.IsSucceeded, Is.True);
-            Assert.That(providedActiveRefreshToken.IsUsed, Is.True);
-        });
-    }
-    
-    [Test]
-    public async Task RefreshTokensPairAsyncReturnsErrorAndRevokesProvidedActiveTokenForUserWhenCalledTwiceForSameRefreshToken()
-    {
-        var user = new UserEntity
-        {
-            Id = Guid.NewGuid(),
-            FirstName = "FirstName",
-            LastName = "LastName",
-            Username = "Username",
-            PasswordHash = "PasswordHash",
-            CreatedDateTimeUtc = DateTime.UtcNow
-        };
-        var providedActiveRefreshToken = new RefreshTokenEntity
-        {
-            Id = Guid.NewGuid(),
-            AuthTokenId = Guid.NewGuid(),
-            UserId = user.Id,
-            CreatedDateTimeUtc = DateTime.UtcNow.AddDays(-1),
-            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(6)
-        };
-        _userRepository.Create(user);
-        _refreshTokenRepository.Create(providedActiveRefreshToken);
-
-        var firstCallResult = await _authService.RefreshTokensPairAsync(providedActiveRefreshToken.Id);
-        var secondCallResult = await _authService.RefreshTokensPairAsync(providedActiveRefreshToken.Id);
+        var refreshTokensResult = await _authService.RefreshTokensPairAsync(tokensPair!.RefreshToken);
+        var providedRefreshToken = await _refreshTokenRepository.GetSingleAsync(x =>
+            x.Id.ToString() == tokensPair.RefreshToken);
         
         Assert.Multiple(() =>
         {
-            Assert.That(firstCallResult.IsSucceeded, Is.True);
-            Assert.That(secondCallResult.IsSucceeded, Is.False);
-            Assert.That(secondCallResult.Data, Is.Null);
-            Assert.That(providedActiveRefreshToken.IsRevoked, Is.True);
-            Assert.That(_authService.IsAuthTokenRevoked(providedActiveRefreshToken.AuthTokenId), Is.True);
+            Assert.That(refreshTokensResult.IsSucceeded, Is.True);
+            Assert.That(providedRefreshToken, Is.Not.Null);
         });
+        Assert.That(providedRefreshToken!.IsUsed, Is.True);
     }
     
+    [Test]
+    public async Task RefreshTokensPairAsyncReturnsErrorWhenCalledTwiceForSameRefreshToken()
+    {
+        var createTokensResult = await _authService.CreateTokensPairAsync(_user1Id);
+        var tokensPair = createTokensResult.Data;
+        
+        await _authService.RefreshTokensPairAsync(tokensPair!.RefreshToken);
+        var secondRefreshTokensCallResult = await _authService.RefreshTokensPairAsync(tokensPair.RefreshToken);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(secondRefreshTokensCallResult.IsSucceeded, Is.False);
+            Assert.That(secondRefreshTokensCallResult.Data, Is.Null);
+        });
+    }
+
     [Test]
     public async Task RefreshTokensPairAsyncRevokesAllActiveTokensForUserWhenCalledTwiceForSameRefreshToken()
     {
-        var user = new UserEntity
-        {
-            Id = Guid.NewGuid(),
-            FirstName = "FirstName",
-            LastName = "LastName",
-            Username = "Username",
-            PasswordHash = "PasswordHash",
-            CreatedDateTimeUtc = DateTime.UtcNow
-        };
-        var providedActiveRefreshToken = new RefreshTokenEntity
-        {
-            Id = Guid.NewGuid(),
-            AuthTokenId = Guid.NewGuid(),
-            UserId = user.Id,
-            CreatedDateTimeUtc = DateTime.UtcNow.AddDays(-1),
-            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(6)
-        };
-        var activeRefreshToken2 = new RefreshTokenEntity
-        {
-            Id = Guid.NewGuid(),
-            AuthTokenId = Guid.NewGuid(),
-            UserId =  user.Id,
-            CreatedDateTimeUtc = DateTime.UtcNow.AddDays(-2),
-            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(5)
-        };
-        var activeRefreshToken3 = new RefreshTokenEntity
-        {
-            Id = Guid.NewGuid(),
-            AuthTokenId = Guid.NewGuid(),
-            UserId =  user.Id,
-            CreatedDateTimeUtc = DateTime.UtcNow.AddDays(-6),
-            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(1)
-        };
-        _userRepository.Create(user);
-        _refreshTokenRepository.Create(providedActiveRefreshToken);
-        _refreshTokenRepository.Create(activeRefreshToken2);
-        _refreshTokenRepository.Create(activeRefreshToken3);
+        var createTokensResult1 = await _authService.CreateTokensPairAsync(_user1Id);
+        var tokensPair1 = createTokensResult1.Data;
+        var createTokensResult2 = await _authService.CreateTokensPairAsync(_user1Id);
+        var tokensPair2 = createTokensResult2.Data;
+        var createTokensResult3 = await _authService.CreateTokensPairAsync(_user1Id);
+        var tokensPair3 = createTokensResult3.Data;
 
-        var firstCallResult = await _authService.RefreshTokensPairAsync(providedActiveRefreshToken.Id);
-        var newTokensPair = firstCallResult.Data;
-        var newActiveRefreshToken =
-            await _refreshTokenRepository.GetSingleAsync(x => x.Id.ToString() == newTokensPair!.RefreshToken);
-        await _authService.RefreshTokensPairAsync(providedActiveRefreshToken.Id);
+        await _authService.RefreshTokensPairAsync(tokensPair1!.RefreshToken);
+        await _authService.RefreshTokensPairAsync(tokensPair1.RefreshToken);
+        var providedRefreshToken = await _refreshTokenRepository.GetSingleAsync(x =>
+            x.Id.ToString() == tokensPair1.RefreshToken);
+        var otherActiveRefreshToken1 = await _refreshTokenRepository.GetSingleAsync(x =>
+            x.Id.ToString() == tokensPair2!.RefreshToken);
+        var otherActiveRefreshToken2 = await _refreshTokenRepository.GetSingleAsync(x =>
+            x.Id.ToString() == tokensPair3!.RefreshToken);
+        var validateResult1 = _authService.ValidateAuthTokenAndGetPrincipal(tokensPair1.AuthToken);
+        var validateResult2 = _authService.ValidateAuthTokenAndGetPrincipal(tokensPair2!.AuthToken);
+        var validateResult3 = _authService.ValidateAuthTokenAndGetPrincipal(tokensPair3!.AuthToken);
         
+        Assert.That(providedRefreshToken, Is.Not.Null);
+        Assert.That(otherActiveRefreshToken1, Is.Not.Null);
+        Assert.That(otherActiveRefreshToken2, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(newActiveRefreshToken!.IsRevoked, Is.True);
-            Assert.That(activeRefreshToken2.IsRevoked, Is.True);
-            Assert.That(activeRefreshToken3.IsRevoked, Is.True);
-            Assert.That(_authService.IsAuthTokenRevoked(newActiveRefreshToken!.AuthTokenId), Is.True);
-            Assert.That(_authService.IsAuthTokenRevoked(activeRefreshToken2.AuthTokenId), Is.True);
-            Assert.That(_authService.IsAuthTokenRevoked(activeRefreshToken3.AuthTokenId), Is.True);
+            Assert.That(providedRefreshToken!.IsRevoked, Is.True);
+            Assert.That(otherActiveRefreshToken1!.IsRevoked, Is.True);
+            Assert.That(otherActiveRefreshToken2!.IsRevoked, Is.True);
+            Assert.That(validateResult1.IsSucceeded, Is.False);
+            Assert.That(validateResult2.IsSucceeded, Is.False);
+            Assert.That(validateResult3.IsSucceeded, Is.False);
         });
     }
     
     [Test]
     public async Task RefreshTokensPairAsyncDoesNotRevokeNotActiveTokensForUserWhenCalledTwiceForSameRefreshToken()
     {
-        var user = new UserEntity
-        {
-            Id = Guid.NewGuid(),
-            FirstName = "FirstName",
-            LastName = "LastName",
-            Username = "Username",
-            PasswordHash = "PasswordHash",
-            CreatedDateTimeUtc = DateTime.UtcNow
-        };
-        var providedActiveRefreshToken = new RefreshTokenEntity
-        {
-            Id = Guid.NewGuid(),
-            AuthTokenId = Guid.NewGuid(),
-            UserId = user.Id,
-            CreatedDateTimeUtc = DateTime.UtcNow.AddDays(-1),
-            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(6)
-        };
-        var alreadyUsedRefreshToken = new RefreshTokenEntity
-        {
-            Id = Guid.NewGuid(),
-            AuthTokenId = Guid.NewGuid(),
-            UserId = user.Id,
-            IsUsed = true,
-            CreatedDateTimeUtc = DateTime.UtcNow.AddDays(-2),
-            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(5)
-        };
-        var expiredRefreshToken = new RefreshTokenEntity
-        {
-            Id = Guid.NewGuid(),
-            AuthTokenId = Guid.NewGuid(),
-            UserId = user.Id,
-            CreatedDateTimeUtc = DateTime.UtcNow.AddDays(-8),
-            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(-1)
-        };
-        _userRepository.Create(user);
-        _refreshTokenRepository.Create(providedActiveRefreshToken);
-        _refreshTokenRepository.Create(alreadyUsedRefreshToken);
-        _refreshTokenRepository.Create(expiredRefreshToken);
-
-        await _authService.RefreshTokensPairAsync(providedActiveRefreshToken.Id);
-        await _authService.RefreshTokensPairAsync(providedActiveRefreshToken.Id);
+        // provided
+        var createTokensResult = await _authService.CreateTokensPairAsync(_user1Id);
+        var tokensPair = createTokensResult.Data;
         
+        // used
+        var createOtherTokensResult1 = await _authService.CreateTokensPairAsync(_user1Id);
+        var otherTokensPair1 = createOtherTokensResult1.Data;
+        var otherRefreshToken1 = await _refreshTokenRepository.GetSingleAsync(x =>
+            x.Id.ToString() == otherTokensPair1!.RefreshToken);
+        otherRefreshToken1!.IsUsed = true;
+        
+        // expired
+        var createOtherTokensResult2 = await _authService.CreateTokensPairAsync(_user1Id);
+        var otherTokensPair2 = createOtherTokensResult2.Data;
+        var otherRefreshToken2 = await _refreshTokenRepository.GetSingleAsync(x =>
+            x.Id.ToString() == otherTokensPair2!.RefreshToken);
+        otherRefreshToken2!.ExpiresDateTimeUtc =
+            otherRefreshToken2.ExpiresDateTimeUtc.AddDays(-RefreshTokenExpiresDays);
+
+        await _authService.RefreshTokensPairAsync(tokensPair!.RefreshToken);
+        await _authService.RefreshTokensPairAsync(tokensPair.RefreshToken);
+        var validateResult1 = _authService.ValidateAuthTokenAndGetPrincipal(otherTokensPair1!.AuthToken);
+        var validateResult2 = _authService.ValidateAuthTokenAndGetPrincipal(otherTokensPair2!.AuthToken);
+
         Assert.Multiple(() =>
         {
-            Assert.That(alreadyUsedRefreshToken.IsRevoked, Is.False);
-            Assert.That(expiredRefreshToken.IsRevoked, Is.False);
-            Assert.That(_authService.IsAuthTokenRevoked(alreadyUsedRefreshToken.AuthTokenId), Is.False);
-            Assert.That(_authService.IsAuthTokenRevoked(expiredRefreshToken.AuthTokenId), Is.False);
+            Assert.That(otherRefreshToken1.IsRevoked, Is.False);
+            Assert.That(otherRefreshToken2.IsRevoked, Is.False);
+            Assert.That(validateResult1.IsSucceeded, Is.True);
+            Assert.That(validateResult2.IsSucceeded, Is.True);
         });
     }
     
     [Test]
     public async Task RefreshTokensPairAsyncDoesNotRevokeActiveTokensForOtherUsersWhenCalledTwiceForSameRefreshToken()
     {
-        var user = new UserEntity
-        {
-            Id = Guid.NewGuid(),
-            FirstName = "FirstName",
-            LastName = "LastName",
-            Username = "Username",
-            PasswordHash = "PasswordHash",
-            CreatedDateTimeUtc = DateTime.UtcNow
-        };
-        var otherUser1 = new UserEntity
-        {
-            Id = Guid.NewGuid(),
-            FirstName = "FirstName",
-            LastName = "LastName",
-            Username = "Username",
-            PasswordHash = "PasswordHash",
-            CreatedDateTimeUtc = DateTime.UtcNow
-        };
-        var otherUser2 = new UserEntity
-        {
-            Id = Guid.NewGuid(),
-            FirstName = "FirstName",
-            LastName = "LastName",
-            Username = "Username",
-            PasswordHash = "PasswordHash",
-            CreatedDateTimeUtc = DateTime.UtcNow
-        };
-        var providedActiveRefreshToken = new RefreshTokenEntity
-        {
-            Id = Guid.NewGuid(),
-            AuthTokenId = Guid.NewGuid(),
-            UserId = user.Id,
-            CreatedDateTimeUtc = DateTime.UtcNow.AddDays(-1),
-            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(6)
-        };
-        var activeRefreshTokenForOtherUser1 = new RefreshTokenEntity
-        {
-            Id = Guid.NewGuid(),
-            AuthTokenId = Guid.NewGuid(),
-            UserId = otherUser1.Id,
-            CreatedDateTimeUtc = DateTime.UtcNow.AddDays(-1),
-            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(6)
-        };
-        var activeRefreshTokenForOtherUser2 = new RefreshTokenEntity
-        {
-            Id = Guid.NewGuid(),
-            AuthTokenId = Guid.NewGuid(),
-            UserId = otherUser2.Id,
-            CreatedDateTimeUtc = DateTime.UtcNow.AddDays(-1),
-            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(6)
-        };
-        _userRepository.Create(user);
-        _userRepository.Create(otherUser1);
-        _userRepository.Create(otherUser2);
-        _refreshTokenRepository.Create(providedActiveRefreshToken);
-        _refreshTokenRepository.Create(activeRefreshTokenForOtherUser1);
-        _refreshTokenRepository.Create(activeRefreshTokenForOtherUser2);
+        var createTokensResult = await _authService.CreateTokensPairAsync(_user1Id);
+        var tokensPair = createTokensResult.Data;
+        var createOtherTokensResult1 = await _authService.CreateTokensPairAsync(_user2Id);
+        var otherTokensPair1 = createOtherTokensResult1.Data;
+        var createOtherTokensResult2 = await _authService.CreateTokensPairAsync(_user3Id);
+        var otherTokensPair2 = createOtherTokensResult2.Data;
 
-        await _authService.RefreshTokensPairAsync(providedActiveRefreshToken.Id);
-        await _authService.RefreshTokensPairAsync(providedActiveRefreshToken.Id);
+        await _authService.RefreshTokensPairAsync(tokensPair!.RefreshToken);
+        await _authService.RefreshTokensPairAsync(tokensPair.RefreshToken);
+        var otherActiveRefreshToken1 = await _refreshTokenRepository.GetSingleAsync(x =>
+            x.Id.ToString() == otherTokensPair1!.RefreshToken);
+        var otherActiveRefreshToken2 = await _refreshTokenRepository.GetSingleAsync(x =>
+            x.Id.ToString() == otherTokensPair2!.RefreshToken);
+        var validateResult1 = _authService.ValidateAuthTokenAndGetPrincipal(otherTokensPair1!.AuthToken);
+        var validateResult2= _authService.ValidateAuthTokenAndGetPrincipal(otherTokensPair2!.AuthToken);
         
+        Assert.That(otherActiveRefreshToken1, Is.Not.Null);
+        Assert.That(otherActiveRefreshToken2, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(activeRefreshTokenForOtherUser1.IsRevoked, Is.False);
-            Assert.That(activeRefreshTokenForOtherUser2.IsRevoked, Is.False);
-            Assert.That(_authService.IsAuthTokenRevoked(activeRefreshTokenForOtherUser1.AuthTokenId), Is.False);
-            Assert.That(_authService.IsAuthTokenRevoked(activeRefreshTokenForOtherUser2.AuthTokenId), Is.False);
+            Assert.That(otherActiveRefreshToken1!.IsRevoked, Is.False);
+            Assert.That(otherActiveRefreshToken2!.IsRevoked, Is.False);
+            Assert.That(validateResult1.IsSucceeded, Is.True);
+            Assert.That(validateResult2.IsSucceeded, Is.True);
         });
     }
 }

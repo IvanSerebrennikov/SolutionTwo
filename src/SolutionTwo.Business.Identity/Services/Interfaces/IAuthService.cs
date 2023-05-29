@@ -8,9 +8,7 @@ public interface IAuthService
 {
     Task<IServiceResult<TokensPairModel>> CreateTokensPairAsync(Guid userId);
     
-    Task<IServiceResult<TokensPairModel>> RefreshTokensPairAsync(Guid refreshToken);
+    Task<IServiceResult<TokensPairModel>> RefreshTokensPairAsync(string refreshToken);
     
     IServiceResult<ClaimsPrincipal> ValidateAuthTokenAndGetPrincipal(string tokenString);
-
-    bool IsAuthTokenRevoked(Guid authTokenId);
 }

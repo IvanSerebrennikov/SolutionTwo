@@ -46,10 +46,10 @@ public class AuthController : ApiControllerBase
     [HttpPost("refresh-token")]
     public async Task<ActionResult<TokensPairModel>> RefreshToken([FromBody] string refreshTokenValue)
     {
-        if (string.IsNullOrEmpty(refreshTokenValue) || !Guid.TryParse(refreshTokenValue, out var refreshTokenId))
+        if (string.IsNullOrEmpty(refreshTokenValue))
             return BadRequest("Invalid Refresh token");
 
-        var serviceResult = await _authService.RefreshTokensPairAsync(refreshTokenId);
+        var serviceResult = await _authService.RefreshTokensPairAsync(refreshTokenValue);
 
         if (!serviceResult.IsSucceeded)
             return BadRequest(serviceResult);

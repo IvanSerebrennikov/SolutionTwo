@@ -56,9 +56,12 @@ public class AuthService : IAuthService
         return ServiceResult<TokensPairModel>.Success(tokensPair);
     }
 
-    public async Task<IServiceResult<TokensPairModel>> RefreshTokensPairAsync(Guid refreshToken)
+    public async Task<IServiceResult<TokensPairModel>> RefreshTokensPairAsync(string refreshToken)
     {
-        var refreshTokenEntity = await _refreshTokenRepository.GetByIdAsync(refreshToken);
+        if (!Guid.TryParse(refreshToken, out var refreshTokenId))
+            return ServiceResult<TokensPairModel>.Error("Invalid refresh token");
+        
+        var refreshTokenEntity = await _refreshTokenRepository.GetByIdAsync(refreshTokenId);
 
         string? refreshTokenValidationError = null;
         if (refreshTokenEntity == null)
@@ -121,11 +124,6 @@ public class AuthService : IAuthService
 
         return ServiceResult<ClaimsPrincipal>.Success(claimsPrincipal);
     }
-    
-    public bool IsAuthTokenRevoked(Guid authTokenId)
-    {
-        return _memoryCache.TryGetValue(GetRevokedAuthTokenKey(authTokenId), out int _);
-    }
 
     private async Task<UserEntity?> GetUserWithRolesAsync(Guid userId)
     {
@@ -185,6 +183,11 @@ public class AuthService : IAuthService
     {
         _memoryCache.Set(GetRevokedAuthTokenKey(authTokenId), 1,
             TimeSpan.FromMinutes(_identityConfiguration.JwtExpiresMinutes!.Value));
+    }
+    
+    private bool IsAuthTokenRevoked(Guid authTokenId)
+    {
+        return _memoryCache.TryGetValue(GetRevokedAuthTokenKey(authTokenId), out int _);
     }
 
     private static string GetRevokedAuthTokenKey(Guid authTokenId)
