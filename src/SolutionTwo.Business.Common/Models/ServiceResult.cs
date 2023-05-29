@@ -23,7 +23,7 @@ public class ServiceResult<T> : IServiceResult<T>
         return new ServiceResult<T>(data, message, true, null);
     }
     
-    public static IServiceResult<T> Error(string? message, Guid? traceId = null)
+    public static IServiceResult<T> Error(string? message = null, Guid? traceId = null)
     {
         return new ServiceResult<T>(default, message, false, traceId);
     }

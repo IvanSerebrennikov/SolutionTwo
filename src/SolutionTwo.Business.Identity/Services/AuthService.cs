@@ -107,6 +107,21 @@ public class AuthService : IAuthService
         return ServiceResult<TokensPairModel>.Success(tokensPair);
     }
 
+    public IServiceResult<ClaimsPrincipal> ValidateAuthTokenAndGetPrincipal(string tokenString)
+    {
+        var claimsPrincipal = _tokenProvider.ValidateAuthToken(tokenString, out var securityToken);
+
+        if (claimsPrincipal == null ||
+            securityToken == null ||
+            !Guid.TryParse(securityToken.Id, out var authTokenId) ||
+            IsAuthTokenRevoked(authTokenId))
+        {
+            return ServiceResult<ClaimsPrincipal>.Error();
+        }
+
+        return ServiceResult<ClaimsPrincipal>.Success(claimsPrincipal);
+    }
+    
     public bool IsAuthTokenRevoked(Guid authTokenId)
     {
         return _memoryCache.TryGetValue(GetRevokedAuthTokenKey(authTokenId), out int _);
@@ -171,7 +186,7 @@ public class AuthService : IAuthService
         _memoryCache.Set(GetRevokedAuthTokenKey(authTokenId), 1,
             TimeSpan.FromMinutes(_identityConfiguration.JwtExpiresMinutes!.Value));
     }
-    
+
     private static string GetRevokedAuthTokenKey(Guid authTokenId)
     {
         return $"auth-tokens:{authTokenId}:revoked";

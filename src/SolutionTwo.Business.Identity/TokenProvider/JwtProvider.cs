@@ -40,7 +40,7 @@ public class JwtProvider : ITokenProvider
         return tokenString;
     }
     
-    public ClaimsPrincipal? ValidateAuthTokenAndGetPrincipal(string tokenString, out SecurityToken? securityToken)
+    public ClaimsPrincipal? ValidateAuthToken(string tokenString, out SecurityToken? securityToken)
     {
         var key = GetSymmetricSecurityKey();
         var tokenHandler = new JwtSecurityTokenHandler();
