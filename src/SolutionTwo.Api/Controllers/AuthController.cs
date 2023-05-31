@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using SolutionTwo.Api.Controllers.Base;
-using SolutionTwo.Api.Models;
-using SolutionTwo.Business.Core.Models.User.Incoming;
-using SolutionTwo.Business.Core.Services.Interfaces;
 using SolutionTwo.Business.Identity.Models.Auth.Incoming;
 using SolutionTwo.Business.Identity.Models.Auth.Outgoing;
 using SolutionTwo.Business.Identity.Services.Interfaces;

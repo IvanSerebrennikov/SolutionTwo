@@ -5,8 +5,6 @@ public interface IServiceResult
     bool IsSucceeded { get; }
 
     string? Message { get; }
-    
-    string? TraceId { get; }
 }
 
 public interface IServiceResult<T> : IServiceResult

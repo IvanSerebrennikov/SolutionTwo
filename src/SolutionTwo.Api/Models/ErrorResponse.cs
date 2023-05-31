@@ -2,37 +2,37 @@
 
 public class ErrorResponse
 {
-    public ErrorResponse(string? message, string? traceId = null, string? errorType = null)
+    public ErrorResponse(string? message, string? requestId = null, string? errorType = null)
     {
-        Error = new ErrorData(message, traceId, errorType);
+        Error = new ErrorData(message, requestId, errorType);
     }
     
-    public ErrorResponse(string[] messages, string? traceId = null, string? errorType = null)
+    public ErrorResponse(string[] messages, string? requestId = null, string? errorType = null)
     {
-        Error = new ErrorData(messages, traceId, errorType);
+        Error = new ErrorData(messages, requestId, errorType);
     }
 
     public ErrorData Error { get; }
 
     public class ErrorData
     {
-        public ErrorData(string? message, string? traceId = null, string? errorType = null)
+        public ErrorData(string? message, string? requestId = null, string? errorType = null)
         {
             Messages = !string.IsNullOrEmpty(message) ? new[] { message } : Array.Empty<string>();
-            TraceId = traceId;
+            RequestId = requestId;
             ErrorType = errorType;
         }
         
-        public ErrorData(string[] messages, string? traceId = null, string? errorType = null)
+        public ErrorData(string[] messages, string? requestId = null, string? errorType = null)
         {
             Messages = messages;
-            TraceId = traceId;
+            RequestId = requestId;
             ErrorType = errorType;
         }
 
         public string[] Messages { get; }
 
-        public string? TraceId { get; }
+        public string? RequestId { get; }
 
         public string? ErrorType { get; }
     }

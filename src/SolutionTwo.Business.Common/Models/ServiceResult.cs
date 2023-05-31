@@ -2,12 +2,11 @@
 
 public class ServiceResult<T> : IServiceResult<T>
 {
-    private ServiceResult(T? data, string? message, bool isSucceeded, string? traceId)
+    private ServiceResult(T? data, string? message, bool isSucceeded)
     {
         Data = data;
         Message = message;
         IsSucceeded = isSucceeded;
-        TraceId = traceId;
     }
     
     public T? Data { get; }
@@ -16,15 +15,13 @@ public class ServiceResult<T> : IServiceResult<T>
 
     public string? Message { get; }
 
-    public string? TraceId { get; }
-
     public static IServiceResult<T> Success(T? data, string? message = null)
     {
-        return new ServiceResult<T>(data, message, true, null);
+        return new ServiceResult<T>(data, message, true);
     }
     
-    public static IServiceResult<T> Error(string? message = null, string? traceId = null)
+    public static IServiceResult<T> Error(string? message = null)
     {
-        return new ServiceResult<T>(default, message, false, traceId);
+        return new ServiceResult<T>(default, message, false);
     }
 }
