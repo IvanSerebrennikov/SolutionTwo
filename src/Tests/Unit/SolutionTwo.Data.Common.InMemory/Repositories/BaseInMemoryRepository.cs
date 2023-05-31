@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
-using SolutionTwo.Business.Tests.InMemoryRepositories.EntityComparer;
 using SolutionTwo.Data.Common.Entities.Interfaces;
+using SolutionTwo.Data.Common.InMemory.EntityComparer;
 using SolutionTwo.Data.Common.Repositories.Interfaces;
 
-namespace SolutionTwo.Business.Tests.InMemoryRepositories.Base;
+namespace SolutionTwo.Data.Common.InMemory.Repositories;
 
 // Changes are applied instantly, without UnitOfWork.CommitChanges
 

@@ -1,8 +1,8 @@
-﻿using SolutionTwo.Business.Tests.InMemoryRepositories.Base;
+﻿using SolutionTwo.Data.Common.InMemory.Repositories;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
 
-namespace SolutionTwo.Business.Tests.InMemoryRepositories;
+namespace SolutionTwo.Data.MainDatabase.InMemory.Repositories;
 
 public class InMemoryRefreshTokenRepository : BaseInMemoryRepository<RefreshTokenEntity, Guid>, IRefreshTokenRepository
 {

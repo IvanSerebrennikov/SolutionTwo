@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\SolutionTwo.Data.MainDatabase\SolutionTwo.Data.MainDatabase.csproj" />
+      <ProjectReference Include="..\SolutionTwo.Data.Common.InMemory\SolutionTwo.Data.Common.InMemory.csproj" />
+    </ItemGroup>
+
+</Project>
