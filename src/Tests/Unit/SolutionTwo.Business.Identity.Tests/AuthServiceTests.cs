@@ -169,9 +169,12 @@ public class AuthServiceTests
         var validateResult2 = _authService.ValidateAuthTokenAndGetPrincipal(tokensPair2!.AuthToken);
         var validateResult3 = _authService.ValidateAuthTokenAndGetPrincipal(tokensPair3!.AuthToken);
         
-        Assert.That(providedRefreshToken, Is.Not.Null);
-        Assert.That(otherActiveRefreshToken1, Is.Not.Null);
-        Assert.That(otherActiveRefreshToken2, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(providedRefreshToken, Is.Not.Null);
+            Assert.That(otherActiveRefreshToken1, Is.Not.Null);
+            Assert.That(otherActiveRefreshToken2, Is.Not.Null);
+        });
         Assert.Multiple(() =>
         {
             Assert.That(providedRefreshToken!.IsRevoked, Is.True);
@@ -182,7 +185,7 @@ public class AuthServiceTests
             Assert.That(validateResult3.IsSucceeded, Is.False);
         });
     }
-    
+
     [Test]
     public async Task RefreshTokensPairAsyncDoesNotRevokeNotActiveTokensForUserWhenCalledTwiceForSameRefreshToken()
     {
@@ -238,8 +241,11 @@ public class AuthServiceTests
         var validateResult1 = _authService.ValidateAuthTokenAndGetPrincipal(otherTokensPair1!.AuthToken);
         var validateResult2= _authService.ValidateAuthTokenAndGetPrincipal(otherTokensPair2!.AuthToken);
         
-        Assert.That(otherActiveRefreshToken1, Is.Not.Null);
-        Assert.That(otherActiveRefreshToken2, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(otherActiveRefreshToken1, Is.Not.Null);
+            Assert.That(otherActiveRefreshToken2, Is.Not.Null);
+        });
         Assert.Multiple(() =>
         {
             Assert.That(otherActiveRefreshToken1!.IsRevoked, Is.False);

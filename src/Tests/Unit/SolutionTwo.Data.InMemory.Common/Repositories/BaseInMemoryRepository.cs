@@ -7,7 +7,7 @@ namespace SolutionTwo.Data.InMemory.Common;
 
 // Changes are applied instantly, without UnitOfWork.CommitChanges
 
-// includeProperties is not supported, entities return with all nested data
+// includeProperties is not supported, entities are returned with all nested data
 
 // asNoTracking is not supported, behavior like all entities are tracking 
 
