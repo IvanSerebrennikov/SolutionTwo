@@ -3,7 +3,7 @@ using SolutionTwo.Data.Common.Entities.Interfaces;
 using SolutionTwo.Data.Common.InMemory.EntityComparer;
 using SolutionTwo.Data.Common.Repositories.Interfaces;
 
-namespace SolutionTwo.Data.Common.InMemory.Repositories;
+namespace SolutionTwo.Data.Common.InMemory;
 
 // Changes are applied instantly, without UnitOfWork.CommitChanges
 
