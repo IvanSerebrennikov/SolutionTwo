@@ -10,5 +10,5 @@ public interface IAuthService
     
     Task<IServiceResult<TokensPairModel>> RefreshTokensPairAsync(string refreshToken);
     
-    IServiceResult<ClaimsPrincipal> ValidateAuthTokenAndGetPrincipal(string tokenString);
+    IServiceResult<ClaimsPrincipal> VerifyAuthTokenAndGetPrincipal(string tokenString);
 }

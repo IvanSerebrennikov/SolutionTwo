@@ -43,15 +43,15 @@ public class TokenBasedAuthenticationMiddleware
             return;
         }
 
-        var authServiceResult = authService.ValidateAuthTokenAndGetPrincipal(tokenString);
+        var verificationResult = authService.VerifyAuthTokenAndGetPrincipal(tokenString);
 
-        if (!authServiceResult.IsSucceeded || authServiceResult.Data == null)
+        if (!verificationResult.IsSucceeded || verificationResult.Data == null)
         {
             context.Response.StatusCode = BadResultStatusCode;
             return;
         }
 
-        context.User = authServiceResult.Data;
+        context.User = verificationResult.Data;
 
         await _next(context);
     }

@@ -103,7 +103,7 @@ public class AuthService : IAuthService
         return ServiceResult<TokensPairModel>.Success(tokensPair);
     }
 
-    public IServiceResult<ClaimsPrincipal> ValidateAuthTokenAndGetPrincipal(string tokenString)
+    public IServiceResult<ClaimsPrincipal> VerifyAuthTokenAndGetPrincipal(string tokenString)
     {
         var claimsPrincipal = _tokenProvider.ValidateAuthToken(tokenString, out var securityToken);
 

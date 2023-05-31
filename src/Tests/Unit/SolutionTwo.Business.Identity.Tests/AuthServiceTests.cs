@@ -165,9 +165,9 @@ public class AuthServiceTests
             x.Id.ToString() == tokensPair2!.RefreshToken);
         var otherActiveRefreshToken2 = await _mainDatabase.RefreshTokens.GetSingleAsync(x =>
             x.Id.ToString() == tokensPair3!.RefreshToken);
-        var validateResult1 = _authService.ValidateAuthTokenAndGetPrincipal(tokensPair1.AuthToken);
-        var validateResult2 = _authService.ValidateAuthTokenAndGetPrincipal(tokensPair2!.AuthToken);
-        var validateResult3 = _authService.ValidateAuthTokenAndGetPrincipal(tokensPair3!.AuthToken);
+        var verificationResult1 = _authService.VerifyAuthTokenAndGetPrincipal(tokensPair1.AuthToken);
+        var verificationResult2 = _authService.VerifyAuthTokenAndGetPrincipal(tokensPair2!.AuthToken);
+        var verificationResult3 = _authService.VerifyAuthTokenAndGetPrincipal(tokensPair3!.AuthToken);
         
         Assert.Multiple(() =>
         {
@@ -180,9 +180,9 @@ public class AuthServiceTests
             Assert.That(providedRefreshToken!.IsRevoked, Is.True);
             Assert.That(otherActiveRefreshToken1!.IsRevoked, Is.True);
             Assert.That(otherActiveRefreshToken2!.IsRevoked, Is.True);
-            Assert.That(validateResult1.IsSucceeded, Is.False);
-            Assert.That(validateResult2.IsSucceeded, Is.False);
-            Assert.That(validateResult3.IsSucceeded, Is.False);
+            Assert.That(verificationResult1.IsSucceeded, Is.False);
+            Assert.That(verificationResult2.IsSucceeded, Is.False);
+            Assert.That(verificationResult3.IsSucceeded, Is.False);
         });
     }
 
@@ -210,15 +210,15 @@ public class AuthServiceTests
 
         await _authService.RefreshTokensPairAsync(tokensPair!.RefreshToken);
         await _authService.RefreshTokensPairAsync(tokensPair.RefreshToken);
-        var validateResult1 = _authService.ValidateAuthTokenAndGetPrincipal(otherTokensPair1!.AuthToken);
-        var validateResult2 = _authService.ValidateAuthTokenAndGetPrincipal(otherTokensPair2!.AuthToken);
+        var verificationResult1 = _authService.VerifyAuthTokenAndGetPrincipal(otherTokensPair1!.AuthToken);
+        var verificationResult2 = _authService.VerifyAuthTokenAndGetPrincipal(otherTokensPair2!.AuthToken);
 
         Assert.Multiple(() =>
         {
             Assert.That(otherRefreshToken1.IsRevoked, Is.False);
             Assert.That(otherRefreshToken2.IsRevoked, Is.False);
-            Assert.That(validateResult1.IsSucceeded, Is.True);
-            Assert.That(validateResult2.IsSucceeded, Is.True);
+            Assert.That(verificationResult1.IsSucceeded, Is.True);
+            Assert.That(verificationResult2.IsSucceeded, Is.True);
         });
     }
     
@@ -238,8 +238,8 @@ public class AuthServiceTests
             x.Id.ToString() == otherTokensPair1!.RefreshToken);
         var otherActiveRefreshToken2 = await _mainDatabase.RefreshTokens.GetSingleAsync(x =>
             x.Id.ToString() == otherTokensPair2!.RefreshToken);
-        var validateResult1 = _authService.ValidateAuthTokenAndGetPrincipal(otherTokensPair1!.AuthToken);
-        var validateResult2= _authService.ValidateAuthTokenAndGetPrincipal(otherTokensPair2!.AuthToken);
+        var verificationResult1 = _authService.VerifyAuthTokenAndGetPrincipal(otherTokensPair1!.AuthToken);
+        var verificationResult2= _authService.VerifyAuthTokenAndGetPrincipal(otherTokensPair2!.AuthToken);
         
         Assert.Multiple(() =>
         {
@@ -250,8 +250,8 @@ public class AuthServiceTests
         {
             Assert.That(otherActiveRefreshToken1!.IsRevoked, Is.False);
             Assert.That(otherActiveRefreshToken2!.IsRevoked, Is.False);
-            Assert.That(validateResult1.IsSucceeded, Is.True);
-            Assert.That(validateResult2.IsSucceeded, Is.True);
+            Assert.That(verificationResult1.IsSucceeded, Is.True);
+            Assert.That(verificationResult2.IsSucceeded, Is.True);
         });
     }
 }
