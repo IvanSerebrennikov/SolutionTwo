@@ -6,40 +6,36 @@ using SolutionTwo.Business.Core.PasswordHasher.Interfaces;
 using SolutionTwo.Business.Core.Services.Interfaces;
 using SolutionTwo.Common.Extensions;
 using SolutionTwo.Data.MainDatabase.Entities;
-using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
 using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
 namespace SolutionTwo.Business.Core.Services;
 
 public class UserService : IUserService
 {
-    private readonly IUserRepository _userRepository;
     private readonly IMainDatabase _mainDatabase;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ILogger<UserService> _logger;
 
     public UserService(
         IMainDatabase mainDatabase, 
-        IUserRepository userRepository, 
         IPasswordHasher passwordHasher, 
         ILogger<UserService> logger)
     {
         _mainDatabase = mainDatabase;
-        _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _logger = logger;
     }
 
     public async Task<UserWithRolesModel?> GetUserWithRolesByIdAsync(Guid id)
     {
-        var userEntity = await _userRepository.GetByIdAsync(id, includeProperties: "Roles", asNoTracking: true);
+        var userEntity = await _mainDatabase.Users.GetByIdAsync(id, includeProperties: "Roles", asNoTracking: true);
 
         return userEntity != null ? new UserWithRolesModel(userEntity) : null;
     }
 
     public async Task<UserWithRolesModel?> GetUserWithRolesAsync(string username)
     {
-        var userEntity = await _userRepository.GetSingleAsync(
+        var userEntity = await _mainDatabase.Users.GetSingleAsync(
             x => x.Username == username,
             includeProperties: "Roles", 
             asNoTracking: true);
@@ -52,7 +48,7 @@ public class UserService : IUserService
         userCredentials.Username.AssertValueIsNotNull();
         userCredentials.Password.AssertValueIsNotNull();
         
-        var userEntity = await _userRepository.GetSingleAsync(
+        var userEntity = await _mainDatabase.Users.GetSingleAsync(
             x => x.Username == userCredentials.Username,
             includeProperties: "Roles", 
             asNoTracking: true);
@@ -75,7 +71,7 @@ public class UserService : IUserService
 
     public async Task<IReadOnlyList<UserWithRolesModel>> GetAllUsersWithRolesAsync()
     {
-        var userEntities = await _userRepository.GetAsync(includeProperties: "Roles", asNoTracking: true);
+        var userEntities = await _mainDatabase.Users.GetAsync(includeProperties: "Roles", asNoTracking: true);
         var userModels = userEntities.Select(x => new UserWithRolesModel(x)).ToList();
 
         return userModels;
@@ -100,7 +96,7 @@ public class UserService : IUserService
             CreatedDateTimeUtc = DateTime.UtcNow
         };
 
-        _userRepository.Create(userEntity);
+        _mainDatabase.Users.Create(userEntity);
         await _mainDatabase.CommitChangesAsync();
 
         return new UserWithRolesModel(userEntity);

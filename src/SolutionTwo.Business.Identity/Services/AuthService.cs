@@ -7,7 +7,6 @@ using SolutionTwo.Business.Identity.Models.Auth.Outgoing;
 using SolutionTwo.Business.Identity.Services.Interfaces;
 using SolutionTwo.Business.Identity.TokenProvider.Interfaces;
 using SolutionTwo.Data.MainDatabase.Entities;
-using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
 using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
 namespace SolutionTwo.Business.Identity.Services;
@@ -15,8 +14,6 @@ namespace SolutionTwo.Business.Identity.Services;
 public class AuthService : IAuthService
 {
     private readonly IdentityConfiguration _identityConfiguration;
-    private readonly IRefreshTokenRepository _refreshTokenRepository;
-    private readonly IUserRepository _userRepository;
     private readonly IMainDatabase _mainDatabase;
     private readonly ITokenProvider _tokenProvider;
     private readonly IMemoryCache _memoryCache;
@@ -24,16 +21,12 @@ public class AuthService : IAuthService
 
     public AuthService(
         IdentityConfiguration identityConfiguration,
-        IRefreshTokenRepository refreshTokenRepository,
-        IUserRepository userRepository,
         IMainDatabase mainDatabase, 
         ITokenProvider tokenProvider, 
         IMemoryCache memoryCache,
         ILogger<AuthService> logger)
     {
         _identityConfiguration = identityConfiguration;
-        _refreshTokenRepository = refreshTokenRepository;
-        _userRepository = userRepository;
         _mainDatabase = mainDatabase;
         _tokenProvider = tokenProvider;
         _logger = logger;
@@ -61,7 +54,7 @@ public class AuthService : IAuthService
         if (!Guid.TryParse(refreshToken, out var refreshTokenId))
             return ServiceResult<TokensPairModel>.Error("Invalid refresh token");
         
-        var refreshTokenEntity = await _refreshTokenRepository.GetByIdAsync(refreshTokenId);
+        var refreshTokenEntity = await _mainDatabase.RefreshTokens.GetByIdAsync(refreshTokenId);
 
         string? refreshTokenValidationError = null;
         if (refreshTokenEntity == null)
@@ -127,7 +120,7 @@ public class AuthService : IAuthService
 
     private async Task<UserEntity?> GetUserWithRolesAsync(Guid userId)
     {
-        var userEntity = await _userRepository.GetByIdAsync(
+        var userEntity = await _mainDatabase.Users.GetByIdAsync(
             userId, 
             includeProperties: "Roles",
             asNoTracking: true);
@@ -155,14 +148,14 @@ public class AuthService : IAuthService
             ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(_identityConfiguration.RefreshTokenExpiresDays!.Value)
         };
 
-        _refreshTokenRepository.Create(refreshToken);
+        _mainDatabase.RefreshTokens.Create(refreshToken);
 
         return refreshToken.Id.ToString();
     }
     
     private async Task RevokeProvidedAndAllActiveRefreshTokensForUserAsync(Guid tokenId, Guid userId)
     {
-        var tokenEntities = await _refreshTokenRepository.GetAsync(
+        var tokenEntities = await _mainDatabase.RefreshTokens.GetAsync(
             x => x.Id == tokenId || (
                 x.UserId == userId && !x.IsUsed && x.ExpiresDateTimeUtc > DateTime.UtcNow));
 
@@ -175,7 +168,7 @@ public class AuthService : IAuthService
     private void RevokeTokens(RefreshTokenEntity refreshTokenEntity)
     {
         refreshTokenEntity.IsRevoked = true;
-        _refreshTokenRepository.Update(refreshTokenEntity);
+        _mainDatabase.RefreshTokens.Update(refreshTokenEntity);
         RevokeAuthToken(refreshTokenEntity.AuthTokenId);
     }
     
