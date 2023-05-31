@@ -28,7 +28,7 @@ public class GlobalErrorHandlingMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        var traceId = Guid.NewGuid();
+        var traceId = context.TraceIdentifier;
 
         _logger.LogError(exception, $"TraceId: {traceId}.");
 

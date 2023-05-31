@@ -132,12 +132,10 @@ public class AuthService : IAuthService
         if (userEntity == null || 
             !_passwordHasher.VerifyHashedPassword(userEntity.PasswordHash, userCredentials.Password))
         {
-            var traceId = Guid.NewGuid();
             var incorrectProperty =
                 userEntity == null ? nameof(userCredentials.Username) : nameof(userCredentials.Password);
             _logger.LogWarning($"Incorrect {incorrectProperty} was provided during User's credentials verification. " +
-                               $"Provided {nameof(userCredentials.Username)}: {userCredentials.Username}. " +
-                               $"TraceId: {traceId}.");
+                               $"Provided {nameof(userCredentials.Username)}: {userCredentials.Username}.");
         }
 
         return userEntity;

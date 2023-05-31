@@ -6,7 +6,7 @@ public interface IServiceResult
 
     string? Message { get; }
     
-    Guid? TraceId { get; }
+    string? TraceId { get; }
 }
 
 public interface IServiceResult<T> : IServiceResult

@@ -7,14 +7,15 @@ namespace SolutionTwo.Api.Controllers.Base;
 
 public class ApiControllerBase : ControllerBase
 {
-    protected BadRequestObjectResult BadRequest(string? errorMessage, Guid? errorId = null)
+    protected BadRequestObjectResult BadRequest(string? errorMessage, string? traceId = null)
     {
-        return BadRequest(new ErrorResponse(errorMessage, errorId));
+        traceId ??= HttpContext.TraceIdentifier;
+        return BadRequest(new ErrorResponse(errorMessage, traceId));
     }
     
     protected BadRequestObjectResult BadRequest(IServiceResult serviceResult)
     {
-        return BadRequest(new ErrorResponse(serviceResult.Message, serviceResult.TraceId));
+        return BadRequest(serviceResult.Message, serviceResult.TraceId);
     }
 
     protected string? GetUsernameFromClaims()
