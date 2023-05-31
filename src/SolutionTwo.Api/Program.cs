@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMemoryCache();
 
 // Api DI
-builder.Services.AddApiServices(builder.Configuration);
+builder.Services.AddApiServices();
 
 // Business.Identity DI
 var identityConfiguration = builder.Configuration.GetSection<IdentityConfiguration>();

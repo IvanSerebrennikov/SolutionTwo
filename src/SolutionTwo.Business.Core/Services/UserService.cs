@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
-using SolutionTwo.Business.Common.Models;
+using SolutionTwo.Business.Common.PasswordHasher.Interfaces;
+using SolutionTwo.Business.Common.ValueAssertion;
 using SolutionTwo.Business.Core.Models.User.Incoming;
 using SolutionTwo.Business.Core.Models.User.Outgoing;
-using SolutionTwo.Business.Core.PasswordHasher.Interfaces;
 using SolutionTwo.Business.Core.Services.Interfaces;
-using SolutionTwo.Common.Extensions;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
@@ -41,32 +40,6 @@ public class UserService : IUserService
             asNoTracking: true);
 
         return userEntity != null ? new UserWithRolesModel(userEntity) : null;
-    }
-
-    public async Task<IServiceResult<UserWithRolesModel>> GetUserWithRolesByCredentialsAsync(UserCredentialsModel userCredentials)
-    {
-        userCredentials.Username.AssertValueIsNotNull();
-        userCredentials.Password.AssertValueIsNotNull();
-        
-        var userEntity = await _mainDatabase.Users.GetSingleAsync(
-            x => x.Username == userCredentials.Username,
-            includeProperties: "Roles", 
-            asNoTracking: true);
-        
-        if (userEntity == null || 
-            !_passwordHasher.VerifyHashedPassword(userEntity.PasswordHash, userCredentials.Password!))
-        {
-            var traceId = Guid.NewGuid();
-            var incorrectProperty =
-                userEntity == null ? nameof(userCredentials.Username) : nameof(userCredentials.Password);
-            _logger.LogWarning($"Incorrect {incorrectProperty} was provided during User's credentials verification. " +
-                               $"Provided {nameof(userCredentials.Username)}: {userCredentials.Username}. " +
-                               $"TraceId: {traceId}.");
-            return ServiceResult<UserWithRolesModel>.Error(
-                "User with provided credentials was not found");
-        }
-
-        return ServiceResult<UserWithRolesModel>.Success(new UserWithRolesModel(userEntity));
     }
 
     public async Task<IReadOnlyList<UserWithRolesModel>> GetAllUsersWithRolesAsync()

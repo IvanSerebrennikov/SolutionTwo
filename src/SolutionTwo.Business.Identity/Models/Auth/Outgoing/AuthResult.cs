@@ -1,10 +1,8 @@
-﻿using SolutionTwo.Business.Identity.Models.Auth.Outgoing;
+﻿namespace SolutionTwo.Business.Identity.Models.Auth.Outgoing;
 
-namespace SolutionTwo.Api.Models;
-
-public class AuthResponse
+public class AuthResult
 {
-    public AuthResponse(TokensPairModel tokens, string firstName, string lastName)
+    public AuthResult(TokensPairModel tokens, string firstName, string lastName)
     {
         Tokens = tokens;
         FirstName = firstName;

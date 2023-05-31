@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Business.Core.PasswordHasher.Interfaces;
+﻿namespace SolutionTwo.Business.Common.PasswordHasher.Interfaces;
 
 public interface IPasswordHasher
 {

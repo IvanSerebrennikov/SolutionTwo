@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using SolutionTwo.Business.Core.PasswordHasher;
-using SolutionTwo.Business.Core.PasswordHasher.Interfaces;
+using SolutionTwo.Business.Common.PasswordHasher;
+using SolutionTwo.Business.Common.PasswordHasher.Interfaces;
 using SolutionTwo.Business.Core.Services;
 using SolutionTwo.Business.Core.Services.Interfaces;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using SolutionTwo.Business.Core.PasswordHasher.Interfaces;
+using SolutionTwo.Business.Common.PasswordHasher.Interfaces;
 
-namespace SolutionTwo.Business.Core.PasswordHasher;
+namespace SolutionTwo.Business.Common.PasswordHasher;
 
 public class PasswordHasher : IPasswordHasher
 {

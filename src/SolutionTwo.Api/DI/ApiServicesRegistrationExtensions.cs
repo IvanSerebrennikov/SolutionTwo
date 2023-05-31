@@ -1,12 +1,23 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
+using SolutionTwo.Api.Models;
 
 namespace SolutionTwo.Api.DI;
 
 public static class ApiServicesRegistrationExtensions
 {
-    public static void AddApiServices(this IServiceCollection services, IConfiguration configuration)
+    public static void AddApiServices(this IServiceCollection services)
     {
         services.AddControllers();
+        services.Configure<ApiBehaviorOptions>(o =>
+        {
+            o.InvalidModelStateResponseFactory = actionContext =>
+            {
+                var errorMessage = actionContext.ModelState.Values.SelectMany(x => x.Errors)
+                    .Select(x => x.ErrorMessage);
+                return new BadRequestObjectResult(new ErrorResponse(errorMessage.ToArray()));
+            };
+        });
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {

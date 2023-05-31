@@ -2,7 +2,10 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SolutionTwo.Business.Common.Models;
+using SolutionTwo.Business.Common.PasswordHasher.Interfaces;
+using SolutionTwo.Business.Common.ValueAssertion;
 using SolutionTwo.Business.Identity.Configuration;
+using SolutionTwo.Business.Identity.Models.Auth.Incoming;
 using SolutionTwo.Business.Identity.Models.Auth.Outgoing;
 using SolutionTwo.Business.Identity.Services.Interfaces;
 using SolutionTwo.Business.Identity.TokenProvider.Interfaces;
@@ -17,6 +20,7 @@ public class AuthService : IAuthService
     private readonly IMainDatabase _mainDatabase;
     private readonly ITokenProvider _tokenProvider;
     private readonly IMemoryCache _memoryCache;
+    private readonly IPasswordHasher _passwordHasher;
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
@@ -24,29 +28,40 @@ public class AuthService : IAuthService
         IMainDatabase mainDatabase, 
         ITokenProvider tokenProvider, 
         IMemoryCache memoryCache,
-        ILogger<AuthService> logger)
+        ILogger<AuthService> logger, 
+        IPasswordHasher passwordHasher)
     {
         _identityConfiguration = identityConfiguration;
         _mainDatabase = mainDatabase;
         _tokenProvider = tokenProvider;
         _logger = logger;
+        _passwordHasher = passwordHasher;
         _memoryCache = memoryCache;
     }
 
-    public async Task<IServiceResult<TokensPairModel>> CreateTokensPairAsync(Guid userId)
+    public async Task<IServiceResult<AuthResult>> ValidateCredentialsAndCreateTokensPairAsync(
+        UserCredentialsModel userCredentials)
     {
-        var userEntity = await GetUserWithRolesAsync(userId);
-        if (userEntity == null)
-            return ServiceResult<TokensPairModel>.Error("User was not found");
+        userCredentials.Username.AssertValueIsNotNull();
+        userCredentials.Password.AssertValueIsNotNull();
         
+        var userEntity = await VerifyPasswordAndGetUserAsync(userCredentials);
+        
+        if (userEntity == null)
+        {
+            return ServiceResult<AuthResult>.Error(
+                "User with provided credentials was not found");
+        }
+
         var authToken = CreateAuthToken(userEntity, out var authTokenId);
         var refreshToken = CreateRefreshToken(userEntity.Id, authTokenId);
         
         await _mainDatabase.CommitChangesAsync();
         
         var tokensPair = new TokensPairModel(authToken, refreshToken);
+        var authResult = new AuthResult(tokensPair, userEntity.FirstName, userEntity.LastName);
 
-        return ServiceResult<TokensPairModel>.Success(tokensPair);
+        return ServiceResult<AuthResult>.Success(authResult);
     }
 
     public async Task<IServiceResult<TokensPairModel>> RefreshTokensPairAsync(string refreshToken)
@@ -56,7 +71,7 @@ public class AuthService : IAuthService
         
         var refreshTokenEntity = await _mainDatabase.RefreshTokens.GetByIdAsync(refreshTokenId);
 
-        string? refreshTokenValidationError = null;
+        string? refreshTokenValidationError;
         if (refreshTokenEntity == null)
         {
             _logger.LogWarning(
@@ -64,30 +79,19 @@ public class AuthService : IAuthService
                 $"Provided Refresh Token value: {refreshToken}.");
             refreshTokenValidationError = "Provided Refresh token was not found";
         }
-        else if (refreshTokenEntity.ExpiresDateTimeUtc <= DateTime.UtcNow)
+        else
         {
-            refreshTokenValidationError = "Provided Refresh token expired";
-        }
-        else if (refreshTokenEntity.IsRevoked)
-        {
-            refreshTokenValidationError = "Provided Refresh token was revoked";
-        }
-        else if (refreshTokenEntity.IsUsed)
-        {
-            _logger.LogWarning(
-                $"Attempt to refresh already used token. " +
-                $"RefreshTokenId: {refreshTokenEntity.Id}, UserId: {refreshTokenEntity.UserId}.");
-            await RevokeProvidedAndAllActiveRefreshTokensForUserAsync(refreshTokenEntity.Id, refreshTokenEntity.UserId);
-            
-            await _mainDatabase.CommitChangesAsync();
-            
-            refreshTokenValidationError = "Provided Refresh token already used";
+            refreshTokenValidationError =
+                await ValidateRefreshTokenAndHandlePossibleTokenStealingAsync(refreshTokenEntity);
         }
         
         if (!string.IsNullOrEmpty(refreshTokenValidationError))
             return ServiceResult<TokensPairModel>.Error(refreshTokenValidationError);
 
-        var userEntity = await GetUserWithRolesAsync(refreshTokenEntity!.UserId);
+        var userEntity = await _mainDatabase.Users.GetByIdAsync(
+            refreshTokenEntity!.UserId, 
+            includeProperties: "Roles",
+            asNoTracking: true);
         if (userEntity == null)
             return ServiceResult<TokensPairModel>.Error("Associated User was not found");
         
@@ -117,13 +121,24 @@ public class AuthService : IAuthService
 
         return ServiceResult<ClaimsPrincipal>.Success(claimsPrincipal);
     }
-
-    private async Task<UserEntity?> GetUserWithRolesAsync(Guid userId)
+    
+    private async Task<UserEntity?> VerifyPasswordAndGetUserAsync(UserCredentialsModel userCredentials)
     {
-        var userEntity = await _mainDatabase.Users.GetByIdAsync(
-            userId, 
-            includeProperties: "Roles",
+        var userEntity = await _mainDatabase.Users.GetSingleAsync(
+            x => x.Username == userCredentials.Username,
+            includeProperties: "Roles", 
             asNoTracking: true);
+        
+        if (userEntity == null || 
+            !_passwordHasher.VerifyHashedPassword(userEntity.PasswordHash, userCredentials.Password))
+        {
+            var traceId = Guid.NewGuid();
+            var incorrectProperty =
+                userEntity == null ? nameof(userCredentials.Username) : nameof(userCredentials.Password);
+            _logger.LogWarning($"Incorrect {incorrectProperty} was provided during User's credentials verification. " +
+                               $"Provided {nameof(userCredentials.Username)}: {userCredentials.Username}. " +
+                               $"TraceId: {traceId}.");
+        }
 
         return userEntity;
     }
@@ -151,6 +166,33 @@ public class AuthService : IAuthService
         _mainDatabase.RefreshTokens.Create(refreshToken);
 
         return refreshToken.Id.ToString();
+    }
+    
+    private async Task<string> ValidateRefreshTokenAndHandlePossibleTokenStealingAsync(RefreshTokenEntity refreshTokenEntity)
+    {
+        if (refreshTokenEntity.ExpiresDateTimeUtc <= DateTime.UtcNow)
+        {
+            return "Provided Refresh token expired";
+        }
+        
+        if (refreshTokenEntity.IsRevoked)
+        {
+            return "Provided Refresh token was revoked";
+        }
+        
+        if (refreshTokenEntity.IsUsed)
+        {
+            _logger.LogWarning(
+                $"Attempt to refresh already used token. " +
+                $"RefreshTokenId: {refreshTokenEntity.Id}, UserId: {refreshTokenEntity.UserId}.");
+            await RevokeProvidedAndAllActiveRefreshTokensForUserAsync(refreshTokenEntity.Id, refreshTokenEntity.UserId);
+            
+            await _mainDatabase.CommitChangesAsync();
+            
+            return "Provided Refresh token already used";
+        }
+
+        return "";
     }
     
     private async Task RevokeProvidedAndAllActiveRefreshTokensForUserAsync(Guid tokenId, Guid userId)

@@ -1,7 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
-using SolutionTwo.Business.Common.ValueAssertion;
 
-namespace SolutionTwo.Common.Extensions;
+namespace SolutionTwo.Business.Common.ValueAssertion;
 
 public static class ValueAssertionExtensions
 {
