@@ -5,12 +5,16 @@ using SolutionTwo.Business.Identity.Models.Auth.Outgoing;
 
 namespace SolutionTwo.Business.Identity.Services.Interfaces;
 
-public interface IAuthService
+public interface IIdentityService
 {
     Task<IServiceResult<AuthResult>> ValidateCredentialsAndCreateTokensPairAsync(
         UserCredentialsModel userCredentials);
     
     Task<IServiceResult<TokensPairModel>> RefreshTokensPairAsync(string refreshToken);
     
-    IServiceResult<ClaimsPrincipal> VerifyAuthTokenAndGetPrincipal(string tokenString);
+    IServiceResult<ClaimsPrincipal> VerifyAuthTokenAndGetPrincipal(string authToken);
+
+    Task RevokeAllActiveTokensForUserAsync(Guid userId);
+    
+    Task DeactivateUserAsync(Guid userId);
 }

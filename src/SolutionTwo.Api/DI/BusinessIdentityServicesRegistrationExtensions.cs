@@ -11,6 +11,6 @@ public static class BusinessIdentityServicesRegistrationExtensions
     {
         services.AddSingleton<ITokenProvider, JwtProvider>();
 
-        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IIdentityService, IdentityService>();
     }
 }

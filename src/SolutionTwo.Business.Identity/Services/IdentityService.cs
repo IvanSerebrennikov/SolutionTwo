@@ -14,21 +14,21 @@ using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
 namespace SolutionTwo.Business.Identity.Services;
 
-public class AuthService : IAuthService
+public class IdentityService : IIdentityService
 {
     private readonly IdentityConfiguration _identityConfiguration;
     private readonly IMainDatabase _mainDatabase;
     private readonly ITokenProvider _tokenProvider;
     private readonly IMemoryCache _memoryCache;
     private readonly IPasswordHasher _passwordHasher;
-    private readonly ILogger<AuthService> _logger;
+    private readonly ILogger<IdentityService> _logger;
 
-    public AuthService(
+    public IdentityService(
         IdentityConfiguration identityConfiguration,
         IMainDatabase mainDatabase, 
         ITokenProvider tokenProvider, 
         IMemoryCache memoryCache,
-        ILogger<AuthService> logger, 
+        ILogger<IdentityService> logger, 
         IPasswordHasher passwordHasher)
     {
         _identityConfiguration = identityConfiguration;
@@ -107,9 +107,9 @@ public class AuthService : IAuthService
         return ServiceResult<TokensPairModel>.Success(tokensPair);
     }
 
-    public IServiceResult<ClaimsPrincipal> VerifyAuthTokenAndGetPrincipal(string tokenString)
+    public IServiceResult<ClaimsPrincipal> VerifyAuthTokenAndGetPrincipal(string authToken)
     {
-        var claimsPrincipal = _tokenProvider.ValidateAuthToken(tokenString, out var securityToken);
+        var claimsPrincipal = _tokenProvider.ValidateAuthToken(authToken, out var securityToken);
 
         if (claimsPrincipal == null ||
             securityToken == null ||
@@ -121,7 +121,17 @@ public class AuthService : IAuthService
 
         return ServiceResult<ClaimsPrincipal>.Success(claimsPrincipal);
     }
-    
+
+    public async Task RevokeAllActiveTokensForUserAsync(Guid userId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task DeactivateUserAsync(Guid userId)
+    {
+        throw new NotImplementedException();
+    }
+
     private async Task<UserEntity?> VerifyPasswordAndGetUserAsync(UserCredentialsModel userCredentials)
     {
         var userEntity = await _mainDatabase.Users.GetSingleAsync(
@@ -180,10 +190,11 @@ public class AuthService : IAuthService
         
         if (refreshTokenEntity.IsUsed)
         {
+            // possible token stealing 
             _logger.LogWarning(
                 $"Attempt to refresh already used token. " +
                 $"RefreshTokenId: {refreshTokenEntity.Id}, UserId: {refreshTokenEntity.UserId}.");
-            await RevokeProvidedAndAllActiveRefreshTokensForUserAsync(refreshTokenEntity.Id, refreshTokenEntity.UserId);
+            await RevokeProvidedAndAllActiveTokensForUserAsync(refreshTokenEntity.Id, refreshTokenEntity.UserId);
             
             await _mainDatabase.CommitChangesAsync();
             
@@ -193,7 +204,7 @@ public class AuthService : IAuthService
         return "";
     }
     
-    private async Task RevokeProvidedAndAllActiveRefreshTokensForUserAsync(Guid tokenId, Guid userId)
+    private async Task RevokeProvidedAndAllActiveTokensForUserAsync(Guid tokenId, Guid userId)
     {
         var tokenEntities = await _mainDatabase.RefreshTokens.GetAsync(
             x => x.Id == tokenId || (

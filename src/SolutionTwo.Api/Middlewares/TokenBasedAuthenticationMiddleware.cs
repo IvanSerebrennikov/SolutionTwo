@@ -18,7 +18,7 @@ public class TokenBasedAuthenticationMiddleware
         _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context, IAuthService authService)
+    public async Task InvokeAsync(HttpContext context, IIdentityService identityService)
     {
         if (UnauthorizedAccessAllowed(context))
         {
@@ -43,7 +43,7 @@ public class TokenBasedAuthenticationMiddleware
             return;
         }
 
-        var verificationResult = authService.VerifyAuthTokenAndGetPrincipal(tokenString);
+        var verificationResult = identityService.VerifyAuthTokenAndGetPrincipal(tokenString);
 
         if (!verificationResult.IsSucceeded || verificationResult.Data == null)
         {

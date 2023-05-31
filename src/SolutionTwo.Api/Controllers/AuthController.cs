@@ -10,11 +10,11 @@ namespace SolutionTwo.Api.Controllers;
 [ApiController]
 public class AuthController : ApiControllerBase
 {
-    private readonly IAuthService _authService;
+    private readonly IIdentityService _identityService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IIdentityService identityService)
     {
-        _authService = authService;
+        _identityService = identityService;
     }
 
     [HttpPost]
@@ -23,12 +23,12 @@ public class AuthController : ApiControllerBase
         if (string.IsNullOrWhiteSpace(userCredentials.Username) || string.IsNullOrWhiteSpace(userCredentials.Password))
             return BadRequest("Credentials can't be empty");
         
-        var authServiceResult = await _authService.ValidateCredentialsAndCreateTokensPairAsync(userCredentials);
+        var serviceResult = await _identityService.ValidateCredentialsAndCreateTokensPairAsync(userCredentials);
 
-        if (!authServiceResult.IsSucceeded || authServiceResult.Data == null)
-            return BadRequest(authServiceResult);
+        if (!serviceResult.IsSucceeded || serviceResult.Data == null)
+            return BadRequest(serviceResult);
 
-        return Ok(authServiceResult.Data);
+        return Ok(serviceResult.Data);
     }
 
     [HttpPost("refresh-token")]
@@ -37,7 +37,7 @@ public class AuthController : ApiControllerBase
         if (string.IsNullOrEmpty(refreshTokenValue))
             return BadRequest("Invalid Refresh token");
 
-        var serviceResult = await _authService.RefreshTokensPairAsync(refreshTokenValue);
+        var serviceResult = await _identityService.RefreshTokensPairAsync(refreshTokenValue);
 
         if (!serviceResult.IsSucceeded)
             return BadRequest(serviceResult);

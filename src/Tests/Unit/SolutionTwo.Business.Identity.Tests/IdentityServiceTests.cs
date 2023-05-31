@@ -13,9 +13,9 @@ using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
 namespace SolutionTwo.Business.Tests;
 
-public class AuthServiceTests
+public class IdentityServiceTests
 {
-    private IAuthService _authService = null!;
+    private IIdentityService _identityService = null!;
     private IMainDatabase _mainDatabase = null!;
     private const int RefreshTokenExpiresDays = 7;
 
@@ -44,14 +44,14 @@ public class AuthServiceTests
         
         var tokenProvider = new JwtProvider(identityConfiguration);
 
-        var loggerMock = new Mock<ILogger<AuthService>>();
+        var loggerMock = new Mock<ILogger<IdentityService>>();
         var logger = loggerMock.Object;
 
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
         
         var passwordHasher = new PasswordHasher(new PasswordHasher<object>());
         
-        _authService = new AuthService(identityConfiguration, _mainDatabase,
+        _identityService = new IdentityService(identityConfiguration, _mainDatabase,
             tokenProvider, memoryCache, logger, passwordHasher);
 
         var randomFaceRolledDataEnteredForUser1ToAllFields = "q1";
@@ -97,10 +97,10 @@ public class AuthServiceTests
     public async Task RefreshTokensPairAsyncReturnsSuccessAndCreatesNewActiveRefreshTokenForUser()
     {
         var createTokensResult =
-            await _authService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
+            await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
         var tokensPair = createTokensResult.Data!.Tokens;
         
-        var refreshTokensResult = await _authService.RefreshTokensPairAsync(tokensPair.RefreshToken);
+        var refreshTokensResult = await _identityService.RefreshTokensPairAsync(tokensPair.RefreshToken);
         var newTokensPair = refreshTokensResult.Data;
         var newActiveRefreshToken = (newTokensPair != null
             ? await _mainDatabase.RefreshTokens.GetSingleAsync(x =>
@@ -126,10 +126,10 @@ public class AuthServiceTests
     public async Task RefreshTokensPairAsyncReturnsSuccessAndMarksProvidedActiveRefreshTokenAsUsed()
     {
         var createTokensResult =
-            await _authService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
+            await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
         var tokensPair = createTokensResult.Data!.Tokens;
 
-        var refreshTokensResult = await _authService.RefreshTokensPairAsync(tokensPair.RefreshToken);
+        var refreshTokensResult = await _identityService.RefreshTokensPairAsync(tokensPair.RefreshToken);
         var providedRefreshToken = await _mainDatabase.RefreshTokens.GetSingleAsync(x =>
             x.Id.ToString() == tokensPair.RefreshToken);
         
@@ -145,11 +145,11 @@ public class AuthServiceTests
     public async Task RefreshTokensPairAsyncReturnsErrorWhenCalledTwiceForSameRefreshToken()
     {
         var createTokensResult =
-            await _authService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
+            await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
         var tokensPair = createTokensResult.Data!.Tokens;
         
-        await _authService.RefreshTokensPairAsync(tokensPair.RefreshToken);
-        var secondRefreshTokensCallResult = await _authService.RefreshTokensPairAsync(tokensPair.RefreshToken);
+        await _identityService.RefreshTokensPairAsync(tokensPair.RefreshToken);
+        var secondRefreshTokensCallResult = await _identityService.RefreshTokensPairAsync(tokensPair.RefreshToken);
 
         Assert.Multiple(() =>
         {
@@ -162,26 +162,26 @@ public class AuthServiceTests
     public async Task RefreshTokensPairAsyncRevokesAllActiveTokensForUserWhenCalledTwiceForSameRefreshToken()
     {
         var createTokensResult1 =
-            await _authService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
+            await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
         var tokensPair1 = createTokensResult1.Data!.Tokens;
         var createTokensResult2 =
-            await _authService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
+            await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
         var tokensPair2 = createTokensResult2.Data!.Tokens;
         var createTokensResult3 =
-            await _authService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
+            await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
         var tokensPair3 = createTokensResult3.Data!.Tokens;
 
-        await _authService.RefreshTokensPairAsync(tokensPair1.RefreshToken);
-        await _authService.RefreshTokensPairAsync(tokensPair1.RefreshToken);
+        await _identityService.RefreshTokensPairAsync(tokensPair1.RefreshToken);
+        await _identityService.RefreshTokensPairAsync(tokensPair1.RefreshToken);
         var providedRefreshToken = await _mainDatabase.RefreshTokens.GetSingleAsync(x =>
             x.Id.ToString() == tokensPair1.RefreshToken);
         var otherActiveRefreshToken1 = await _mainDatabase.RefreshTokens.GetSingleAsync(x =>
             x.Id.ToString() == tokensPair2.RefreshToken);
         var otherActiveRefreshToken2 = await _mainDatabase.RefreshTokens.GetSingleAsync(x =>
             x.Id.ToString() == tokensPair3.RefreshToken);
-        var verificationResult1 = _authService.VerifyAuthTokenAndGetPrincipal(tokensPair1.AuthToken);
-        var verificationResult2 = _authService.VerifyAuthTokenAndGetPrincipal(tokensPair2.AuthToken);
-        var verificationResult3 = _authService.VerifyAuthTokenAndGetPrincipal(tokensPair3.AuthToken);
+        var verificationResult1 = _identityService.VerifyAuthTokenAndGetPrincipal(tokensPair1.AuthToken);
+        var verificationResult2 = _identityService.VerifyAuthTokenAndGetPrincipal(tokensPair2.AuthToken);
+        var verificationResult3 = _identityService.VerifyAuthTokenAndGetPrincipal(tokensPair3.AuthToken);
         
         Assert.Multiple(() =>
         {
@@ -205,12 +205,12 @@ public class AuthServiceTests
     {
         // provided
         var createTokensResult =
-            await _authService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
+            await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
         var tokensPair = createTokensResult.Data!.Tokens;
         
         // used
         var createOtherTokensResult1 =
-            await _authService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
+            await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
         var otherTokensPair1 = createOtherTokensResult1.Data!.Tokens;
         var otherRefreshToken1 = await _mainDatabase.RefreshTokens.GetSingleAsync(x =>
             x.Id.ToString() == otherTokensPair1.RefreshToken);
@@ -218,17 +218,17 @@ public class AuthServiceTests
         
         // expired
         var createOtherTokensResult2 =
-            await _authService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
+            await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
         var otherTokensPair2 = createOtherTokensResult2.Data!.Tokens;
         var otherRefreshToken2 = await _mainDatabase.RefreshTokens.GetSingleAsync(x =>
             x.Id.ToString() == otherTokensPair2.RefreshToken);
         otherRefreshToken2!.ExpiresDateTimeUtc =
             otherRefreshToken2.ExpiresDateTimeUtc.AddDays(-RefreshTokenExpiresDays);
 
-        await _authService.RefreshTokensPairAsync(tokensPair.RefreshToken);
-        await _authService.RefreshTokensPairAsync(tokensPair.RefreshToken);
-        var verificationResult1 = _authService.VerifyAuthTokenAndGetPrincipal(otherTokensPair1.AuthToken);
-        var verificationResult2 = _authService.VerifyAuthTokenAndGetPrincipal(otherTokensPair2.AuthToken);
+        await _identityService.RefreshTokensPairAsync(tokensPair.RefreshToken);
+        await _identityService.RefreshTokensPairAsync(tokensPair.RefreshToken);
+        var verificationResult1 = _identityService.VerifyAuthTokenAndGetPrincipal(otherTokensPair1.AuthToken);
+        var verificationResult2 = _identityService.VerifyAuthTokenAndGetPrincipal(otherTokensPair2.AuthToken);
 
         Assert.Multiple(() =>
         {
@@ -243,23 +243,23 @@ public class AuthServiceTests
     public async Task RefreshTokensPairAsyncDoesNotRevokeActiveTokensForOtherUsersWhenCalledTwiceForSameRefreshToken()
     {
         var createTokensResult =
-            await _authService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
+            await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
         var tokensPair = createTokensResult.Data!.Tokens;
         var createOtherTokensResult1 =
-            await _authService.ValidateCredentialsAndCreateTokensPairAsync(_user2.GetCredentials());
+            await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user2.GetCredentials());
         var otherTokensPair1 = createOtherTokensResult1.Data!.Tokens;
         var createOtherTokensResult2 =
-            await _authService.ValidateCredentialsAndCreateTokensPairAsync(_user3.GetCredentials());
+            await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user3.GetCredentials());
         var otherTokensPair2 = createOtherTokensResult2.Data!.Tokens;
 
-        await _authService.RefreshTokensPairAsync(tokensPair.RefreshToken);
-        await _authService.RefreshTokensPairAsync(tokensPair.RefreshToken);
+        await _identityService.RefreshTokensPairAsync(tokensPair.RefreshToken);
+        await _identityService.RefreshTokensPairAsync(tokensPair.RefreshToken);
         var otherActiveRefreshToken1 = await _mainDatabase.RefreshTokens.GetSingleAsync(x =>
             x.Id.ToString() == otherTokensPair1.RefreshToken);
         var otherActiveRefreshToken2 = await _mainDatabase.RefreshTokens.GetSingleAsync(x =>
             x.Id.ToString() == otherTokensPair2.RefreshToken);
-        var verificationResult1 = _authService.VerifyAuthTokenAndGetPrincipal(otherTokensPair1.AuthToken);
-        var verificationResult2= _authService.VerifyAuthTokenAndGetPrincipal(otherTokensPair2.AuthToken);
+        var verificationResult1 = _identityService.VerifyAuthTokenAndGetPrincipal(otherTokensPair1.AuthToken);
+        var verificationResult2= _identityService.VerifyAuthTokenAndGetPrincipal(otherTokensPair2.AuthToken);
         
         Assert.Multiple(() =>
         {
@@ -276,7 +276,7 @@ public class AuthServiceTests
     }
 }
 
-internal static class AuthServiceTestsHelpers
+internal static class IdentityServiceTestsHelpers
 {
     public static UserCredentialsModel GetCredentials(this UserEntity userEntity)
     {
