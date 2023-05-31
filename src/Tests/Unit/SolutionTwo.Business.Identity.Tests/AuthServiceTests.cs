@@ -5,7 +5,7 @@ using SolutionTwo.Business.Identity.Services;
 using SolutionTwo.Business.Identity.Services.Interfaces;
 using SolutionTwo.Business.Identity.TokenProvider;
 using SolutionTwo.Data.MainDatabase.Entities;
-using SolutionTwo.Data.MainDatabase.InMemory;
+using SolutionTwo.Data.InMemory.MainDatabase;
 using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
 namespace SolutionTwo.Business.Tests;

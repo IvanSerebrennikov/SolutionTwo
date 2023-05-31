@@ -1,6 +1,6 @@
 ﻿using SolutionTwo.Data.Common.Entities.Interfaces;
 
-namespace SolutionTwo.Data.Common.InMemory.EntityComparer;
+namespace SolutionTwo.Data.InMemory.Common.EntityComparer;
 
 public class IdentifiablyEntityComparer<TId> : IEqualityComparer<IIdentifiablyEntity<TId>>
 {
