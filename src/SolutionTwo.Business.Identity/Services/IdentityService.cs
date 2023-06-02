@@ -74,6 +74,7 @@ public class IdentityService : IIdentityService
         string? refreshTokenValidationError;
         if (refreshTokenEntity == null)
         {
+            // possible token brute force
             _logger.LogWarning(
                 $"Attempt to refresh token that doesn't exist. " +
                 $"Provided Refresh Token value: {refreshToken}.");
@@ -90,12 +91,12 @@ public class IdentityService : IIdentityService
 
         var userEntity = await _mainDatabase.Users.GetByIdAsync(
             refreshTokenEntity!.UserId, 
-            includeProperties: "Roles",
-            asNoTracking: true);
+            includeProperties: "Roles");
         if (userEntity == null)
             return ServiceResult<TokensPairModel>.Error("Associated User was not found");
         
         refreshTokenEntity.IsUsed = true;
+        _mainDatabase.RefreshTokens.Update(refreshTokenEntity, x => x.IsUsed);
         
         var authToken = CreateAuthToken(userEntity, out var authTokenId);
         var newRefreshToken = CreateRefreshToken(refreshTokenEntity.UserId, authTokenId);
@@ -136,8 +137,7 @@ public class IdentityService : IIdentityService
     {
         var userEntity = await _mainDatabase.Users.GetSingleAsync(
             x => x.Username == userCredentials.Username,
-            includeProperties: "Roles", 
-            asNoTracking: true);
+            includeProperties: "Roles");
         
         if (userEntity == null || 
             !_passwordHasher.VerifyHashedPassword(userEntity.PasswordHash, userCredentials.Password))
@@ -219,7 +219,7 @@ public class IdentityService : IIdentityService
     private void RevokeTokens(RefreshTokenEntity refreshTokenEntity)
     {
         refreshTokenEntity.IsRevoked = true;
-        _mainDatabase.RefreshTokens.Update(refreshTokenEntity);
+        _mainDatabase.RefreshTokens.Update(refreshTokenEntity, x => x.IsRevoked);
         RevokeAuthToken(refreshTokenEntity.AuthTokenId);
     }
     

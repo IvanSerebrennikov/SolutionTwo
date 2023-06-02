@@ -9,12 +9,12 @@ public interface IBaseRepository<TEntity, TId>
     Task<TEntity?> GetByIdAsync(
         TId id, 
         string? includeProperties = null,
-        bool asNoTracking = false);
+        bool withTracking = false);
 
     Task<TEntity?> GetSingleAsync(
         Expression<Func<TEntity, bool>> filter,
         string? includeProperties = null,
-        bool asNoTracking = false);
+        bool withTracking = false);
     
     Task<IReadOnlyList<TEntity>> GetAsync(
         Expression<Func<TEntity, bool>>? filter = null,
@@ -22,7 +22,7 @@ public interface IBaseRepository<TEntity, TId>
         string? includeProperties = null,
         int? skip = null,
         int? take = null, 
-        bool asNoTracking = false);
+        bool withTracking = false);
 
     Task<IReadOnlyList<TProjection>> GetProjectionsAsync<TProjection>(
         Expression<Func<TEntity, TProjection>> projection,
@@ -31,11 +31,11 @@ public interface IBaseRepository<TEntity, TId>
         string? includeProperties = null,
         int? skip = null,
         int? take = null, 
-        bool asNoTracking = false);
+        bool withTracking = false);
 
     void Create(TEntity entity);
 
-    void Update(TEntity entity);
+    void Update(TEntity entity, params Expression<Func<TEntity, object>>[] updatedProperties);
 
     void Delete(TEntity entity);
 

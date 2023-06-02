@@ -9,7 +9,8 @@ namespace SolutionTwo.Data.InMemory.Common;
 
 // includeProperties is not supported, entities are returned with all nested data
 
-// asNoTracking is not supported, behavior like all entities are tracking 
+// withTracking is not supported, behavior like all entities are tracked 
+// Update method does nothing, because behavior like all entities are tracked
 
 // orderBy is not supported
 // (if ordering will be really required for some test cases -
@@ -61,7 +62,7 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
         _entities.Add(entity);
     }
 
-    public void Update(TEntity entity)
+    public void Update(TEntity entity, params Expression<Func<TEntity, object>>[] updatedProperties)
     {
     }
 

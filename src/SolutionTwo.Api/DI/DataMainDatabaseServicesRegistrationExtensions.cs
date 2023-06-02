@@ -24,6 +24,9 @@ public static class DataMainDatabaseServicesRegistrationExtensions
                 // Make sure that "Microsoft.EntityFrameworkCore" category is set to "None" 
                 // for all providers except "Debug"
                 o.EnableSensitiveDataLogging();
+
+                // 'Update' repository method should be called to mark entity/properties as changed
+                o.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             }
         );
 

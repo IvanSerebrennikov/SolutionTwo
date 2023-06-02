@@ -18,18 +18,18 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
     public async Task<TEntity?> GetByIdAsync(
         TId id, 
         string? includeProperties = null,
-        bool asNoTracking = false)
+        bool withTracking = false)
     {
-        return await GetQueryable(x => x.Id!.Equals(id), null, includeProperties, null, null, asNoTracking)
+        return await GetQueryable(x => x.Id!.Equals(id), null, includeProperties, null, null, withTracking)
             .FirstOrDefaultAsync();
     }
 
     public async Task<TEntity?> GetSingleAsync(
         Expression<Func<TEntity, bool>> filter,
         string? includeProperties = null, 
-        bool asNoTracking = false)
+        bool withTracking = false)
     {
-        return await GetQueryable(filter, null, includeProperties, null, null, asNoTracking)
+        return await GetQueryable(filter, null, includeProperties, null, null, withTracking)
             .SingleOrDefaultAsync();
     }
 
@@ -39,9 +39,9 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         string? includeProperties = null,
         int? skip = null,
         int? take = null,
-        bool asNoTracking = false)
+        bool withTracking = false)
     {
-        return await GetQueryable(filter, orderBy, includeProperties, skip, take, asNoTracking)
+        return await GetQueryable(filter, orderBy, includeProperties, skip, take, withTracking)
             .ToListAsync();
     }
 
@@ -52,9 +52,9 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         string? includeProperties = null,
         int? skip = null,
         int? take = null,
-        bool asNoTracking = false)
+        bool withTracking = false)
     {
-        return await GetQueryable(filter, orderBy, includeProperties, skip, take, asNoTracking).Select(projection)
+        return await GetQueryable(filter, orderBy, includeProperties, skip, take, withTracking).Select(projection)
             .ToListAsync();
     }
 
@@ -63,9 +63,20 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         _context.Set<TEntity>().Add(entity);
     }
 
-    public void Update(TEntity entity)
+    public void Update(TEntity entity, params Expression<Func<TEntity, object>>[] updatedProperties)
     {
-        _context.Set<TEntity>().Update(entity);
+        var dbEntityEntry = _context.Entry(entity);
+        if (updatedProperties.Any())
+        {
+            foreach (var property in updatedProperties)
+            {
+                dbEntityEntry.Property(property).IsModified = true;
+            }
+        }
+        else
+        {
+            _context.Set<TEntity>().Update(entity);
+        }
     }
 
     public void Delete(TEntity entity)
@@ -86,11 +97,11 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         string? includeProperties = null,
         int? skip = null,
         int? take = null,
-        bool asNoTracking = false)
+        bool withTracking = false)
     {
         IQueryable<TEntity> query = _context.Set<TEntity>();
 
-        if (asNoTracking) query = query.AsNoTracking();
+        if (withTracking) query = query.AsTracking();
 
         if (filter != null) query = query.Where(filter);
 
