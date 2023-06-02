@@ -6,6 +6,8 @@ public interface IMainDatabase
 {
     IUserRepository Users { get; }
     
+    IRoleRepository Roles { get; }
+    
     IRefreshTokenRepository RefreshTokens { get; }
     
     Task CommitChangesAsync();

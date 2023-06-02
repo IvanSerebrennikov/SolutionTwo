@@ -8,11 +8,11 @@ namespace SolutionTwo.Data.Common.Repositories;
 public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
     where TEntity : class, IIdentifiablyEntity<TId>
 {
-    private readonly DbContext _context;
+    protected readonly DbContext Context;
 
     protected BaseRepository(DbContext context)
     {
-        _context = context;
+        Context = context;
     }
 
     public async Task<TEntity?> GetByIdAsync(
@@ -64,12 +64,12 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
 
     public void Create(TEntity entity)
     {
-        _context.Set<TEntity>().Add(entity);
+        Context.Set<TEntity>().Add(entity);
     }
 
     public void Update(TEntity entity, params Expression<Func<TEntity, object>>[] updatedProperties)
     {
-        var dbEntityEntry = _context.Entry(entity);
+        var dbEntityEntry = Context.Entry(entity);
         if (updatedProperties.Any())
         {
             foreach (var property in updatedProperties)
@@ -79,13 +79,13 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         }
         else
         {
-            _context.Set<TEntity>().Update(entity);
+            Context.Set<TEntity>().Update(entity);
         }
     }
 
     public void Delete(TEntity entity)
     {
-        _context.Set<TEntity>().Remove(entity);
+        Context.Set<TEntity>().Remove(entity);
     }
 
     public async Task DeleteAsync(TId id)
@@ -104,7 +104,7 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         int? take = null,
         bool withTracking = false)
     {
-        IQueryable<TEntity> query = _context.Set<TEntity>();
+        IQueryable<TEntity> query = Context.Set<TEntity>();
 
         if (withTracking) query = query.AsTracking();
 
