@@ -7,7 +7,7 @@ namespace SolutionTwo.Data.InMemory.Common;
 
 // Changes are applied instantly, without UnitOfWork.CommitChanges
 
-// includeProperties is not supported, entities are returned with all nested data
+// includeProperties/include is not supported, entities are returned with all nested data
 
 // withTracking is not supported, behavior like all entities are tracked 
 // Update method does nothing, because behavior like all entities are tracked
@@ -21,37 +21,55 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
 {
     private readonly HashSet<TEntity> _entities = new(new IdentifiablyEntityComparer<TId>());
 
-    public async Task<TEntity?> GetByIdAsync(TId id, string? includeProperties = null, bool asNoTracking = false)
+    public async Task<TEntity?> GetByIdAsync(
+        TId id, 
+        string? includeProperties = null, 
+        Expression<Func<TEntity, object>>? include = null,
+        bool withTracking = false)
+
     {
-        var result = GetEnumerable(x => x.Id!.Equals(id), null, includeProperties, null, null, asNoTracking)
+        var result = GetEnumerable(x => x.Id!.Equals(id), null, includeProperties, include, null, null,
+                withTracking)
             .FirstOrDefault();
         return await Task.FromResult(result);
     }
 
-    public async Task<TEntity?> GetSingleAsync(Expression<Func<TEntity, bool>> filter, string? includeProperties = null,
-        bool asNoTracking = false)
+    public async Task<TEntity?> GetSingleAsync(
+        Expression<Func<TEntity, bool>> filter, 
+        string? includeProperties = null,
+        Expression<Func<TEntity, object>>? include = null,
+        bool withTracking = false)
     {
-        var result = GetEnumerable(filter, null, includeProperties, null, null, asNoTracking)
+        var result = GetEnumerable(filter, null, includeProperties, include, null, null, withTracking)
             .SingleOrDefault();
         return await Task.FromResult(result);
     }
 
-    public async Task<IReadOnlyList<TEntity>> GetAsync(Expression<Func<TEntity, bool>>? filter = null,
-        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, string? includeProperties = null,
+    public async Task<IReadOnlyList<TEntity>> GetAsync(
+        Expression<Func<TEntity, bool>>? filter = null,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, 
+        string? includeProperties = null,
+        Expression<Func<TEntity, object>>? include = null,
         int? skip = null,
-        int? take = null, bool asNoTracking = false)
+        int? take = null, 
+        bool withTracking = false)
     {
-        var result = GetEnumerable(filter, orderBy, includeProperties, skip, take, asNoTracking)
+        var result = GetEnumerable(filter, orderBy, includeProperties, include, skip, take, withTracking)
             .ToList();
         return await Task.FromResult(result);
     }
 
     public async Task<IReadOnlyList<TProjection>> GetProjectionsAsync<TProjection>(
-        Expression<Func<TEntity, TProjection>> projection, Expression<Func<TEntity, bool>>? filter = null,
+        Expression<Func<TEntity, TProjection>> projection, 
+        Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        string? includeProperties = null, int? skip = null, int? take = null, bool asNoTracking = false)
+        string? includeProperties = null,
+        Expression<Func<TEntity, object>>? include = null,
+        int? skip = null, 
+        int? take = null, 
+        bool withTracking = false)
     {
-        var result = GetEnumerable(filter, orderBy, includeProperties, skip, take, asNoTracking)
+        var result = GetEnumerable(filter, orderBy, includeProperties, include, skip, take, withTracking)
             .Select(projection.Compile())
             .ToList();
         return await Task.FromResult(result);
@@ -82,9 +100,10 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
         string? includeProperties = null,
+        Expression<Func<TEntity, object>>? include = null,
         int? skip = null,
         int? take = null,
-        bool asNoTracking = false)
+        bool withTracking = false)
     {
         IEnumerable<TEntity> query = _entities;
 

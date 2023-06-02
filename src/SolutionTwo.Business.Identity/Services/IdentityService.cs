@@ -45,7 +45,7 @@ public class IdentityService : IIdentityService
         userCredentials.Username.AssertValueIsNotNull();
         userCredentials.Password.AssertValueIsNotNull();
         
-        var userEntity = await VerifyPasswordAndGetUserAsync(userCredentials);
+        var userEntity = await VerifyPasswordAndGetUserWithRolesAsync(userCredentials);
         
         if (userEntity == null)
         {
@@ -91,7 +91,7 @@ public class IdentityService : IIdentityService
 
         var userEntity = await _mainDatabase.Users.GetByIdAsync(
             refreshTokenEntity!.UserId, 
-            includeProperties: "Roles");
+            include: x => x.Roles);
         if (userEntity == null)
             return ServiceResult<TokensPairModel>.Error("Associated User was not found");
         
@@ -133,11 +133,11 @@ public class IdentityService : IIdentityService
         throw new NotImplementedException();
     }
 
-    private async Task<UserEntity?> VerifyPasswordAndGetUserAsync(UserCredentialsModel userCredentials)
+    private async Task<UserEntity?> VerifyPasswordAndGetUserWithRolesAsync(UserCredentialsModel userCredentials)
     {
         var userEntity = await _mainDatabase.Users.GetSingleAsync(
             x => x.Username == userCredentials.Username,
-            includeProperties: "Roles");
+            include: x => x.Roles);
         
         if (userEntity == null || 
             !_passwordHasher.VerifyHashedPassword(userEntity.PasswordHash, userCredentials.Password))
