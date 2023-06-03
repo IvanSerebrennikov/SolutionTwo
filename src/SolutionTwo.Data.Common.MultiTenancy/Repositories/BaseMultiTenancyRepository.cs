@@ -7,17 +7,17 @@ using SolutionTwo.Common.MultiTenancy;
 
 namespace SolutionTwo.Data.Common.MultiTenancy.Repositories;
 
-public abstract class BaseMultiTenantRepository<TEntity, TId> : BaseRepository<TEntity, TId>
+public abstract class BaseMultiTenancyRepository<TEntity, TId> : BaseRepository<TEntity, TId>
     where TEntity : class, IIdentifiablyEntity<TId>, IOwnedByTenantEntity
 {
     private readonly ITenantAccessGetter _tenantAccessGetter;
     
-    protected BaseMultiTenantRepository(DbContext context, ITenantAccessGetter tenantAccessGetter) : base(context)
+    protected BaseMultiTenancyRepository(DbContext context, ITenantAccessGetter tenantAccessGetter) : base(context)
     {
         _tenantAccessGetter = tenantAccessGetter;
     }
 
-    protected override Expression<Func<TEntity, bool>>? CommonPredicate()
+    protected override Expression<Func<TEntity, bool>>? GetPredicateForEachQuery()
     {
         if (!_tenantAccessGetter.IsInitialized)
         {
@@ -29,6 +29,6 @@ public abstract class BaseMultiTenantRepository<TEntity, TId> : BaseRepository<T
             return x => x.TenantId == _tenantAccessGetter.TenantId.Value;
         }
 
-        return base.CommonPredicate();
+        return base.GetPredicateForEachQuery();
     }
 }

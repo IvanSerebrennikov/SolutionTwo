@@ -58,7 +58,8 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         int? take = null,
         bool withTracking = false)
     {
-        return await GetQueryable(filter, orderBy, includeProperties, include, skip, take, withTracking).Select(projection)
+        return await GetQueryable(filter, orderBy, includeProperties, include, skip, take, withTracking)
+            .Select(projection)
             .ToListAsync();
     }
 
@@ -119,8 +120,9 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
 
         if (filter != null) query = query.Where(filter);
         
-        var commonPredicate = CommonPredicate();
-        if (commonPredicate != null) query = query.Where(commonPredicate);
+        var predicateForEachQuery = GetPredicateForEachQuery();
+        if (predicateForEachQuery != null) 
+            query = query.Where(predicateForEachQuery);
         
         if (include != null)
         {
@@ -144,7 +146,7 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         return query;
     }
 
-    protected virtual Expression<Func<TEntity, bool>>? CommonPredicate()
+    protected virtual Expression<Func<TEntity, bool>>? GetPredicateForEachQuery()
     {
         return null;
     }
