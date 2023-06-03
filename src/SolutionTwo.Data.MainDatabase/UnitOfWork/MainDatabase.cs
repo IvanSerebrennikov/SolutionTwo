@@ -10,16 +10,20 @@ public class MainDatabase : IMainDatabase
 
     public MainDatabase(
         MainDatabaseContext context, 
+        ITenantRepository tenantRepository,
         IUserRepository userRepository,
         IRoleRepository roleRepository,
         IRefreshTokenRepository refreshTokenRepository)
     {
         _context = context;
+        Tenants = tenantRepository;
         Users = userRepository;
         Roles = roleRepository;
         RefreshTokens = refreshTokenRepository;
     }
 
+    public ITenantRepository Tenants { get; }
+    
     public IUserRepository Users { get; }
     
     public IRoleRepository Roles { get; }

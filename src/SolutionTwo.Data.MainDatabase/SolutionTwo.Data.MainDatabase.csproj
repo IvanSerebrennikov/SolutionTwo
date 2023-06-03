@@ -13,7 +13,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\SolutionTwo.Data.Common\SolutionTwo.Data.Common.csproj" />
-        <ProjectReference Include="..\SolutionTwo.Data.Common.MultiTenant\SolutionTwo.Data.Common.MultiTenant.csproj" />
+        <ProjectReference Include="..\SolutionTwo.Data.Common.MultiTenancy\SolutionTwo.Data.Common.MultiTenancy.csproj" />
     </ItemGroup>
 
 </Project>

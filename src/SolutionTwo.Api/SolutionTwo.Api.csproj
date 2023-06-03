@@ -19,7 +19,8 @@
     <ItemGroup>
         <ProjectReference Include="..\SolutionTwo.Business.Identity\SolutionTwo.Business.Identity.csproj" />
         <ProjectReference Include="..\SolutionTwo.Business.Core\SolutionTwo.Business.Core.csproj" />
-        <ProjectReference Include="..\SolutionTwo.MultiTenancy\SolutionTwo.MultiTenancy.csproj" />
+        <ProjectReference Include="..\SolutionTwo.Business.MultiTenancy\SolutionTwo.Business.MultiTenancy.csproj" />
+        <ProjectReference Include="..\SolutionTwo.Common.MultiTenancy\SolutionTwo.Common.MultiTenancy.csproj" />
     </ItemGroup>
 
 </Project>

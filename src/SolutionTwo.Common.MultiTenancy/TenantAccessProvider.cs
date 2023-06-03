@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.MultiTenancy;
+﻿namespace SolutionTwo.Common.MultiTenancy;
 
 public class TenantAccessProvider : ITenantAccessGetter, ITenantAccessSetter
 {

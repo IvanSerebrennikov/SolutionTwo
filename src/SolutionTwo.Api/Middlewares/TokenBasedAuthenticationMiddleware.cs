@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http.Features;
 using SolutionTwo.Api.Attributes;
 using SolutionTwo.Business.Identity.Configuration;
 using SolutionTwo.Business.Identity.Services.Interfaces;
+using SolutionTwo.Common.MultiTenancy;
 
 namespace SolutionTwo.Api.Middlewares;
 
@@ -85,6 +86,8 @@ public class TokenBasedAuthenticationMiddleware
     {
         var claims = _hardCodedIdentityConfiguration.Roles.Select(x => new Claim(ClaimTypes.Role, x)).ToList();
         claims.Add(new Claim(ClaimTypes.Name, _hardCodedIdentityConfiguration.Username!));
+        claims.Add(new Claim(MultiTenancyClaimNames.TenantId,
+            _hardCodedIdentityConfiguration.TenantId!.Value.ToString()));
         context.User = new ClaimsPrincipal(new ClaimsIdentity(claims));
     }
 }

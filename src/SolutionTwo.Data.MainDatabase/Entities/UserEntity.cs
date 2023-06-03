@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SolutionTwo.Data.Common.Entities.Interfaces;
-using SolutionTwo.Data.Common.MultiTenant.Entities.Interfaces;
+using SolutionTwo.Data.Common.MultiTenancy.Entities.Interfaces;
 
 namespace SolutionTwo.Data.MainDatabase.Entities;
 

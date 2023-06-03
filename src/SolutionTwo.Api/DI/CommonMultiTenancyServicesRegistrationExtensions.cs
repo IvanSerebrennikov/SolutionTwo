@@ -1,10 +1,10 @@
-﻿using SolutionTwo.MultiTenancy;
+﻿using SolutionTwo.Common.MultiTenancy;
 
 namespace SolutionTwo.Api.DI;
 
-public static class MultiTenancyServicesRegistrationExtensions
+public static class CommonMultiTenancyServicesRegistrationExtensions
 {
-    public static void AddMultiTenancyServices(this IServiceCollection services)
+    public static void AddCommonMultiTenancyServices(this IServiceCollection services)
     {
         services.AddScoped<TenantAccessProvider>();
         

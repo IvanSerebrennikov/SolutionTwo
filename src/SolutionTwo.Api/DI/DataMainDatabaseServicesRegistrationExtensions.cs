@@ -31,6 +31,7 @@ public static class DataMainDatabaseServicesRegistrationExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<ITenantRepository, TenantRepository>();
         services.AddScoped<IMainDatabase, MainDatabase>();
     }
 }

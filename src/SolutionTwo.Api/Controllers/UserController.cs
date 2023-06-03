@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SolutionTwo.Api.Attributes;
 using SolutionTwo.Api.Controllers.Base;
-using SolutionTwo.Business.Core.Constants;
+using SolutionTwo.Business.Common.Constants;
 using SolutionTwo.Business.Core.Models.User.Incoming;
 using SolutionTwo.Business.Core.Models.User.Outgoing;
 using SolutionTwo.Business.Core.Services.Interfaces;
@@ -52,9 +52,9 @@ public class UserController : ApiAuthorizedControllerBase
         return Ok(userModel);
     }
 
-    [RoleBasedAuthorize(UserRoles.TenantAdmin)]
+    [RoleBasedAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
     [HttpPost]
-    public async Task<ActionResult> AddUser(CreateUserModel createUserModel)
+    public async Task<ActionResult> CreateUser(CreateUserModel createUserModel)
     {
         if (string.IsNullOrEmpty(createUserModel.FirstName) ||
             string.IsNullOrEmpty(createUserModel.LastName) ||
@@ -62,22 +62,7 @@ public class UserController : ApiAuthorizedControllerBase
             string.IsNullOrEmpty(createUserModel.Password))
             return BadRequest("Passed data is invalid. All properties are required.");
 
-        var userModel = await _userService.AddUserAsync(createUserModel, CurrentUserTenantId);
-
-        return CreatedAtAction(nameof(GetById), new { id = userModel.Id }, userModel);
-    }
-    
-    [RoleBasedAuthorize(UserRoles.SuperAdmin)]
-    [HttpPost("tenant-admin")]
-    public async Task<ActionResult> AddTenantAdminUser(CreateUserModel createUserModel, [FromQuery] Guid tenantId)
-    {
-        if (string.IsNullOrEmpty(createUserModel.FirstName) ||
-            string.IsNullOrEmpty(createUserModel.LastName) ||
-            string.IsNullOrEmpty(createUserModel.Username) ||
-            string.IsNullOrEmpty(createUserModel.Password))
-            return BadRequest("Passed data is invalid. All properties are required.");
-
-        var userModel = await _userService.AddUserAsync(createUserModel, tenantId);
+        var userModel = await _userService.CreateUserAsync(createUserModel, CurrentUserTenantId);
 
         return CreatedAtAction(nameof(GetById), new { id = userModel.Id }, userModel);
     }

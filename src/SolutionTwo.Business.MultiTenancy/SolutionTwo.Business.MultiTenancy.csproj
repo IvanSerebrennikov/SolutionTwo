@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SolutionTwo.Data.Common\SolutionTwo.Data.Common.csproj" />
-      <ProjectReference Include="..\SolutionTwo.MultiTenancy\SolutionTwo.MultiTenancy.csproj" />
+      <ProjectReference Include="..\SolutionTwo.Business.Common\SolutionTwo.Business.Common.csproj" />
+      <ProjectReference Include="..\SolutionTwo.Data.MainDatabase\SolutionTwo.Data.MainDatabase.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using SolutionTwo.Api.Attributes;
-using SolutionTwo.Business.Core.Constants;
-using SolutionTwo.MultiTenancy;
+using SolutionTwo.Business.Common.Constants;
+using SolutionTwo.Common.MultiTenancy;
 
 namespace SolutionTwo.Api.Middlewares;
 

@@ -27,5 +27,6 @@ public class MainDatabaseContext : DbContext
                 x => x.ToTable("UserRoles"));
         
         modelBuilder.Entity<UserEntity>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<TenantEntity>().HasQueryFilter(x => !x.IsDeleted);
     }
 }

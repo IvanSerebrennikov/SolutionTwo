@@ -4,6 +4,8 @@ namespace SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
 public interface IMainDatabase
 {
+    ITenantRepository Tenants { get; }
+    
     IUserRepository Users { get; }
     
     IRoleRepository Roles { get; }

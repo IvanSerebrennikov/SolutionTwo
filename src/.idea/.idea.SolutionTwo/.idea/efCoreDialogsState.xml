@@ -4,6 +4,7 @@
     <option name="keyValueStorage">
       <map>
         <entry key="Common:0d475a0d-a5af-4160-96ea-8230b031f36a:dbContext" value="SolutionTwo.Data.MainDatabase.Context.MainDatabaseContext" />
+        <entry key="Common:3aa278db-32c1-41e8-bef5-247cc08d69c8:dbContext" value="SolutionTwo.Data.MainDatabase.Context.MainDatabaseContext" />
         <entry key="Common:buildConfiguration" value="Release" />
         <entry key="Common:noBuild" value="false" />
         <entry key="Common:outputFolder" value="Migrations" />

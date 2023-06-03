@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
-using SolutionTwo.Business.Core.Constants;
-using SolutionTwo.MultiTenancy;
+using SolutionTwo.Business.Common.Constants;
+using SolutionTwo.Common.MultiTenancy;
 
 namespace SolutionTwo.Api.Controllers.Base;
 

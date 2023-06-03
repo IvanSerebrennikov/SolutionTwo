@@ -9,8 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMemoryCache();
 
-// MultiTenancy DI
-builder.Services.AddMultiTenancyServices();
+// Common MultiTenancy DI
+builder.Services.AddCommonMultiTenancyServices();
 
 // Api DI
 builder.Services.AddApiServices();
@@ -59,6 +59,9 @@ builder.Services.AddSingleton(hardCodedIdentityConfiguration);
 // Used custom RoleBasedAuthorizationMiddleware
 // builder.Services.AddAuthorization();
 builder.Services.AddBusinessIdentityServices();
+
+// Business.MultiTenancy DI
+builder.Services.AddBusinessMultiTenancyServices();
 
 // Business.Core DI
 builder.Services.AddBusinessCoreServices();

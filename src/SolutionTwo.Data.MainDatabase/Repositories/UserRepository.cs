@@ -1,8 +1,8 @@
-﻿using SolutionTwo.Data.MainDatabase.Context;
+﻿using SolutionTwo.Common.MultiTenancy;
+using SolutionTwo.Data.MainDatabase.Context;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
-using SolutionTwo.Data.Common.MultiTenant.Repositories;
-using SolutionTwo.MultiTenancy;
+using SolutionTwo.Data.Common.MultiTenancy.Repositories;
 
 namespace SolutionTwo.Data.MainDatabase.Repositories;
 

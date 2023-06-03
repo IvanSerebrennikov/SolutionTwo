@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.MultiTenancy;
+﻿namespace SolutionTwo.Common.MultiTenancy;
 
 public static class MultiTenancyClaimNames
 {

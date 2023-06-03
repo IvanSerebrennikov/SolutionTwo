@@ -1,11 +1,11 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using SolutionTwo.Data.Common.Entities.Interfaces;
-using SolutionTwo.Data.Common.MultiTenant.Entities.Interfaces;
+using SolutionTwo.Data.Common.MultiTenancy.Entities.Interfaces;
 using SolutionTwo.Data.Common.Repositories;
-using SolutionTwo.MultiTenancy;
+using SolutionTwo.Common.MultiTenancy;
 
-namespace SolutionTwo.Data.Common.MultiTenant.Repositories;
+namespace SolutionTwo.Data.Common.MultiTenancy.Repositories;
 
 public abstract class BaseMultiTenantRepository<TEntity, TId> : BaseRepository<TEntity, TId>
     where TEntity : class, IIdentifiablyEntity<TId>, IOwnedByTenantEntity

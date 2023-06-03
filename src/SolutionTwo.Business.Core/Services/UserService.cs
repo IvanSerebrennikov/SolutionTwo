@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SolutionTwo.Business.Common.Models;
 using SolutionTwo.Business.Common.PasswordHasher.Interfaces;
-using SolutionTwo.Business.Common.ValueAssertion;
 using SolutionTwo.Business.Core.Models.User.Incoming;
 using SolutionTwo.Business.Core.Models.User.Outgoing;
 using SolutionTwo.Business.Core.Services.Interfaces;
@@ -50,13 +49,8 @@ public class UserService : IUserService
         return userModels;
     }
 
-    public async Task<UserWithRolesModel> AddUserAsync(CreateUserModel createUserModel, Guid tenantId)
+    public async Task<UserWithRolesModel> CreateUserAsync(CreateUserModel createUserModel, Guid tenantId)
     {
-        createUserModel.FirstName.AssertValueIsNotNull();
-        createUserModel.LastName.AssertValueIsNotNull();
-        createUserModel.Username.AssertValueIsNotNull();
-        createUserModel.Password.AssertValueIsNotNull();
-
         var hashedPassword = _passwordHasher.HashPassword(createUserModel.Password);
 
         var userEntity = new UserEntity
