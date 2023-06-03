@@ -11,7 +11,7 @@ public static class ConfigurationExtensions
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     /// <exception cref="ConfigurationVerificationException">Throws if any property of T is null or empty</exception>
-    public static T GetSection<T>(this IConfiguration configuration)
+    public static T GetSection<T>(this IConfiguration configuration, bool withValidation = true)
         where T : class
     {
         var type = typeof(T);
@@ -19,21 +19,24 @@ public static class ConfigurationExtensions
 
         if (configurationSection == null)
             throw new ConfigurationVerificationException(type.Name);
-        
-        var invalidProperties = new List<string>();
-        var properties = type.GetProperties();
-        foreach (var property in properties)
+
+        if (withValidation)
         {
-            var value = property.GetValue(configurationSection);
-            if (value == null || string.IsNullOrWhiteSpace(value.ToString()))
+            var invalidProperties = new List<string>();
+            var properties = type.GetProperties();
+            foreach (var property in properties)
             {
-                invalidProperties.Add(property.Name);
+                var value = property.GetValue(configurationSection);
+                if (value == null || string.IsNullOrWhiteSpace(value.ToString()))
+                {
+                    invalidProperties.Add(property.Name);
+                }
             }
+        
+            if (invalidProperties.Any())
+                throw new ConfigurationVerificationException(type.Name, invalidProperties);
         }
         
-        if (invalidProperties.Any())
-            throw new ConfigurationVerificationException(type.Name, invalidProperties);
-
         return configurationSection;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SolutionTwo.Business.Common.Models;
 using SolutionTwo.Business.Common.PasswordHasher.Interfaces;
 using SolutionTwo.Business.Common.ValueAssertion;
 using SolutionTwo.Business.Core.Models.User.Incoming;
@@ -56,14 +57,14 @@ public class UserService : IUserService
         createUserModel.Username.AssertValueIsNotNull();
         createUserModel.Password.AssertValueIsNotNull();
 
-        var hashedPassword = _passwordHasher.HashPassword(createUserModel.Password!);
+        var hashedPassword = _passwordHasher.HashPassword(createUserModel.Password);
 
         var userEntity = new UserEntity
         {
             Id = Guid.NewGuid(),
-            FirstName = createUserModel.FirstName!,
-            LastName = createUserModel.LastName!,
-            Username = createUserModel.Username!,
+            FirstName = createUserModel.FirstName,
+            LastName = createUserModel.LastName,
+            Username = createUserModel.Username,
             PasswordHash = hashedPassword,
             CreatedDateTimeUtc = DateTime.UtcNow
         };
@@ -72,5 +73,19 @@ public class UserService : IUserService
         await _mainDatabase.CommitChangesAsync();
 
         return new UserWithRolesModel(userEntity);
+    }
+
+    public async Task<IServiceResult> DeleteUserAsync(Guid id)
+    {
+        var user = await _mainDatabase.Users.GetByIdAsync(id);
+        if (user == null)
+        {
+            return ServiceResult.Error("User was not found");
+        }
+        
+        _mainDatabase.Users.Delete(user);
+        await _mainDatabase.CommitChangesAsync();
+
+        return ServiceResult.Success();
     }
 }

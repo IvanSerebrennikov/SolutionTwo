@@ -1,8 +1,10 @@
 ﻿using System.Net;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using SolutionTwo.Api.Attributes;
+using SolutionTwo.Business.Identity.Configuration;
 using SolutionTwo.Business.Identity.Services.Interfaces;
 
 namespace SolutionTwo.Api.Middlewares;
@@ -12,16 +14,30 @@ public class TokenBasedAuthenticationMiddleware
     private const string AuthenticationScheme = JwtBearerDefaults.AuthenticationScheme;
     private const int BadResultStatusCode = (int)HttpStatusCode.Unauthorized;
     private readonly RequestDelegate _next;
+    private readonly HardCodedIdentityConfiguration _hardCodedIdentityConfiguration;
+    private readonly IWebHostEnvironment _env;
 
-    public TokenBasedAuthenticationMiddleware(RequestDelegate next)
+    public TokenBasedAuthenticationMiddleware(
+        RequestDelegate next, 
+        HardCodedIdentityConfiguration hardCodedIdentityConfiguration, 
+        IWebHostEnvironment env)
     {
         _next = next;
+        _hardCodedIdentityConfiguration = hardCodedIdentityConfiguration;
+        _env = env;
     }
 
     public async Task InvokeAsync(HttpContext context, IIdentityService identityService)
     {
         if (UnauthorizedAccessAllowed(context))
         {
+            await _next(context);
+            return;
+        }
+
+        if (_env.IsDevelopment() && _hardCodedIdentityConfiguration.UseHardCodedIdentity)
+        {
+            ConfigureHardCodedIdentity(context);
             await _next(context);
             return;
         }
@@ -63,5 +79,12 @@ public class TokenBasedAuthenticationMiddleware
         var allowAnonymousAttribute = endpoint?.Metadata.GetMetadata<AllowAnonymousAttribute>();
 
         return authorizeAttribute == null || allowAnonymousAttribute != null;
+    }
+
+    private void ConfigureHardCodedIdentity(HttpContext context)
+    {
+        var claims = _hardCodedIdentityConfiguration.Roles.Select(x => new Claim(ClaimTypes.Role, x)).ToList();
+        claims.Add(new Claim(ClaimTypes.Name, _hardCodedIdentityConfiguration.Username));
+        context.User = new ClaimsPrincipal(new ClaimsIdentity(claims));
     }
 }

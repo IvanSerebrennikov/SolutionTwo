@@ -3,7 +3,7 @@ using SolutionTwo.Data.Common.Entities.Interfaces;
 
 namespace SolutionTwo.Data.MainDatabase.Entities;
 
-public class UserEntity : IIdentifiablyEntity<Guid>
+public class UserEntity : IIdentifiablyEntity<Guid>, ISoftDeletableEntity
 {
     public Guid Id { get; set; }
 
@@ -24,4 +24,6 @@ public class UserEntity : IIdentifiablyEntity<Guid>
     public List<RoleEntity> Roles { get; set; } = new();
     
     public List<RefreshTokenEntity> RefreshTokens { get; set; } = new();
+    
+    public bool IsDeleted { get; set; }
 }

@@ -29,9 +29,10 @@ public class UserController : ApiControllerBase
 
         var userModel = await _userService.GetUserWithRolesAsync(username);
 
-        if (userModel != null)
-            return Ok(userModel);
-        return NotFound();
+        if (userModel == null)
+            return NotFound();
+        
+        return Ok(userModel);
     }
 
     [RoleBasedAuthorize(UserRoles.SuperAdmin)]
@@ -49,9 +50,10 @@ public class UserController : ApiControllerBase
     {
         var userModel = await _userService.GetUserWithRolesByIdAsync(id);
 
-        if (userModel != null)
-            return Ok(userModel);
-        return NotFound();
+        if (userModel == null)
+            return NotFound();
+        
+        return Ok(userModel);
     }
 
     [RoleBasedAuthorize(UserRoles.SuperAdmin)]
@@ -67,5 +69,19 @@ public class UserController : ApiControllerBase
         var userModel = await _userService.AddUserAsync(createUserModel);
 
         return CreatedAtAction(nameof(GetById), new { id = userModel.Id }, userModel);
+    }
+
+    [RoleBasedAuthorize(UserRoles.SuperAdmin)]
+    [HttpDelete]
+    public async Task<ActionResult> DeleteUser(Guid id)
+    {
+        var result = await _userService.DeleteUserAsync(id);
+
+        if (!result.IsSucceeded)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok();
     }
 }

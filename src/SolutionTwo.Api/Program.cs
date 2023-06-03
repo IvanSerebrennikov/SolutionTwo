@@ -14,7 +14,12 @@ builder.Services.AddApiServices();
 
 // Business.Identity DI
 var identityConfiguration = builder.Configuration.GetSection<IdentityConfiguration>();
+var useHardCodedIdentity =
+    builder.Configuration.GetValue<bool>($"{nameof(HardCodedIdentityConfiguration)}:UseHardCodedIdentity");
+var hardCodedIdentityConfiguration =
+    builder.Configuration.GetSection<HardCodedIdentityConfiguration>(withValidation: useHardCodedIdentity);
 builder.Services.AddSingleton(identityConfiguration);
+builder.Services.AddSingleton(hardCodedIdentityConfiguration);
 // Used custom TokenBasedAuthenticationMiddleware
 // var identityConfiguration = builder.Configuration.GetSection<IdentityConfiguration>();
 // builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -54,10 +59,10 @@ builder.Services.AddBusinessCoreServices();
 
 // Data DI
 var connectionStrings = builder.Configuration.GetSection<ConnectionStrings>();
-var databaseConfiguration = builder.Configuration.GetSection<MainDatabaseConfiguration>();
+var mainDatabaseConfiguration = builder.Configuration.GetSection<MainDatabaseConfiguration>();
 builder.Services.AddSingleton(connectionStrings);
-builder.Services.AddSingleton(databaseConfiguration);
-builder.Services.AddDataMainDatabaseServices(connectionStrings, databaseConfiguration);
+builder.Services.AddSingleton(mainDatabaseConfiguration);
+builder.Services.AddDataMainDatabaseServices(connectionStrings, mainDatabaseConfiguration);
 
 // Build WebApp
 var app = builder.Build();
