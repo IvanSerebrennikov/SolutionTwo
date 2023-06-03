@@ -19,6 +19,7 @@
     <ItemGroup>
         <ProjectReference Include="..\SolutionTwo.Business.Identity\SolutionTwo.Business.Identity.csproj" />
         <ProjectReference Include="..\SolutionTwo.Business.Core\SolutionTwo.Business.Core.csproj" />
+        <ProjectReference Include="..\SolutionTwo.MultiTenancy\SolutionTwo.MultiTenancy.csproj" />
     </ItemGroup>
 
 </Project>

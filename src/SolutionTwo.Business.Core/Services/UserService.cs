@@ -50,7 +50,7 @@ public class UserService : IUserService
         return userModels;
     }
 
-    public async Task<UserWithRolesModel> AddUserAsync(CreateUserModel createUserModel)
+    public async Task<UserWithRolesModel> AddUserAsync(CreateUserModel createUserModel, Guid tenantId)
     {
         createUserModel.FirstName.AssertValueIsNotNull();
         createUserModel.LastName.AssertValueIsNotNull();
@@ -62,6 +62,7 @@ public class UserService : IUserService
         var userEntity = new UserEntity
         {
             Id = Guid.NewGuid(),
+            TenantId = tenantId,
             FirstName = createUserModel.FirstName,
             LastName = createUserModel.LastName,
             Username = createUserModel.Username,

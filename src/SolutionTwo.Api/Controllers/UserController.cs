@@ -10,7 +10,7 @@ namespace SolutionTwo.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UserController : ApiControllerBase
+public class UserController : ApiAuthorizedControllerBase
 {
     private readonly IUserService _userService;
 
@@ -23,11 +23,7 @@ public class UserController : ApiControllerBase
     [HttpGet("me")]
     public async Task<ActionResult<UserWithRolesModel>> GetMe()
     {
-        var username = GetUsernameFromClaims();
-        if (string.IsNullOrEmpty(username))
-            return BadRequest("Name claim was not found");
-
-        var userModel = await _userService.GetUserWithRolesAsync(username);
+        var userModel = await _userService.GetUserWithRolesAsync(CurrentUserUsername);
 
         if (userModel == null)
             return NotFound();
@@ -35,7 +31,7 @@ public class UserController : ApiControllerBase
         return Ok(userModel);
     }
 
-    [RoleBasedAuthorize(UserRoles.SuperAdmin)]
+    [RoleBasedAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserWithRolesModel>>> GetAll()
     {
@@ -44,7 +40,7 @@ public class UserController : ApiControllerBase
         return Ok(userModels);
     }
 
-    [RoleBasedAuthorize(UserRoles.SuperAdmin)]
+    [RoleBasedAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
     [HttpGet("{id}")]
     public async Task<ActionResult<UserWithRolesModel>> GetById(Guid id)
     {
@@ -56,7 +52,7 @@ public class UserController : ApiControllerBase
         return Ok(userModel);
     }
 
-    [RoleBasedAuthorize(UserRoles.SuperAdmin)]
+    [RoleBasedAuthorize(UserRoles.TenantAdmin)]
     [HttpPost]
     public async Task<ActionResult> AddUser(CreateUserModel createUserModel)
     {
@@ -66,12 +62,27 @@ public class UserController : ApiControllerBase
             string.IsNullOrEmpty(createUserModel.Password))
             return BadRequest("Passed data is invalid. All properties are required.");
 
-        var userModel = await _userService.AddUserAsync(createUserModel);
+        var userModel = await _userService.AddUserAsync(createUserModel, CurrentUserTenantId);
+
+        return CreatedAtAction(nameof(GetById), new { id = userModel.Id }, userModel);
+    }
+    
+    [RoleBasedAuthorize(UserRoles.SuperAdmin)]
+    [HttpPost("tenant-admin")]
+    public async Task<ActionResult> AddTenantAdminUser(CreateUserModel createUserModel, [FromQuery] Guid tenantId)
+    {
+        if (string.IsNullOrEmpty(createUserModel.FirstName) ||
+            string.IsNullOrEmpty(createUserModel.LastName) ||
+            string.IsNullOrEmpty(createUserModel.Username) ||
+            string.IsNullOrEmpty(createUserModel.Password))
+            return BadRequest("Passed data is invalid. All properties are required.");
+
+        var userModel = await _userService.AddUserAsync(createUserModel, tenantId);
 
         return CreatedAtAction(nameof(GetById), new { id = userModel.Id }, userModel);
     }
 
-    [RoleBasedAuthorize(UserRoles.SuperAdmin)]
+    [RoleBasedAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
     [HttpDelete]
     public async Task<ActionResult> DeleteUser(Guid id)
     {

@@ -35,7 +35,7 @@ public class TokenBasedAuthenticationMiddleware
             return;
         }
 
-        if (_env.IsDevelopment() && _hardCodedIdentityConfiguration.UseHardCodedIdentity)
+        if (_env.IsDevelopment() && _hardCodedIdentityConfiguration.UseHardCodedIdentity == true)
         {
             ConfigureHardCodedIdentity(context);
             await _next(context);
@@ -84,7 +84,7 @@ public class TokenBasedAuthenticationMiddleware
     private void ConfigureHardCodedIdentity(HttpContext context)
     {
         var claims = _hardCodedIdentityConfiguration.Roles.Select(x => new Claim(ClaimTypes.Role, x)).ToList();
-        claims.Add(new Claim(ClaimTypes.Name, _hardCodedIdentityConfiguration.Username));
+        claims.Add(new Claim(ClaimTypes.Name, _hardCodedIdentityConfiguration.Username!));
         context.User = new ClaimsPrincipal(new ClaimsIdentity(claims));
     }
 }

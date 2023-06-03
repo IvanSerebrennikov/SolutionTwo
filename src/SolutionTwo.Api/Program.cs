@@ -9,15 +9,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMemoryCache();
 
+// MultiTenancy DI
+builder.Services.AddMultiTenancyServices();
+
 // Api DI
 builder.Services.AddApiServices();
+
+// Business.Common DI
+builder.Services.AddBusinessCommonServices();
 
 // Business.Identity DI
 var identityConfiguration = builder.Configuration.GetSection<IdentityConfiguration>();
 var useHardCodedIdentity =
-    builder.Configuration.GetValue<bool>($"{nameof(HardCodedIdentityConfiguration)}:UseHardCodedIdentity");
+    builder.Configuration.GetValue<bool?>($"{nameof(HardCodedIdentityConfiguration)}:UseHardCodedIdentity");
 var hardCodedIdentityConfiguration =
-    builder.Configuration.GetSection<HardCodedIdentityConfiguration>(withValidation: useHardCodedIdentity);
+    builder.Configuration.GetSection<HardCodedIdentityConfiguration>(withValidation: useHardCodedIdentity == true);
 builder.Services.AddSingleton(identityConfiguration);
 builder.Services.AddSingleton(hardCodedIdentityConfiguration);
 // Used custom TokenBasedAuthenticationMiddleware
@@ -81,6 +87,7 @@ app.UseHttpsRedirection();
 app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 app.UseMiddleware<TokenBasedAuthenticationMiddleware>();
 app.UseMiddleware<RoleBasedAuthorizationMiddleware>();
+app.UseMiddleware<TenantAccessMiddleware>();
 
 // Used custom TokenBasedAuthenticationMiddleware
 // app.UseAuthentication();

@@ -22,6 +22,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data.InMemory.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data.InMemory.MainDatabase", "Tests\Unit\SolutionTwo.Data.InMemory.MainDatabase\SolutionTwo.Data.InMemory.MainDatabase.csproj", "{6E7AA595-14E6-4E9A-BEDA-C6EE345EA1CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.MultiTenancy", "SolutionTwo.MultiTenancy\SolutionTwo.MultiTenancy.csproj", "{500EA4EE-5996-4D0A-956C-BC4B84424649}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data.Common.MultiTenant", "SolutionTwo.Data.Common.MultiTenant\SolutionTwo.Data.Common.MultiTenant.csproj", "{9B127B72-CC82-4091-B9CC-9F759BDAF32B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +68,14 @@ Global
 		{6E7AA595-14E6-4E9A-BEDA-C6EE345EA1CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E7AA595-14E6-4E9A-BEDA-C6EE345EA1CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E7AA595-14E6-4E9A-BEDA-C6EE345EA1CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{500EA4EE-5996-4D0A-956C-BC4B84424649}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{500EA4EE-5996-4D0A-956C-BC4B84424649}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{500EA4EE-5996-4D0A-956C-BC4B84424649}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{500EA4EE-5996-4D0A-956C-BC4B84424649}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B127B72-CC82-4091-B9CC-9F759BDAF32B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B127B72-CC82-4091-B9CC-9F759BDAF32B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B127B72-CC82-4091-B9CC-9F759BDAF32B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B127B72-CC82-4091-B9CC-9F759BDAF32B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{2E4C39F0-142B-461A-9FB0-42A3800F9BAE} = {C3814B18-592C-448A-A732-4BD75B581390}

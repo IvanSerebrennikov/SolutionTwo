@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SolutionTwo.Data.MainDatabase.Context;
 
@@ -11,9 +12,10 @@ using SolutionTwo.Data.MainDatabase.Context;
 namespace SolutionTwo.Data.MainDatabase.Migrations
 {
     [DbContext(typeof(MainDatabaseContext))]
-    partial class MainDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20230603155637_ChangedTenantIdForUserToNotNullable")]
+    partial class ChangedTenantIdForUserToNotNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

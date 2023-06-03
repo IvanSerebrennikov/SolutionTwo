@@ -12,7 +12,7 @@ public interface IUserService
     
     Task<IReadOnlyList<UserWithRolesModel>> GetAllUsersWithRolesAsync();
 
-    Task<UserWithRolesModel> AddUserAsync(CreateUserModel createUserModel);
+    Task<UserWithRolesModel> AddUserAsync(CreateUserModel createUserModel, Guid tenantId);
 
     Task<IServiceResult> DeleteUserAsync(Guid id);
 }

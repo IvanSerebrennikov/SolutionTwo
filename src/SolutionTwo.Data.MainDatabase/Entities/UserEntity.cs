@@ -1,11 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SolutionTwo.Data.Common.Entities.Interfaces;
+using SolutionTwo.Data.Common.MultiTenant.Entities.Interfaces;
 
 namespace SolutionTwo.Data.MainDatabase.Entities;
 
-public class UserEntity : IIdentifiablyEntity<Guid>, ISoftDeletableEntity
+public class UserEntity : IIdentifiablyEntity<Guid>, ISoftDeletableEntity, IOwnedByTenantEntity
 {
     public Guid Id { get; set; }
+
+    public Guid TenantId { get; set; }
 
     [MaxLength(256)]
     public string FirstName { get; set; } = null!;

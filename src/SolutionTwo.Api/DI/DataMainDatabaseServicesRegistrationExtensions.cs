@@ -14,15 +14,13 @@ public static class DataMainDatabaseServicesRegistrationExtensions
     public static void AddDataMainDatabaseServices(this IServiceCollection services,
         ConnectionStrings connectionStrings, MainDatabaseConfiguration databaseConfiguration)
     {
-        services.AddSingleton(databaseConfiguration);
-
         services.AddDbContext<MainDatabaseContext>(o =>
             {
                 o.UseSqlServer(connectionStrings.MainDatabaseConnection!,
                     x => x.CommandTimeout(databaseConfiguration.CommandTimeOutInSeconds));
 
                 // Make sure that "Microsoft.EntityFrameworkCore" category is set to "None" 
-                // for all providers except "Debug"
+                // for all production logging providers
                 o.EnableSensitiveDataLogging();
 
                 // 'Update' repository method should be called to mark entity/properties as changed

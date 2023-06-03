@@ -11,6 +11,7 @@ using SolutionTwo.Business.Identity.Services.Interfaces;
 using SolutionTwo.Business.Identity.TokenProvider.Interfaces;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
+using SolutionTwo.MultiTenancy;
 
 namespace SolutionTwo.Business.Identity.Services;
 
@@ -154,7 +155,11 @@ public class IdentityService : IIdentityService
     private string CreateAuthToken(UserEntity user, out Guid authTokenId)
     {
         var claims = user.Roles.Select(x => (ClaimTypes.Role, x.Name)).ToList();
+        
         claims.Add((ClaimTypes.Name, user.Username));
+        
+        claims.Add((MultiTenancyClaimNames.TenantId, user.TenantId.ToString()));
+        
         var authToken =
             _tokenProvider.GenerateAuthToken(claims, out authTokenId);
         return authToken;

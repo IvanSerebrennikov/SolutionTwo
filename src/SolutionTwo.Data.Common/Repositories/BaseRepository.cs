@@ -118,7 +118,10 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         if (withTracking) query = query.AsTracking();
 
         if (filter != null) query = query.Where(filter);
-
+        
+        var commonPredicate = CommonPredicate();
+        if (commonPredicate != null) query = query.Where(commonPredicate);
+        
         if (include != null)
         {
             query = query.Include(include);
@@ -139,5 +142,10 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         if (take != null) query = query.Take(take.Value);
 
         return query;
+    }
+
+    protected virtual Expression<Func<TEntity, bool>>? CommonPredicate()
+    {
+        return null;
     }
 }

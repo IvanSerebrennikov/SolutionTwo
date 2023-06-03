@@ -12,8 +12,8 @@ using SolutionTwo.Data.MainDatabase.Context;
 namespace SolutionTwo.Data.MainDatabase.Migrations
 {
     [DbContext(typeof(MainDatabaseContext))]
-    [Migration("20230603083148_AddedIsDeletedPropertyToUser")]
-    partial class AddedIsDeletedPropertyToUser
+    [Migration("20230603133712_AddedIsDeletedAndTenantIdToUser")]
+    partial class AddedIsDeletedAndTenantIdToUser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -112,6 +112,9 @@ namespace SolutionTwo.Data.MainDatabase.Migrations
                         .IsRequired()
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Username")
                         .IsRequired()
