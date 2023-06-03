@@ -1,6 +1,6 @@
 ﻿namespace SolutionTwo.Data.MainDatabase.Entities.ManyToMany;
 
-public class UserRoleEntity
+public class UserRoleRelation
 {
     public Guid UserId { get; set; }
 

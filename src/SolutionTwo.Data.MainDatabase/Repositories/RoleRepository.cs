@@ -14,7 +14,7 @@ public class RoleRepository : BaseRepository<RoleEntity, Guid>, IRoleRepository
 
     public void AddRoleToUser(RoleEntity role, UserEntity user)
     {
-        Context.Set<UserRoleEntity>().Add(new UserRoleEntity
+        Context.Set<UserRoleRelation>().Add(new UserRoleRelation
         {
             RoleId = role.Id,
             UserId = user.Id

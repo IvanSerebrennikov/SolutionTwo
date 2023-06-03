@@ -21,7 +21,7 @@ public class MainDatabaseContext : DbContext
         modelBuilder.Entity<UserEntity>()
             .HasMany(x => x.Roles)
             .WithMany(x => x.Users)
-            .UsingEntity<UserRoleEntity>(
+            .UsingEntity<UserRoleRelation>(
                 l => l.HasOne<RoleEntity>().WithMany().HasForeignKey(e => e.RoleId),
                 r => r.HasOne<UserEntity>().WithMany().HasForeignKey(e => e.UserId),
                 x => x.ToTable("UserRoles"));
