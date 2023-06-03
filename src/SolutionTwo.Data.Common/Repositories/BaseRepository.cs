@@ -120,9 +120,9 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
 
         if (filter != null) query = query.Where(filter);
         
-        var predicateForEachQuery = GetPredicateForEachQuery();
-        if (predicateForEachQuery != null) 
-            query = query.Where(predicateForEachQuery);
+        var filterForEachQuery = GetFilterForEachQuery();
+        if (filterForEachQuery != null) 
+            query = query.Where(filterForEachQuery);
         
         if (include != null)
         {
@@ -146,7 +146,7 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         return query;
     }
 
-    protected virtual Expression<Func<TEntity, bool>>? GetPredicateForEachQuery()
+    protected virtual Expression<Func<TEntity, bool>>? GetFilterForEachQuery()
     {
         return null;
     }

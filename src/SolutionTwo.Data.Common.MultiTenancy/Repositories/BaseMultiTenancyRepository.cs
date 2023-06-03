@@ -17,11 +17,11 @@ public abstract class BaseMultiTenancyRepository<TEntity, TId> : BaseRepository<
         _tenantAccessGetter = tenantAccessGetter;
     }
 
-    protected override Expression<Func<TEntity, bool>>? GetPredicateForEachQuery()
+    protected override Expression<Func<TEntity, bool>>? GetFilterForEachQuery()
     {
         if (!_tenantAccessGetter.IsInitialized)
         {
-            throw new ApplicationException("TenantAccessGetter is not initialized");
+            throw new ApplicationException("Tenant Access is not initialized");
         }
         
         if (!_tenantAccessGetter.AllTenantsAccessible && _tenantAccessGetter.TenantId.HasValue)
@@ -29,6 +29,6 @@ public abstract class BaseMultiTenancyRepository<TEntity, TId> : BaseRepository<
             return x => x.TenantId == _tenantAccessGetter.TenantId.Value;
         }
 
-        return base.GetPredicateForEachQuery();
+        return base.GetFilterForEachQuery();
     }
 }
