@@ -1,12 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SolutionTwo.Common.MultiTenancy;
+using SolutionTwo.Data.Common.MultiTenancy.Context;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.Entities.ManyToMany;
 
 namespace SolutionTwo.Data.MainDatabase.Context;
 
-public class MainDatabaseContext : DbContext
+public class MainDatabaseContext : MultiTenancyDbContext
 {
-    public MainDatabaseContext(DbContextOptions options) : base(options)
+    public MainDatabaseContext(DbContextOptions options, ITenantAccessGetter tenantAccessGetter) : base(options,
+        tenantAccessGetter)
     {
     }
 

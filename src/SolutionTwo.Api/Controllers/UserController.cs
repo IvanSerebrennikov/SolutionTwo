@@ -62,7 +62,7 @@ public class UserController : ApiAuthorizedControllerBase
             string.IsNullOrEmpty(createUserModel.Password))
             return BadRequest("Passed data is invalid. All properties are required.");
 
-        var userModel = await _userService.CreateUserAsync(createUserModel, CurrentUserTenantId);
+        var userModel = await _userService.CreateUserAsync(createUserModel);
 
         return CreatedAtAction(nameof(GetById), new { id = userModel.Id }, userModel);
     }

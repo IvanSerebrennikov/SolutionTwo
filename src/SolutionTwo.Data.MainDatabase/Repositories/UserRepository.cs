@@ -6,7 +6,7 @@ using SolutionTwo.Data.Common.MultiTenancy.Repositories;
 
 namespace SolutionTwo.Data.MainDatabase.Repositories;
 
-public class UserRepository : BaseMultiTenancyRepository<UserEntity, Guid>, IUserRepository
+public class UserRepository : BaseMultiTenancyRepository<MainDatabaseContext, UserEntity, Guid>, IUserRepository
 {
     public UserRepository(MainDatabaseContext context, ITenantAccessGetter tenantAccessGetter) : base(context,
         tenantAccessGetter)

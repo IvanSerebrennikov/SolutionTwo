@@ -49,14 +49,13 @@ public class UserService : IUserService
         return userModels;
     }
 
-    public async Task<UserWithRolesModel> CreateUserAsync(CreateUserModel createUserModel, Guid tenantId)
+    public async Task<UserWithRolesModel> CreateUserAsync(CreateUserModel createUserModel)
     {
         var hashedPassword = _passwordHasher.HashPassword(createUserModel.Password);
 
         var userEntity = new UserEntity
         {
             Id = Guid.NewGuid(),
-            TenantId = tenantId,
             FirstName = createUserModel.FirstName,
             LastName = createUserModel.LastName,
             Username = createUserModel.Username,

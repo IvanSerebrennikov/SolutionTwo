@@ -1,18 +1,19 @@
 ﻿using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
 using SolutionTwo.Data.Common.Entities.Interfaces;
 using SolutionTwo.Data.Common.MultiTenancy.Entities.Interfaces;
 using SolutionTwo.Data.Common.Repositories;
 using SolutionTwo.Common.MultiTenancy;
+using SolutionTwo.Data.Common.MultiTenancy.Context;
 
 namespace SolutionTwo.Data.Common.MultiTenancy.Repositories;
 
-public abstract class BaseMultiTenancyRepository<TEntity, TId> : BaseRepository<TEntity, TId>
+public abstract class BaseMultiTenancyRepository<TContext, TEntity, TId> : BaseRepository<TEntity, TId>
     where TEntity : class, IIdentifiablyEntity<TId>, IOwnedByTenantEntity
+    where TContext : MultiTenancyDbContext
 {
     private readonly ITenantAccessGetter _tenantAccessGetter;
     
-    protected BaseMultiTenancyRepository(DbContext context, ITenantAccessGetter tenantAccessGetter) : base(context)
+    protected BaseMultiTenancyRepository(TContext context, ITenantAccessGetter tenantAccessGetter) : base(context)
     {
         _tenantAccessGetter = tenantAccessGetter;
     }
