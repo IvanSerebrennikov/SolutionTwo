@@ -25,5 +25,7 @@ public class MainDatabaseContext : DbContext
                 l => l.HasOne<RoleEntity>().WithMany().HasForeignKey(e => e.RoleId),
                 r => r.HasOne<UserEntity>().WithMany().HasForeignKey(e => e.UserId),
                 x => x.ToTable("UserRoles"));
+        
+        modelBuilder.Entity<UserEntity>().HasQueryFilter(b => !b.IsDeleted);
     }
 }
