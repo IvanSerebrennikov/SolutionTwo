@@ -40,7 +40,7 @@ public class TenantController : ApiControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateUser(CreateTenantModel createTenantModel)
+    public async Task<ActionResult> CreateTenant(CreateTenantModel createTenantModel)
     {
         if (string.IsNullOrEmpty(createTenantModel.TenantName) ||
             string.IsNullOrEmpty(createTenantModel.AdminFirstName) ||

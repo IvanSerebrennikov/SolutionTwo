@@ -2,5 +2,5 @@
 
 public interface IOwnedByTenantEntity
 {
-    public Guid TenantId { get; set; }
+    Guid TenantId { get; set; }
 }
