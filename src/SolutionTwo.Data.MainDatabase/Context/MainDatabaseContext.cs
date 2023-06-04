@@ -29,7 +29,6 @@ public class MainDatabaseContext : MultiTenancyDbContext
                 r => r.HasOne<UserEntity>().WithMany().HasForeignKey(e => e.UserId),
                 x => x.ToTable("UserRoles"));
         
-        modelBuilder.Entity<UserEntity>().HasQueryFilter(x => !x.IsDeleted);
-        modelBuilder.Entity<TenantEntity>().HasQueryFilter(x => !x.IsDeleted);
+        base.OnModelCreating(modelBuilder);
     }
 }

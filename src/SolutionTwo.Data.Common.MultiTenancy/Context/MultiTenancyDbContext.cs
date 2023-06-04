@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SolutionTwo.Common.MultiTenancy;
+using SolutionTwo.Data.Common.Context;
 using SolutionTwo.Data.Common.MultiTenancy.Entities.Interfaces;
 
 namespace SolutionTwo.Data.Common.MultiTenancy.Context;
 
-public class MultiTenancyDbContext : DbContext
+public class MultiTenancyDbContext : BaseDbContext
 {
     private readonly ITenantAccessGetter _tenantAccessGetter;
     
