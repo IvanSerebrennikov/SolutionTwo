@@ -121,11 +121,7 @@ public abstract class BaseRepository<TContext, TEntity, TId> : IBaseRepository<T
         if (withTracking) query = query.AsTracking();
 
         if (filter != null) query = query.Where(filter);
-        
-        var filterForEachQuery = GetFilterForEachQuery();
-        if (filterForEachQuery != null) 
-            query = query.Where(filterForEachQuery);
-        
+
         if (include != null)
         {
             query = query.Include(include);
@@ -146,10 +142,5 @@ public abstract class BaseRepository<TContext, TEntity, TId> : IBaseRepository<T
         if (take != null) query = query.Take(take.Value);
 
         return query;
-    }
-
-    protected virtual Expression<Func<TEntity, bool>>? GetFilterForEachQuery()
-    {
-        return null;
     }
 }

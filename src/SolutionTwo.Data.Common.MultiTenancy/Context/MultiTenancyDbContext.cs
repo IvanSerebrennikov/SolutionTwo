@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SolutionTwo.Common.MultiTenancy;
 using SolutionTwo.Data.Common.Context;
+using SolutionTwo.Data.Common.Extensions;
 using SolutionTwo.Data.Common.MultiTenancy.Entities.Interfaces;
 
 namespace SolutionTwo.Data.Common.MultiTenancy.Context;
@@ -26,6 +27,14 @@ public class MultiTenancyDbContext : BaseDbContext
         HandleMultiTenancyBeforeSaveChanges();
 
         return base.SaveChanges();
+    }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.AppendGlobalQueryFilter<IOwnedByTenantEntity>(x =>
+            !_tenantAccessGetter.TenantId.HasValue || x.TenantId == (_tenantAccessGetter.TenantId ?? Guid.Empty));
+        
+        base.OnModelCreating(modelBuilder);
     }
 
     private void HandleMultiTenancyBeforeSaveChanges()
