@@ -26,38 +26,6 @@ var hardCodedIdentityConfiguration =
     builder.Configuration.GetSection<HardCodedIdentityConfiguration>(withValidation: useHardCodedIdentity == true);
 builder.Services.AddSingleton(identityConfiguration);
 builder.Services.AddSingleton(hardCodedIdentityConfiguration);
-// Used custom TokenBasedAuthenticationMiddleware
-// var identityConfiguration = builder.Configuration.GetSection<IdentityConfiguration>();
-// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-// {
-//     options.TokenValidationParameters = new TokenValidationParameters()
-//     {
-//         ValidateIssuer = true,
-//         ValidateAudience = true,
-//         ValidateLifetime = true,
-//         ValidateIssuerSigningKey = true,
-//         ValidIssuer = identityConfiguration.JwtIssuer,
-//         ValidAudience = identityConfiguration.JwtAudience,
-//         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(identityConfiguration.JwtKey!))
-//     };
-//     options.Events = new JwtBearerEvents
-//     {
-//         OnTokenValidated = ctx =>
-//         {
-//             var id = ctx.SecurityToken.Id;
-//             var tokenManager = ctx.HttpContext.RequestServices.GetRequiredService<ITokenManager>();
-//
-//             if (!Guid.TryParse(id, out var authTokenId) || tokenManager.IsTokenDeactivated(authTokenId))
-//             {
-//                 ctx.Fail("Access was revoked.");
-//             }
-//             
-//             return Task.CompletedTask;
-//         }
-//     };
-// });
-// Used custom RoleBasedAuthorizationMiddleware
-// builder.Services.AddAuthorization();
 builder.Services.AddBusinessIdentityServices();
 
 // Business.MultiTenancy DI
@@ -91,12 +59,6 @@ app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 app.UseMiddleware<TokenBasedAuthenticationMiddleware>();
 app.UseMiddleware<RoleBasedAuthorizationMiddleware>();
 app.UseMiddleware<TenantAccessMiddleware>();
-
-// Used custom TokenBasedAuthenticationMiddleware
-// app.UseAuthentication();
-
-// Used custom RoleBasedAuthorizationMiddleware
-// app.UseAuthorization();
 
 app.MapControllers();
 
