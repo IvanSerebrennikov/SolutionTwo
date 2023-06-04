@@ -6,7 +6,7 @@ using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
 
 namespace SolutionTwo.Data.MainDatabase.Repositories;
 
-public class RoleRepository : BaseRepository<RoleEntity, Guid>, IRoleRepository
+public class RoleRepository : BaseRepository<MainDatabaseContext, RoleEntity, Guid>, IRoleRepository
 {
     public RoleRepository(MainDatabaseContext context) : base(context)
     {

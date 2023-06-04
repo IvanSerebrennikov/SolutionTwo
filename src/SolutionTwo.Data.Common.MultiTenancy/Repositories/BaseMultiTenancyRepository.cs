@@ -7,7 +7,7 @@ using SolutionTwo.Data.Common.MultiTenancy.Context;
 
 namespace SolutionTwo.Data.Common.MultiTenancy.Repositories;
 
-public abstract class BaseMultiTenancyRepository<TContext, TEntity, TId> : BaseRepository<TEntity, TId>
+public abstract class BaseMultiTenancyRepository<TContext, TEntity, TId> : BaseRepository<TContext, TEntity, TId>
     where TEntity : class, IIdentifiablyEntity<TId>, IOwnedByTenantEntity
     where TContext : MultiTenancyDbContext
 {
