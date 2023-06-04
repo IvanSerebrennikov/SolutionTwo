@@ -32,18 +32,23 @@ public class MultiTenancyDbContext : BaseDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.AppendGlobalQueryFilter<IOwnedByTenantEntity>(x =>
-            !_tenantAccessGetter.TenantId.HasValue || x.TenantId == (_tenantAccessGetter.TenantId ?? Guid.Empty));
+            _tenantAccessGetter.AllTenantsAccessible ||
+            x.TenantId == (_tenantAccessGetter.TenantId ?? Guid.Empty));
         
         base.OnModelCreating(modelBuilder);
     }
 
     private void HandleMultiTenancyBeforeSaveChanges()
     {
-        if (!_tenantAccessGetter.IsInitialized) 
-            throw new ApplicationException("Tenant Access is not initialized");
-
-        if (!_tenantAccessGetter.TenantId.HasValue || _tenantAccessGetter.TenantId.Value == Guid.Empty)
+        if (_tenantAccessGetter.AllTenantsAccessible)
+        {
             return;
+        }
+        
+        if (!_tenantAccessGetter.TenantId.HasValue || _tenantAccessGetter.TenantId.Value == Guid.Empty)
+        {
+            throw new ApplicationException("TenantAccessGetter can't provide access to any tenant");
+        }
 
         foreach (var entry in ChangeTracker.Entries<IOwnedByTenantEntity>()
                      .Where(entry => entry.State == EntityState.Added))

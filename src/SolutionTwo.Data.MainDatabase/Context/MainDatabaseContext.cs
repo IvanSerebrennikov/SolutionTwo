@@ -18,6 +18,8 @@ public class MainDatabaseContext : MultiTenancyDbContext
     public DbSet<RoleEntity> Roles => Set<RoleEntity>();
     
     public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
+    
+    public DbSet<TenantEntity> Tenants => Set<TenantEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
