@@ -18,9 +18,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Business.Common
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data.Common", "SolutionTwo.Data.Common\SolutionTwo.Data.Common.csproj", "{D0C92FD4-DA14-44A8-880A-E053A26E26EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data.InMemory.Common", "Tests\Unit\SolutionTwo.Data.InMemory.Common\SolutionTwo.Data.InMemory.Common.csproj", "{A0E8CC04-E549-44F3-AD97-F1F042AA299F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data.InMemory.Common", "Tests\Unit\InMemoryDb\SolutionTwo.Data.InMemory.Common\SolutionTwo.Data.InMemory.Common.csproj", "{A0E8CC04-E549-44F3-AD97-F1F042AA299F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data.InMemory.MainDatabase", "Tests\Unit\SolutionTwo.Data.InMemory.MainDatabase\SolutionTwo.Data.InMemory.MainDatabase.csproj", "{6E7AA595-14E6-4E9A-BEDA-C6EE345EA1CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data.InMemory.MainDatabase", "Tests\Unit\InMemoryDb\SolutionTwo.Data.InMemory.MainDatabase\SolutionTwo.Data.InMemory.MainDatabase.csproj", "{6E7AA595-14E6-4E9A-BEDA-C6EE345EA1CA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Common.MultiTenancy", "SolutionTwo.Common.MultiTenancy\SolutionTwo.Common.MultiTenancy.csproj", "{500EA4EE-5996-4D0A-956C-BC4B84424649}"
 EndProject

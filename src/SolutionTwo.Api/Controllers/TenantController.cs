@@ -8,7 +8,7 @@ using SolutionTwo.Business.MultiTenancy.Services.Interfaces;
 
 namespace SolutionTwo.Api.Controllers;
 
-[RoleBasedAuthorize(UserRoles.SuperAdmin)]
+[SolutionTwoAuthorize(UserRoles.SuperAdmin)]
 [Route("api/[controller]")]
 [ApiController]
 public class TenantController : ApiControllerBase

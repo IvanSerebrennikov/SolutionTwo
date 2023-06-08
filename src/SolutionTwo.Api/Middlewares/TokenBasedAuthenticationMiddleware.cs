@@ -76,7 +76,7 @@ public class TokenBasedAuthenticationMiddleware
     private static bool UnauthorizedAccessAllowed(HttpContext context)
     {
         var endpoint = context.Features.Get<IEndpointFeature>()?.Endpoint;
-        var authorizeAttribute = endpoint?.Metadata.GetMetadata<RoleBasedAuthorizeAttribute>();
+        var authorizeAttribute = endpoint?.Metadata.GetMetadata<SolutionTwoAuthorizeAttribute>();
         var allowAnonymousAttribute = endpoint?.Metadata.GetMetadata<AllowAnonymousAttribute>();
 
         return authorizeAttribute == null || allowAnonymousAttribute != null;

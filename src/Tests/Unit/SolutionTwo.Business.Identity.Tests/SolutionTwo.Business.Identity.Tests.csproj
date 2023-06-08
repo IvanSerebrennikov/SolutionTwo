@@ -21,7 +21,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\SolutionTwo.Business.Identity\SolutionTwo.Business.Identity.csproj" />
-        <ProjectReference Include="..\SolutionTwo.Data.InMemory.MainDatabase\SolutionTwo.Data.InMemory.MainDatabase.csproj" />
+        <ProjectReference Include="..\InMemoryDb\SolutionTwo.Data.InMemory.MainDatabase\SolutionTwo.Data.InMemory.MainDatabase.csproj" />
     </ItemGroup>
 
 </Project>

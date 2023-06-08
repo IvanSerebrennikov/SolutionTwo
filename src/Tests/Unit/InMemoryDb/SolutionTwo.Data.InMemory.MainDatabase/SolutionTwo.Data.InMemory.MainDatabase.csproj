@@ -7,7 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\SolutionTwo.Data.Common\SolutionTwo.Data.Common.csproj" />
+      <ProjectReference Include="..\..\..\..\SolutionTwo.Data.MainDatabase\SolutionTwo.Data.MainDatabase.csproj" />
+      <ProjectReference Include="..\SolutionTwo.Data.InMemory.Common\SolutionTwo.Data.InMemory.Common.csproj" />
     </ItemGroup>
 
 </Project>

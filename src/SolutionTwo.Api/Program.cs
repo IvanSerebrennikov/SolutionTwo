@@ -58,7 +58,7 @@ app.UseHttpsRedirection();
 app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 app.UseMiddleware<TokenBasedAuthenticationMiddleware>();
 app.UseMiddleware<RoleBasedAuthorizationMiddleware>();
-app.UseMiddleware<TenantAccessMiddleware>();
+app.UseMiddleware<TenantAccessSetupMiddleware>();
 
 app.MapControllers();
 

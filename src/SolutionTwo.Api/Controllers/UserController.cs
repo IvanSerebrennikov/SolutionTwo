@@ -19,7 +19,7 @@ public class UserController : ApiAuthorizedControllerBase
         _userService = userService;
     }
 
-    [RoleBasedAuthorize]
+    [SolutionTwoAuthorize]
     [HttpGet("me")]
     public async Task<ActionResult<UserWithRolesModel>> GetMe()
     {
@@ -31,7 +31,7 @@ public class UserController : ApiAuthorizedControllerBase
         return Ok(userModel);
     }
 
-    [RoleBasedAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
+    [SolutionTwoAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserWithRolesModel>>> GetAll()
     {
@@ -40,7 +40,7 @@ public class UserController : ApiAuthorizedControllerBase
         return Ok(userModels);
     }
 
-    [RoleBasedAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
+    [SolutionTwoAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
     [HttpGet("{id}")]
     public async Task<ActionResult<UserWithRolesModel>> GetById(Guid id)
     {
@@ -52,7 +52,7 @@ public class UserController : ApiAuthorizedControllerBase
         return Ok(userModel);
     }
 
-    [RoleBasedAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
+    [SolutionTwoAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
     [HttpPost]
     public async Task<ActionResult> CreateUser(CreateUserModel createUserModel)
     {
@@ -67,7 +67,7 @@ public class UserController : ApiAuthorizedControllerBase
         return CreatedAtAction(nameof(GetById), new { id = userModel.Id }, userModel);
     }
 
-    [RoleBasedAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
+    [SolutionTwoAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
     [HttpDelete]
     public async Task<ActionResult> DeleteUser(Guid id)
     {

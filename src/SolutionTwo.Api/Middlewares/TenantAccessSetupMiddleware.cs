@@ -6,11 +6,11 @@ using SolutionTwo.Common.MultiTenancy;
 
 namespace SolutionTwo.Api.Middlewares;
 
-public class TenantAccessMiddleware
+public class TenantAccessSetupMiddleware
 {
     private readonly RequestDelegate _next;
 
-    public TenantAccessMiddleware(RequestDelegate next)
+    public TenantAccessSetupMiddleware(RequestDelegate next)
     {
         _next = next;
     }
@@ -40,7 +40,7 @@ public class TenantAccessMiddleware
     private static bool UnauthorizedAccessAllowed(HttpContext context)
     {
         var endpoint = context.Features.Get<IEndpointFeature>()?.Endpoint;
-        var authorizeAttribute = endpoint?.Metadata.GetMetadata<RoleBasedAuthorizeAttribute>();
+        var authorizeAttribute = endpoint?.Metadata.GetMetadata<SolutionTwoAuthorizeAttribute>();
         var allowAnonymousAttribute = endpoint?.Metadata.GetMetadata<AllowAnonymousAttribute>();
 
         return authorizeAttribute == null || allowAnonymousAttribute != null;

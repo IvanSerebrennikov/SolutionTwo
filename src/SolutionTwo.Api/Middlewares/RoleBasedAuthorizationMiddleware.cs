@@ -36,7 +36,7 @@ public class RoleBasedAuthorizationMiddleware
     private static bool UnauthorizedAccessAllowed(HttpContext context, out string[]? roles)
     {
         var endpoint = context.Features.Get<IEndpointFeature>()?.Endpoint;
-        var authorizeAttribute = endpoint?.Metadata.GetMetadata<RoleBasedAuthorizeAttribute>();
+        var authorizeAttribute = endpoint?.Metadata.GetMetadata<SolutionTwoAuthorizeAttribute>();
         var allowAnonymousAttribute = endpoint?.Metadata.GetMetadata<AllowAnonymousAttribute>();
 
         roles = authorizeAttribute?.Roles;
