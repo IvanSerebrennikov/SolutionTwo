@@ -1,10 +1,11 @@
+using System.Security.Claims;
 using Microsoft.Extensions.Logging;
 using SolutionTwo.Business.Common.PasswordHasher.Interfaces;
 using SolutionTwo.Business.Identity.Configuration;
 using SolutionTwo.Business.Identity.Models.Auth.Incoming;
 using SolutionTwo.Business.Identity.Services;
 using SolutionTwo.Business.Identity.Services.Interfaces;
-using SolutionTwo.Business.Identity.TokenProvider;
+using SolutionTwo.Business.Identity.TokenProvider.Interfaces;
 using SolutionTwo.Business.Identity.TokenStore.Interfaces;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.InMemory.MainDatabase;
@@ -21,68 +22,28 @@ public class IdentityServiceTests
     private UserEntity _user1 = null!;
     private UserEntity _user2 = null!;
     private UserEntity _user3 = null!;
+
+    private delegate string GenerateAuthToken(List<(string, string)> claims, out Guid authTokenId);
+
+    private delegate ClaimsPrincipal? ValidateAuthToken(string tokenString, out Guid? authTokenId);
     
     [SetUp]
     public void Setup()
     {
         var identityConfiguration = new IdentityConfiguration
         {
-            JwtKey = Guid.NewGuid().ToString(),
-            JwtAudience = "test",
-            JwtIssuer = "test",
-            JwtExpiresMinutes = 15,
             RefreshTokenExpiresDays = RefreshTokenExpiresDays
         };
         
-        var userRepository = new InMemoryUserRepository();
-        var refreshTokenRepository = new InMemoryRefreshTokenRepository();
-        var mainDatabaseMock = new Mock<IMainDatabase>();
-        mainDatabaseMock.Setup(x => x.Users).Returns(userRepository);
-        mainDatabaseMock.Setup(x => x.RefreshTokens).Returns(refreshTokenRepository);
-        _mainDatabase = mainDatabaseMock.Object;
-        
-        // used real JwtProvider to simplify logic,
-        // ideally ITokenProvider Mock should be used and configured in each test method
-        var tokenProvider = new JwtProvider(identityConfiguration);
+        FakeInMemoryDatabase();
 
-        var loggerMock = new Mock<ILogger<IdentityService>>();
-        var logger = loggerMock.Object;
+        var tokenProvider = MockTokenProvider();
+        var revokedTokenStore = MockRevokedTokenStore();
+        var logger = MockLogger();
+        var passwordHasher = MockPasswordHasher();
 
-        var revokedTokens = new List<Guid>();
-        var revokedTokenStoreMock = new Mock<IRevokedTokenStore>();
-        revokedTokenStoreMock.Setup(x => x.RevokeAuthToken(It.IsAny<Guid>())).Callback((Guid authTokenId) =>
-        {
-            revokedTokens.Add(authTokenId);
-        });
-        revokedTokenStoreMock.Setup(x => x.IsAuthTokenRevoked(It.IsAny<Guid>()))
-            .Returns((Guid authTokenId) => revokedTokens.Contains(authTokenId));
-        var revokedTokenStore = revokedTokenStoreMock.Object;
-
-        var passwordHasherMock = new Mock<IPasswordHasher>();
-        passwordHasherMock.Setup(x => x.VerifyHashedPassword(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
-        var passwordHasher = passwordHasherMock.Object;
-        
         _identityService = new IdentityService(identityConfiguration, _mainDatabase,
             tokenProvider, revokedTokenStore, logger, passwordHasher);
-
-        _user1 = new UserEntity
-        {
-            Id = Guid.NewGuid(),
-            Username = "user1"
-        };
-        _user2 = new UserEntity
-        {
-            Id = Guid.NewGuid(),
-            Username = "user2"
-        };
-        _user3 = new UserEntity
-        {
-            Id = Guid.NewGuid(),
-            Username = "user3"
-        };
-        _mainDatabase.Users.Create(_user1);
-        _mainDatabase.Users.Create(_user2);
-        _mainDatabase.Users.Create(_user3);
     }
 
     // TODO: ValidateCredentialsAndCreateTokensPairAsync tests
@@ -274,6 +235,91 @@ public class IdentityServiceTests
             Assert.That(verificationResult1.IsSucceeded, Is.True);
             Assert.That(verificationResult2.IsSucceeded, Is.True);
         });
+    }
+    
+    private static IPasswordHasher MockPasswordHasher()
+    {
+        var passwordHasherMock = new Mock<IPasswordHasher>();
+        passwordHasherMock.Setup(x => x.VerifyHashedPassword(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+        var passwordHasher = passwordHasherMock.Object;
+        return passwordHasher;
+    }
+
+    private static IRevokedTokenStore MockRevokedTokenStore()
+    {
+        var revokedTokens = new List<Guid>();
+        var revokedTokenStoreMock = new Mock<IRevokedTokenStore>();
+        revokedTokenStoreMock.Setup(x => x.RevokeAuthToken(It.IsAny<Guid>())).Callback((Guid authTokenId) =>
+        {
+            revokedTokens.Add(authTokenId);
+        });
+        revokedTokenStoreMock.Setup(x => x.IsAuthTokenRevoked(It.IsAny<Guid>()))
+            .Returns((Guid authTokenId) => revokedTokens.Contains(authTokenId));
+        var revokedTokenStore = revokedTokenStoreMock.Object;
+        return revokedTokenStore;
+    }
+
+    private static ILogger<IdentityService> MockLogger()
+    {
+        var loggerMock = new Mock<ILogger<IdentityService>>();
+        var logger = loggerMock.Object;
+        return logger;
+    }
+
+    private static ITokenProvider MockTokenProvider()
+    {
+        var authTokens = new Dictionary<string, Guid>();
+        var tokenProviderMock = new Mock<ITokenProvider>();
+        tokenProviderMock.Setup(x => x.GenerateAuthToken(It.IsAny<List<(string, string)>>(), out It.Ref<Guid>.IsAny))
+            .Returns(new GenerateAuthToken((List<(string, string)> claims, out Guid authTokenId) =>
+            {
+                authTokenId = Guid.NewGuid();
+                var tokenValue = authTokenId.ToString();
+                authTokens.Add(tokenValue, authTokenId);
+                return tokenValue;
+            }));
+        tokenProviderMock.Setup(x => x.ValidateAuthToken(It.IsAny<string>(), out It.Ref<Guid?>.IsAny))
+            .Returns(new ValidateAuthToken((string tokenString, out Guid? authTokenId) =>
+            {
+                if (authTokens.TryGetValue(tokenString, out var id))
+                {
+                    authTokenId = id;
+                }
+                else
+                {
+                    authTokenId = null;
+                }
+
+                return new ClaimsPrincipal();
+            }));
+        var tokenProvider = tokenProviderMock.Object;
+        return tokenProvider;
+    }
+
+    private void FakeInMemoryDatabase()
+    {
+        var mainDatabaseMock = new Mock<IMainDatabase>();
+        mainDatabaseMock.Setup(x => x.Users).Returns(new InMemoryUserRepository());
+        mainDatabaseMock.Setup(x => x.RefreshTokens).Returns(new InMemoryRefreshTokenRepository());
+        _mainDatabase = mainDatabaseMock.Object;
+        _user1 = new UserEntity
+        {
+            Id = Guid.NewGuid(),
+            Username = "user1"
+        };
+        _user2 = new UserEntity
+        {
+            Id = Guid.NewGuid(),
+            Username = "user2"
+        };
+        _user3 = new UserEntity
+        {
+            Id = Guid.NewGuid(),
+            Username = "user3"
+        };
+        _mainDatabase.Users.Create(_user1);
+        _mainDatabase.Users.Create(_user2);
+        _mainDatabase.Users.Create(_user3);
     }
 }
 

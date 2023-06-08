@@ -107,12 +107,11 @@ public class IdentityService : IIdentityService
 
     public IServiceResult<ClaimsPrincipal> VerifyAuthTokenAndGetPrincipal(string authToken)
     {
-        var claimsPrincipal = _tokenProvider.ValidateAuthToken(authToken, out var securityToken);
+        var claimsPrincipal = _tokenProvider.ValidateAuthToken(authToken, out var authTokenId);
 
         if (claimsPrincipal == null ||
-            securityToken == null ||
-            !Guid.TryParse(securityToken.Id, out var authTokenId) ||
-            _revokedTokenStore.IsAuthTokenRevoked(authTokenId))
+            authTokenId == null ||
+            _revokedTokenStore.IsAuthTokenRevoked(authTokenId.Value))
         {
             return ServiceResult<ClaimsPrincipal>.Error();
         }

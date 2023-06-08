@@ -40,7 +40,7 @@ public class JwtProvider : ITokenProvider
         return tokenString;
     }
     
-    public ClaimsPrincipal? ValidateAuthToken(string tokenString, out SecurityToken? securityToken)
+    public ClaimsPrincipal? ValidateAuthToken(string tokenString, out Guid? authTokenId)
     {
         var key = GetSymmetricSecurityKey();
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -58,12 +58,12 @@ public class JwtProvider : ITokenProvider
                 IssuerSigningKey = key
             }, out var validatedToken);
 
-            securityToken = validatedToken;
-            return validatedToken != null ? principal : null;
+            authTokenId = Guid.Parse(validatedToken?.Id ?? "");
+            return principal;
         }
         catch
         {
-            securityToken = null;
+            authTokenId = null;
             return null;
         }
     }
