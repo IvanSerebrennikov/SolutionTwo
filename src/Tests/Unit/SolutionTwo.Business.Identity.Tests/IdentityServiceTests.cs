@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SolutionTwo.Business.Common.PasswordHasher.Interfaces;
 using SolutionTwo.Business.Identity.Configuration;
@@ -6,6 +5,7 @@ using SolutionTwo.Business.Identity.Models.Auth.Incoming;
 using SolutionTwo.Business.Identity.Services;
 using SolutionTwo.Business.Identity.Services.Interfaces;
 using SolutionTwo.Business.Identity.TokenProvider;
+using SolutionTwo.Business.Identity.TokenStore.Interfaces;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.InMemory.MainDatabase;
 using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
@@ -21,7 +21,7 @@ public class IdentityServiceTests
     private UserEntity _user1 = null!;
     private UserEntity _user2 = null!;
     private UserEntity _user3 = null!;
-
+    
     [SetUp]
     public void Setup()
     {
@@ -48,14 +48,22 @@ public class IdentityServiceTests
         var loggerMock = new Mock<ILogger<IdentityService>>();
         var logger = loggerMock.Object;
 
-        var memoryCache = new MemoryCache(new MemoryCacheOptions());
+        var revokedTokens = new List<Guid>();
+        var revokedTokenStoreMock = new Mock<IRevokedTokenStore>();
+        revokedTokenStoreMock.Setup(x => x.RevokeAuthToken(It.IsAny<Guid>())).Callback((Guid authTokenId) =>
+        {
+            revokedTokens.Add(authTokenId);
+        });
+        revokedTokenStoreMock.Setup(x => x.IsAuthTokenRevoked(It.IsAny<Guid>()))
+            .Returns((Guid authTokenId) => revokedTokens.Contains(authTokenId));
+        var revokedTokenStore = revokedTokenStoreMock.Object;
 
         var passwordHasherMock = new Mock<IPasswordHasher>();
         passwordHasherMock.Setup(x => x.VerifyHashedPassword(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
         var passwordHasher = passwordHasherMock.Object;
         
         _identityService = new IdentityService(identityConfiguration, _mainDatabase,
-            tokenProvider, memoryCache, logger, passwordHasher);
+            tokenProvider, revokedTokenStore, logger, passwordHasher);
 
         _user1 = new UserEntity
         {

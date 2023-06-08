@@ -1,14 +1,13 @@
 ﻿using System.Security.Claims;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SolutionTwo.Business.Common.Models;
 using SolutionTwo.Business.Common.PasswordHasher.Interfaces;
-using SolutionTwo.Business.Common.ValueAssertion;
 using SolutionTwo.Business.Identity.Configuration;
 using SolutionTwo.Business.Identity.Models.Auth.Incoming;
 using SolutionTwo.Business.Identity.Models.Auth.Outgoing;
 using SolutionTwo.Business.Identity.Services.Interfaces;
 using SolutionTwo.Business.Identity.TokenProvider.Interfaces;
+using SolutionTwo.Business.Identity.TokenStore.Interfaces;
 using SolutionTwo.Common.MultiTenancy;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
@@ -20,7 +19,7 @@ public class IdentityService : IIdentityService
     private readonly IdentityConfiguration _identityConfiguration;
     private readonly IMainDatabase _mainDatabase;
     private readonly ITokenProvider _tokenProvider;
-    private readonly IMemoryCache _memoryCache;
+    private readonly IRevokedTokenStore _revokedTokenStore;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ILogger<IdentityService> _logger;
 
@@ -28,7 +27,7 @@ public class IdentityService : IIdentityService
         IdentityConfiguration identityConfiguration,
         IMainDatabase mainDatabase, 
         ITokenProvider tokenProvider, 
-        IMemoryCache memoryCache,
+        IRevokedTokenStore revokedTokenStore,
         ILogger<IdentityService> logger, 
         IPasswordHasher passwordHasher)
     {
@@ -37,7 +36,7 @@ public class IdentityService : IIdentityService
         _tokenProvider = tokenProvider;
         _logger = logger;
         _passwordHasher = passwordHasher;
-        _memoryCache = memoryCache;
+        _revokedTokenStore = revokedTokenStore;
     }
 
     public async Task<IServiceResult<AuthResult>> ValidateCredentialsAndCreateTokensPairAsync(
@@ -113,7 +112,7 @@ public class IdentityService : IIdentityService
         if (claimsPrincipal == null ||
             securityToken == null ||
             !Guid.TryParse(securityToken.Id, out var authTokenId) ||
-            IsAuthTokenRevoked(authTokenId))
+            _revokedTokenStore.IsAuthTokenRevoked(authTokenId))
         {
             return ServiceResult<ClaimsPrincipal>.Error();
         }
@@ -222,22 +221,6 @@ public class IdentityService : IIdentityService
     {
         refreshTokenEntity.IsRevoked = true;
         _mainDatabase.RefreshTokens.Update(refreshTokenEntity, x => x.IsRevoked);
-        RevokeAuthToken(refreshTokenEntity.AuthTokenId);
-    }
-    
-    private void RevokeAuthToken(Guid authTokenId)
-    {
-        _memoryCache.Set(GetRevokedAuthTokenKey(authTokenId), 1,
-            TimeSpan.FromMinutes(_identityConfiguration.JwtExpiresMinutes!.Value));
-    }
-    
-    private bool IsAuthTokenRevoked(Guid authTokenId)
-    {
-        return _memoryCache.TryGetValue(GetRevokedAuthTokenKey(authTokenId), out int _);
-    }
-
-    private static string GetRevokedAuthTokenKey(Guid authTokenId)
-    {
-        return $"auth-tokens:{authTokenId}:revoked";
+        _revokedTokenStore.RevokeAuthToken(refreshTokenEntity.AuthTokenId);
     }
 }
