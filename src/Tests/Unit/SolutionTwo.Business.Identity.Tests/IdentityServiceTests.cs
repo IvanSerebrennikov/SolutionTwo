@@ -1,7 +1,6 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using SolutionTwo.Business.Common.PasswordHasher;
+using SolutionTwo.Business.Common.PasswordHasher.Interfaces;
 using SolutionTwo.Business.Identity.Configuration;
 using SolutionTwo.Business.Identity.Models.Auth.Incoming;
 using SolutionTwo.Business.Identity.Services;
@@ -42,47 +41,36 @@ public class IdentityServiceTests
         mainDatabaseMock.Setup(x => x.RefreshTokens).Returns(refreshTokenRepository);
         _mainDatabase = mainDatabaseMock.Object;
         
+        // used real JwtProvider to simplify logic,
+        // ideally ITokenProvider Mock should be used and configured in each test method
         var tokenProvider = new JwtProvider(identityConfiguration);
 
         var loggerMock = new Mock<ILogger<IdentityService>>();
         var logger = loggerMock.Object;
 
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        
-        var passwordHasher = new PasswordHasher(new PasswordHasher<object>());
+
+        var passwordHasherMock = new Mock<IPasswordHasher>();
+        passwordHasherMock.Setup(x => x.VerifyHashedPassword(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+        var passwordHasher = passwordHasherMock.Object;
         
         _identityService = new IdentityService(identityConfiguration, _mainDatabase,
             tokenProvider, memoryCache, logger, passwordHasher);
 
-        var randomFaceRolledDataEnteredForUser1ToAllFields = "q1";
         _user1 = new UserEntity
         {
             Id = Guid.NewGuid(),
-            FirstName = randomFaceRolledDataEnteredForUser1ToAllFields,
-            LastName = randomFaceRolledDataEnteredForUser1ToAllFields,
-            Username = randomFaceRolledDataEnteredForUser1ToAllFields,
-            PasswordHash = passwordHasher.HashPassword(randomFaceRolledDataEnteredForUser1ToAllFields),
-            CreatedDateTimeUtc = DateTime.UtcNow
+            Username = "user1"
         };
-        var randomFaceRolledDataEnteredForUser2ToAllFields = "x2";
         _user2 = new UserEntity
         {
             Id = Guid.NewGuid(),
-            FirstName = randomFaceRolledDataEnteredForUser2ToAllFields,
-            LastName = randomFaceRolledDataEnteredForUser2ToAllFields,
-            Username = randomFaceRolledDataEnteredForUser2ToAllFields,
-            PasswordHash = passwordHasher.HashPassword(randomFaceRolledDataEnteredForUser2ToAllFields),
-            CreatedDateTimeUtc = DateTime.UtcNow
+            Username = "user2"
         };
-        var randomFaceRolledDataEnteredForUser3ToAllFields = "e3";
         _user3 = new UserEntity
         {
             Id = Guid.NewGuid(),
-            FirstName = randomFaceRolledDataEnteredForUser3ToAllFields,
-            LastName = randomFaceRolledDataEnteredForUser3ToAllFields,
-            Username = randomFaceRolledDataEnteredForUser3ToAllFields,
-            PasswordHash = passwordHasher.HashPassword(randomFaceRolledDataEnteredForUser3ToAllFields),
-            CreatedDateTimeUtc = DateTime.UtcNow
+            Username = "user3"
         };
         _mainDatabase.Users.Create(_user1);
         _mainDatabase.Users.Create(_user2);
@@ -94,7 +82,7 @@ public class IdentityServiceTests
     // TODO: VerifyAuthTokenAndGetPrincipal tests
     
     [Test]
-    public async Task RefreshTokensPairAsyncReturnsSuccessAndCreatesNewActiveRefreshTokenForUser()
+    public async Task RefreshTokensPairAsyncReturnsSuccessAndCreatesNewActiveTokensPairForUser()
     {
         var createTokensResult =
             await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
@@ -106,11 +94,15 @@ public class IdentityServiceTests
             ? await _mainDatabase.RefreshTokens.GetSingleAsync(x =>
                 x.Id.ToString() == newTokensPair.RefreshToken)
             : await Task.FromResult<RefreshTokenEntity?>(null));
+        var verificationResult = newTokensPair != null
+            ? _identityService.VerifyAuthTokenAndGetPrincipal(newTokensPair.AuthToken)
+            : null;
         
         Assert.Multiple(() =>
         {
             Assert.That(refreshTokensResult.IsSucceeded, Is.True);
             Assert.That(newActiveRefreshToken, Is.Not.Null);
+            Assert.That(verificationResult, Is.Not.Null);
         });
         Assert.Multiple(() =>
         {
@@ -119,6 +111,7 @@ public class IdentityServiceTests
             Assert.That(newActiveRefreshToken.UserId, Is.EqualTo(_user1.Id));
             Assert.That(newActiveRefreshToken.ExpiresDateTimeUtc,
                 Is.GreaterThan(DateTime.UtcNow.AddDays(RefreshTokenExpiresDays).AddMinutes(-1)));
+            Assert.That(verificationResult!.IsSucceeded, Is.True);
         });
     }
 
@@ -283,7 +276,7 @@ internal static class IdentityServiceTestsHelpers
         return new UserCredentialsModel
         {
             Username = userEntity.Username,
-            Password = userEntity.Username
+            Password = "password"
         };
     }
 }

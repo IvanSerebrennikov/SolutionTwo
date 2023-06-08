@@ -43,9 +43,6 @@ public class IdentityService : IIdentityService
     public async Task<IServiceResult<AuthResult>> ValidateCredentialsAndCreateTokensPairAsync(
         UserCredentialsModel userCredentials)
     {
-        userCredentials.Username.AssertValueIsNotNull();
-        userCredentials.Password.AssertValueIsNotNull();
-        
         var userEntity = await VerifyPasswordAndGetUserWithRolesAsync(userCredentials);
         
         if (userEntity == null)
