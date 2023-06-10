@@ -268,20 +268,18 @@ public class IdentityServiceTests
 
     private static ITokenProvider MockTokenProvider()
     {
-        var authTokens = new Dictionary<string, Guid>();
         var tokenProviderMock = new Mock<ITokenProvider>();
         tokenProviderMock.Setup(x => x.GenerateAuthToken(It.IsAny<List<(string, string)>>(), out It.Ref<Guid>.IsAny))
             .Returns(new GenerateAuthToken((List<(string, string)> claims, out Guid authTokenId) =>
             {
                 authTokenId = Guid.NewGuid();
                 var tokenValue = authTokenId.ToString();
-                authTokens.Add(tokenValue, authTokenId);
                 return tokenValue;
             }));
         tokenProviderMock.Setup(x => x.ValidateAuthToken(It.IsAny<string>(), out It.Ref<Guid?>.IsAny))
             .Returns(new ValidateAuthToken((string tokenString, out Guid? authTokenId) =>
             {
-                if (authTokens.TryGetValue(tokenString, out var id))
+                if (Guid.TryParse(tokenString, out var id))
                 {
                     authTokenId = id;
                 }

@@ -42,7 +42,7 @@ public class IdentityService : IIdentityService
     public async Task<IServiceResult<AuthResult>> ValidateCredentialsAndCreateTokensPairAsync(
         UserCredentialsModel userCredentials)
     {
-        var userEntity = await VerifyPasswordAndGetUserWithRolesAsync(userCredentials);
+        var userEntity = await GetUserWithRolesByCredentialsAsync(userCredentials);
         
         if (userEntity == null)
         {
@@ -129,7 +129,7 @@ public class IdentityService : IIdentityService
         throw new NotImplementedException();
     }
 
-    private async Task<UserEntity?> VerifyPasswordAndGetUserWithRolesAsync(UserCredentialsModel userCredentials)
+    private async Task<UserEntity?> GetUserWithRolesByCredentialsAsync(UserCredentialsModel userCredentials)
     {
         var userEntity = await _mainDatabase.Users.GetSingleAsync(
             x => x.Username == userCredentials.Username,
