@@ -13,9 +13,10 @@ public static class ApiServicesRegistrationExtensions
         {
             o.InvalidModelStateResponseFactory = actionContext =>
             {
+                var traceId = actionContext.HttpContext.TraceIdentifier;
                 var errorMessage = actionContext.ModelState.Values.SelectMany(x => x.Errors)
                     .Select(x => x.ErrorMessage);
-                return new BadRequestObjectResult(new ErrorResponse(errorMessage.ToArray()));
+                return new BadRequestObjectResult(new ErrorResponse(errorMessage.ToArray(), traceId));
             };
         });
         services.AddEndpointsApiExplorer();
