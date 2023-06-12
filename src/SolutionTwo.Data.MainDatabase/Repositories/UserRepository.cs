@@ -12,12 +12,12 @@ public class UserRepository : BaseRepository<MainDatabaseContext, UserEntity, Gu
     {
     }
 
-    public void AddUserToRole(UserEntity user, RoleEntity role)
+    public void AddUserToRole(UserEntity userEntity, RoleEntity roleEntity)
     {
         Context.Set<UserRoleRelation>().Add(new UserRoleRelation
         {
-            RoleId = role.Id,
-            UserId = user.Id
+            RoleId = roleEntity.Id,
+            UserId = userEntity.Id
         });
     }
 }
