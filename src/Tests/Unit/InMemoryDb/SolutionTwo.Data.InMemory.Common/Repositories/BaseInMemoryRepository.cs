@@ -7,7 +7,7 @@ namespace SolutionTwo.Data.InMemory.Common;
 
 // Changes are applied instantly, without UnitOfWork.CommitChanges
 
-// includeProperties/include is not supported, entities are returned with all nested data
+// includeMany/include is not supported, entities are returned with all nested data
 
 // withTracking is not supported, behavior like all entities are tracked 
 // Update method does nothing, because behavior like all entities are tracked
@@ -23,12 +23,12 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
 
     public async Task<TEntity?> GetByIdAsync(
         TId id, 
-        string? includeProperties = null, 
+        string? includeMany = null, 
         Expression<Func<TEntity, object>>? include = null,
         bool withTracking = false)
 
     {
-        var result = GetEnumerable(x => x.Id!.Equals(id), null, includeProperties, include, null, null,
+        var result = GetEnumerable(x => x.Id!.Equals(id), null, includeMany, include, null, null,
                 withTracking)
             .FirstOrDefault();
         return await Task.FromResult(result);
@@ -36,11 +36,11 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
 
     public async Task<TEntity?> GetSingleAsync(
         Expression<Func<TEntity, bool>> filter, 
-        string? includeProperties = null,
+        string? includeMany = null,
         Expression<Func<TEntity, object>>? include = null,
         bool withTracking = false)
     {
-        var result = GetEnumerable(filter, null, includeProperties, include, null, null, withTracking)
+        var result = GetEnumerable(filter, null, includeMany, include, null, null, withTracking)
             .SingleOrDefault();
         return await Task.FromResult(result);
     }
@@ -48,13 +48,13 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
     public async Task<IReadOnlyList<TEntity>> GetAsync(
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, 
-        string? includeProperties = null,
+        string? includeMany = null,
         Expression<Func<TEntity, object>>? include = null,
         int? skip = null,
         int? take = null, 
         bool withTracking = false)
     {
-        var result = GetEnumerable(filter, orderBy, includeProperties, include, skip, take, withTracking)
+        var result = GetEnumerable(filter, orderBy, includeMany, include, skip, take, withTracking)
             .ToList();
         return await Task.FromResult(result);
     }
@@ -63,13 +63,13 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
         Expression<Func<TEntity, TProjection>> projection, 
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        string? includeProperties = null,
+        string? includeMany = null,
         Expression<Func<TEntity, object>>? include = null,
         int? skip = null, 
         int? take = null, 
         bool withTracking = false)
     {
-        var result = GetEnumerable(filter, orderBy, includeProperties, include, skip, take, withTracking)
+        var result = GetEnumerable(filter, orderBy, includeMany, include, skip, take, withTracking)
             .Select(projection.Compile())
             .ToList();
         return await Task.FromResult(result);
@@ -99,7 +99,7 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
     protected virtual IEnumerable<TEntity> GetEnumerable(
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        string? includeProperties = null,
+        string? includeMany = null,
         Expression<Func<TEntity, object>>? include = null,
         int? skip = null,
         int? take = null,

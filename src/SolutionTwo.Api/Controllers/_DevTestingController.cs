@@ -74,7 +74,7 @@ public class DevTestingController : ApiControllerBase
         var user = await _mainDatabase.Users.GetByIdAsync(request.UserId);
         var role = await _mainDatabase.Roles.GetByIdAsync(request.RoleId);
 
-        _mainDatabase.Roles.AddRoleToUser(role!, user!);
+        _mainDatabase.Users.AddUserToRole(user!, role!);
 
         await _mainDatabase.CommitChangesAsync();
 

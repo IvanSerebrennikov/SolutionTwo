@@ -19,34 +19,34 @@ public abstract class BaseRepository<TContext, TEntity, TId> : IBaseRepository<T
 
     public async Task<TEntity?> GetByIdAsync(
         TId id, 
-        string? includeProperties = null,
+        string? includeMany = null,
         Expression<Func<TEntity, object>>? include = null,
         bool withTracking = false)
     {
-        return await GetQueryable(x => x.Id!.Equals(id), null, includeProperties, include, null, null, withTracking)
+        return await GetQueryable(x => x.Id!.Equals(id), null, includeMany, include, null, null, withTracking)
             .FirstOrDefaultAsync();
     }
 
     public async Task<TEntity?> GetSingleAsync(
         Expression<Func<TEntity, bool>> filter,
-        string? includeProperties = null, 
+        string? includeMany = null, 
         Expression<Func<TEntity, object>>? include = null,
         bool withTracking = false)
     {
-        return await GetQueryable(filter, null, includeProperties, include, null, null, withTracking)
+        return await GetQueryable(filter, null, includeMany, include, null, null, withTracking)
             .SingleOrDefaultAsync();
     }
 
     public async Task<IReadOnlyList<TEntity>> GetAsync(
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        string? includeProperties = null,
+        string? includeMany = null,
         Expression<Func<TEntity, object>>? include = null,
         int? skip = null,
         int? take = null,
         bool withTracking = false)
     {
-        return await GetQueryable(filter, orderBy, includeProperties, include, skip, take, withTracking)
+        return await GetQueryable(filter, orderBy, includeMany, include, skip, take, withTracking)
             .ToListAsync();
     }
 
@@ -54,13 +54,13 @@ public abstract class BaseRepository<TContext, TEntity, TId> : IBaseRepository<T
         Expression<Func<TEntity, TProjection>> projection,
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        string? includeProperties = null,
+        string? includeMany = null,
         Expression<Func<TEntity, object>>? include = null,
         int? skip = null,
         int? take = null,
         bool withTracking = false)
     {
-        return await GetQueryable(filter, orderBy, includeProperties, include, skip, take, withTracking)
+        return await GetQueryable(filter, orderBy, includeMany, include, skip, take, withTracking)
             .Select(projection)
             .ToListAsync();
     }
@@ -110,7 +110,7 @@ public abstract class BaseRepository<TContext, TEntity, TId> : IBaseRepository<T
     protected virtual IQueryable<TEntity> GetQueryable(
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        string? includeProperties = null,
+        string? includeMany = null,
         Expression<Func<TEntity, object>>? include = null, 
         int? skip = null,
         int? take = null,
@@ -127,9 +127,9 @@ public abstract class BaseRepository<TContext, TEntity, TId> : IBaseRepository<T
             query = query.Include(include);
         }
         
-        if (!string.IsNullOrEmpty(includeProperties))
+        if (!string.IsNullOrEmpty(includeMany))
         {
-            query = includeProperties
+            query = includeMany
                 .Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
                 .Aggregate(query,
                     (current, property) => current.Include(property.Trim()));

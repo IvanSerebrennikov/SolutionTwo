@@ -37,8 +37,8 @@ public class TenantService : ITenantService
 
     public async Task<IServiceResult<TenantModel>> CreateTenantAsync(CreateTenantModel createTenantModel)
     {
-        var role = await _mainDatabase.Roles.GetSingleAsync(x => x.Name == UserRoles.TenantAdmin);
-        if (role == null)
+        var roleEntity = await _mainDatabase.Roles.GetSingleAsync(x => x.Name == UserRoles.TenantAdmin);
+        if (roleEntity == null)
         {
             return ServiceResult<TenantModel>.Error($"Role '{UserRoles.TenantAdmin}' was not found");
         }
@@ -67,7 +67,7 @@ public class TenantService : ITenantService
         
         _mainDatabase.Users.Create(userEntity);
         
-        _mainDatabase.Roles.AddRoleToUser(role, userEntity);
+        _mainDatabase.Users.AddUserToRole(userEntity, roleEntity);
         
         await _mainDatabase.CommitChangesAsync();
 

@@ -5,5 +5,5 @@ namespace SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
 
 public interface IUserRepository : IBaseRepository<UserEntity, Guid>
 {
-    
+    void AddUserToRole(UserEntity user, RoleEntity role);
 }
