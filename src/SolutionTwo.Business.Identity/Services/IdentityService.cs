@@ -147,13 +147,13 @@ public class IdentityService : IIdentityService
         return userEntity;
     }
 
-    private string CreateAuthToken(UserEntity user, out Guid authTokenId)
+    private string CreateAuthToken(UserEntity userWithRolesEntity, out Guid authTokenId)
     {
-        var claims = user.Roles.Select(x => (ClaimTypes.Role, x.Name)).ToList();
+        var claims = userWithRolesEntity.Roles.Select(x => (ClaimTypes.Role, x.Name)).ToList();
         
-        claims.Add((ClaimTypes.Name, user.Username));
+        claims.Add((ClaimTypes.Name, userWithRolesEntity.Username));
         
-        claims.Add((MultiTenancyClaimNames.TenantId, user.TenantId.ToString()));
+        claims.Add((MultiTenancyClaimNames.TenantId, userWithRolesEntity.TenantId.ToString()));
         
         var authToken =
             _tokenProvider.GenerateAuthToken(claims, out authTokenId);
@@ -162,7 +162,7 @@ public class IdentityService : IIdentityService
     
     private string CreateRefreshToken(Guid userId, Guid authTokenId)
     {
-        var refreshToken = new RefreshTokenEntity
+        var refreshTokenEntity = new RefreshTokenEntity
         {
             Id = Guid.NewGuid(),
             AuthTokenId = authTokenId,
@@ -171,9 +171,9 @@ public class IdentityService : IIdentityService
             ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(_identityConfiguration.RefreshTokenExpiresDays!.Value)
         };
 
-        _mainDatabase.RefreshTokens.Create(refreshToken);
+        _mainDatabase.RefreshTokens.Create(refreshTokenEntity);
 
-        return refreshToken.Id.ToString();
+        return refreshTokenEntity.Id.ToString();
     }
     
     private async Task<string> ValidateRefreshTokenAndHandlePossibleTokenStealingAsync(RefreshTokenEntity refreshTokenEntity)
@@ -206,13 +206,13 @@ public class IdentityService : IIdentityService
     
     private async Task RevokeProvidedAndAllActiveTokensForUserAsync(Guid tokenId, Guid userId)
     {
-        var tokenEntities = await _mainDatabase.RefreshTokens.GetAsync(
+        var refreshTokenEntities = await _mainDatabase.RefreshTokens.GetAsync(
             x => x.Id == tokenId || (
                 x.UserId == userId && !x.IsUsed && x.ExpiresDateTimeUtc > DateTime.UtcNow));
 
-        foreach (var tokenEntity in tokenEntities)
+        foreach (var refreshTokenEntity in refreshTokenEntities)
         {
-            RevokeTokens(tokenEntity);
+            RevokeTokens(refreshTokenEntity);
         }
     }
 

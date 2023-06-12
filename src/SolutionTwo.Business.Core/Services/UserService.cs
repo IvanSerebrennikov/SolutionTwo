@@ -71,13 +71,13 @@ public class UserService : IUserService
 
     public async Task<IServiceResult> DeleteUserAsync(Guid id)
     {
-        var user = await _mainDatabase.Users.GetByIdAsync(id);
-        if (user == null)
+        var userEntity = await _mainDatabase.Users.GetByIdAsync(id);
+        if (userEntity == null)
         {
             return ServiceResult.Error("User was not found");
         }
         
-        _mainDatabase.Users.Delete(user);
+        _mainDatabase.Users.Delete(userEntity);
         await _mainDatabase.CommitChangesAsync();
 
         return ServiceResult.Success();
