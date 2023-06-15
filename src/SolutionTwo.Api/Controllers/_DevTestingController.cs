@@ -20,6 +20,42 @@ public class DevTestingController : ApiControllerBase
         _mainDatabase = mainDatabase;
         _passwordHasher = passwordHasher;
     }
+
+    [HttpPost("CreateRoles")]
+    public async Task<ActionResult<Guid>> CreateRoles()
+    {
+        var roles = new[]
+        {
+            UserRoles.SuperAdmin,
+            UserRoles.TenantAdmin,
+            UserRoles.TenantUser
+        };
+
+        var created = 0;
+        foreach (var role in roles)
+        {
+            var roleEntity = await _mainDatabase.Roles.GetSingleAsync(x => x.Name == role);
+            if (roleEntity == null)
+            {
+                var newRoleEntity = new RoleEntity
+                {
+                    Id = Guid.NewGuid(),
+                    Name = role
+                };
+                
+                _mainDatabase.Roles.Create(newRoleEntity);
+
+                created++;
+            }
+        }
+
+        if (created > 0)
+        {
+            await _mainDatabase.CommitChangesAsync();
+        }
+        
+        return Ok(created);
+    }
     
     [HttpPost("CreateSuperAdmin")]
     public async Task<ActionResult<Guid>> CreateSuperAdmin()

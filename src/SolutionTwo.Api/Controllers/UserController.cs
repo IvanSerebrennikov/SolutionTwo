@@ -8,6 +8,7 @@ using SolutionTwo.Business.Core.Services.Interfaces;
 
 namespace SolutionTwo.Api.Controllers;
 
+[SolutionTwoAuthorize]
 [Route("api/[controller]")]
 [ApiController]
 public class UserController : ApiAuthorizedControllerBase
@@ -18,8 +19,7 @@ public class UserController : ApiAuthorizedControllerBase
     {
         _userService = userService;
     }
-
-    [SolutionTwoAuthorize]
+    
     [HttpGet("me")]
     public async Task<ActionResult<UserWithRolesModel>> GetMe()
     {
@@ -29,6 +29,26 @@ public class UserController : ApiAuthorizedControllerBase
             return NotFound();
         
         return Ok(userModel);
+    }
+    
+    [SolutionTwoAuthorize(UserRoles.TenantAdmin)]
+    [HttpPost]
+    public async Task<ActionResult> CreateTenantUser(CreateUserModel createUserModel)
+    {
+        if (string.IsNullOrEmpty(createUserModel.FirstName) ||
+            string.IsNullOrEmpty(createUserModel.LastName) ||
+            string.IsNullOrEmpty(createUserModel.Username) ||
+            string.IsNullOrEmpty(createUserModel.Password))
+            return BadRequest("Passed data is invalid. All properties are required.");
+
+        var serviceResult = await _userService.CreateTenantUserAsync(createUserModel);
+        
+        if (!serviceResult.IsSucceeded || serviceResult.Data == null)
+            return BadRequest(serviceResult);
+        
+        var userModel = serviceResult.Data;
+
+        return CreatedAtAction(nameof(GetById), new { id = userModel.Id }, userModel);
     }
 
     [SolutionTwoAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
@@ -50,21 +70,6 @@ public class UserController : ApiAuthorizedControllerBase
             return NotFound();
         
         return Ok(userModel);
-    }
-
-    [SolutionTwoAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
-    [HttpPost]
-    public async Task<ActionResult> CreateUser(CreateUserModel createUserModel)
-    {
-        if (string.IsNullOrEmpty(createUserModel.FirstName) ||
-            string.IsNullOrEmpty(createUserModel.LastName) ||
-            string.IsNullOrEmpty(createUserModel.Username) ||
-            string.IsNullOrEmpty(createUserModel.Password))
-            return BadRequest("Passed data is invalid. All properties are required.");
-
-        var userModel = await _userService.CreateUserAsync(createUserModel);
-
-        return CreatedAtAction(nameof(GetById), new { id = userModel.Id }, userModel);
     }
 
     [SolutionTwoAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]

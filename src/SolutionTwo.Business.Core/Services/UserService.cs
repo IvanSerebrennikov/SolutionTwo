@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SolutionTwo.Business.Common.Constants;
 using SolutionTwo.Business.Common.Models;
 using SolutionTwo.Business.Common.PasswordHasher.Interfaces;
 using SolutionTwo.Business.Core.Models.User.Incoming;
@@ -49,8 +50,14 @@ public class UserService : IUserService
         return userModels;
     }
 
-    public async Task<UserWithRolesModel> CreateUserAsync(CreateUserModel createUserModel)
+    public async Task<IServiceResult<UserWithRolesModel>> CreateTenantUserAsync(CreateUserModel createUserModel)
     {
+        var roleEntity = await _mainDatabase.Roles.GetSingleAsync(x => x.Name == UserRoles.TenantUser);
+        if (roleEntity == null)
+        {
+            return ServiceResult<UserWithRolesModel>.Error($"Role '{UserRoles.TenantUser}' was not found");
+        }
+        
         var hashedPassword = _passwordHasher.HashPassword(createUserModel.Password);
 
         var userEntity = new UserEntity
@@ -64,9 +71,14 @@ public class UserService : IUserService
         };
 
         _mainDatabase.Users.Create(userEntity);
+        
+        _mainDatabase.Users.AddUserToRole(userEntity, roleEntity);
+        
         await _mainDatabase.CommitChangesAsync();
 
-        return new UserWithRolesModel(userEntity);
+        var model = new UserWithRolesModel(userEntity);
+
+        return ServiceResult<UserWithRolesModel>.Success(model);
     }
 
     public async Task<IServiceResult> DeleteUserAsync(Guid id)

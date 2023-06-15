@@ -10,9 +10,9 @@ public class ApiAuthorizedControllerBase : ApiControllerBase
     {
         get
         {
-            var claimsValue = GetClaimValue(ClaimTypes.Name);
-            if (!string.IsNullOrEmpty(claimsValue)) 
-                return claimsValue;
+            var claimValue = GetClaimValue(ClaimTypes.Name);
+            if (!string.IsNullOrEmpty(claimValue)) 
+                return claimValue;
             
             throw new ApplicationException("Username doesn't exist in Claims");
         }
@@ -22,8 +22,8 @@ public class ApiAuthorizedControllerBase : ApiControllerBase
     {
         get
         {
-            var claimsValue = GetClaimValue(MultiTenancyClaimNames.TenantId);
-            if (!string.IsNullOrEmpty(claimsValue) && Guid.TryParse(claimsValue, out var tenantId)) 
+            var claimValue = GetClaimValue(MultiTenancyClaimNames.TenantId);
+            if (!string.IsNullOrEmpty(claimValue) && Guid.TryParse(claimValue, out var tenantId)) 
                 return tenantId;
 
             if (HttpContext.User.IsInRole(UserRoles.SuperAdmin))

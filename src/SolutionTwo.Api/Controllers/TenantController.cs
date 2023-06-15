@@ -11,7 +11,7 @@ namespace SolutionTwo.Api.Controllers;
 [SolutionTwoAuthorize(UserRoles.SuperAdmin)]
 [Route("api/[controller]")]
 [ApiController]
-public class TenantController : ApiControllerBase
+public class TenantController : ApiAuthorizedControllerBase
 {
     private readonly ITenantService _tenantService;
 
