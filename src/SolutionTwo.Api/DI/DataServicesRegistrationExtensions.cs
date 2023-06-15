@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SolutionTwo.Api.Extensions;
 using SolutionTwo.Data.Common.Configuration;
 using SolutionTwo.Data.MainDatabase.Configuration;
 using SolutionTwo.Data.MainDatabase.Context;
@@ -9,15 +10,21 @@ using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
 namespace SolutionTwo.Api.DI;
 
-public static class DataMainDatabaseServicesRegistrationExtensions
+public static class DataServicesRegistrationExtensions
 {
-    public static void AddDataMainDatabaseServices(this IServiceCollection services,
-        ConnectionStrings connectionStrings, MainDatabaseConfiguration databaseConfiguration)
+    public static void AddDataMainDatabaseServices(this IServiceCollection services, IConfiguration configuration)
     {
+        var connectionStrings = configuration.GetSection<ConnectionStrings>();
+        var mainDatabaseConfiguration = configuration.GetSection<MainDatabaseConfiguration>();
+        
+        services.AddSingleton(connectionStrings);
+        
+        services.AddSingleton(mainDatabaseConfiguration);
+        
         services.AddDbContext<MainDatabaseContext>(o =>
             {
                 o.UseSqlServer(connectionStrings.MainDatabaseConnection!,
-                    x => x.CommandTimeout(databaseConfiguration.CommandTimeOutInSeconds));
+                    x => x.CommandTimeout(mainDatabaseConfiguration.CommandTimeOutInSeconds));
 
                 // Make sure that "Microsoft.EntityFrameworkCore" category is set to "None" 
                 // for all production logging providers

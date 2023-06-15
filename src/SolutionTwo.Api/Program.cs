@@ -1,9 +1,5 @@
 using SolutionTwo.Api.DI;
-using SolutionTwo.Api.Extensions;
 using SolutionTwo.Api.Middlewares;
-using SolutionTwo.Business.Identity.Configuration;
-using SolutionTwo.Data.Common.Configuration;
-using SolutionTwo.Data.MainDatabase.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,14 +15,7 @@ builder.Services.AddApiServices();
 builder.Services.AddBusinessCommonServices();
 
 // Business.Identity DI
-var identityConfiguration = builder.Configuration.GetSection<IdentityConfiguration>();
-var useHardCodedIdentity =
-    builder.Configuration.GetValue<bool?>($"{nameof(HardCodedIdentityConfiguration)}:UseHardCodedIdentity");
-var hardCodedIdentityConfiguration =
-    builder.Configuration.GetSection<HardCodedIdentityConfiguration>(withValidation: useHardCodedIdentity == true);
-builder.Services.AddSingleton(identityConfiguration);
-builder.Services.AddSingleton(hardCodedIdentityConfiguration);
-builder.Services.AddBusinessIdentityServices();
+builder.Services.AddBusinessIdentityServices(builder.Configuration);
 
 // Business.MultiTenancy DI
 builder.Services.AddBusinessMultiTenancyServices();
@@ -35,11 +24,7 @@ builder.Services.AddBusinessMultiTenancyServices();
 builder.Services.AddBusinessCoreServices();
 
 // Data DI
-var connectionStrings = builder.Configuration.GetSection<ConnectionStrings>();
-var mainDatabaseConfiguration = builder.Configuration.GetSection<MainDatabaseConfiguration>();
-builder.Services.AddSingleton(connectionStrings);
-builder.Services.AddSingleton(mainDatabaseConfiguration);
-builder.Services.AddDataMainDatabaseServices(connectionStrings, mainDatabaseConfiguration);
+builder.Services.AddDataMainDatabaseServices(builder.Configuration);
 
 // Build WebApp
 var app = builder.Build();
@@ -48,10 +33,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHsts();
-}
+if (!app.Environment.IsDevelopment()) app.UseHsts();
 
 app.UseHttpsRedirection();
 
