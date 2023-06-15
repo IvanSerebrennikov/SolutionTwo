@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SolutionTwo.Api.Controllers.Base;
+using SolutionTwo.Business.Common.Constants;
+using SolutionTwo.Business.Common.PasswordHasher.Interfaces;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
@@ -11,80 +13,51 @@ namespace SolutionTwo.Api.Controllers;
 public class DevTestingController : ApiControllerBase
 {
     private readonly IMainDatabase _mainDatabase;
+    private readonly IPasswordHasher _passwordHasher;
 
-    public DevTestingController(IMainDatabase mainDatabase)
+    public DevTestingController(IMainDatabase mainDatabase, IPasswordHasher passwordHasher)
     {
         _mainDatabase = mainDatabase;
+        _passwordHasher = passwordHasher;
     }
     
-    [HttpPost("CreateUniqueFakeRole")]
-    public async Task<ActionResult<Guid>> CreateUniqueFakeRole()
+    [HttpPost("CreateSuperAdmin")]
+    public async Task<ActionResult<Guid>> CreateSuperAdmin()
     {
-        var uniqueRole = new RoleEntity
+        var roleEntity = await _mainDatabase.Roles.GetSingleAsync(x => x.Name == UserRoles.SuperAdmin);
+        if (roleEntity == null)
+        {
+            return BadRequest($"Role {nameof(UserRoles.SuperAdmin)} was not found");
+        }
+
+        var name = "su";
+        var pass = "b9c0ee39-f058-49db-9b3a-ec046c2068e1";
+        
+        var existingUserEntity = await _mainDatabase.Users.GetSingleAsync(x => x.Username == name);
+        if (existingUserEntity != null)
+        {
+            return BadRequest("Super Admin user already exists");
+        }
+
+        var hashedPassword = _passwordHasher.HashPassword(pass);
+        
+        var userEntity = new UserEntity
         {
             Id = Guid.NewGuid(),
-            Name = $"Fake-{Guid.NewGuid()}"
+            TenantId = Guid.Empty,
+            FirstName = "Super",
+            LastName = "Admin",
+            Username = name,
+            PasswordHash = hashedPassword,
+            CreatedDateTimeUtc = DateTime.UtcNow
         };
         
-        _mainDatabase.Roles.Create(uniqueRole);
-        await _mainDatabase.CommitChangesAsync();
-
-        return Ok(uniqueRole.Id);
-    }
-    
-    [HttpPost("CreateTwoUniqueFakeRoles")]
-    public async Task<ActionResult> CreateTwoUniqueFakeRoles()
-    {
-        var uniqueRole1 = new RoleEntity
-        {
-            Id = Guid.NewGuid(),
-            Name = $"Fake-{Guid.NewGuid()}"
-        };
+        _mainDatabase.Users.Create(userEntity);
         
-        var uniqueRole2 = new RoleEntity
-        {
-            Id = Guid.NewGuid(),
-            Name = $"Fake-{Guid.NewGuid()}"
-        };
+        _mainDatabase.Users.AddUserToRole(userEntity, roleEntity);
         
-        _mainDatabase.Roles.Create(uniqueRole1);
-        _mainDatabase.Roles.Create(uniqueRole2);
         await _mainDatabase.CommitChangesAsync();
 
-        return Ok(new { uniqueRole1Id = uniqueRole1.Id, uniqueRole2d = uniqueRole2.Id });
+        return Ok(userEntity.Id);
     }
-
-    [HttpPost("AddUniqueFakeRoleToUser")]
-    public async Task<ActionResult> AddUniqueFakeRoleToUser(AddUniqueFakeRoleToUserRequest request)
-    {
-        // with 'Update' method (without 'withTracking') will be additional unnecessary updates fot user and role entries  
-        var user = await _mainDatabase.Users.GetByIdAsync(request.UserId, withTracking: true);
-        var role = await _mainDatabase.Roles.GetByIdAsync(request.RoleId, withTracking: true);
-
-        user!.Roles.Add(role!);
-
-        await _mainDatabase.CommitChangesAsync();
-
-        return Ok();
-    }
-    
-    [HttpPost("AddUniqueFakeRoleToUser2")]
-    public async Task<ActionResult> AddUniqueFakeRoleToUser2(AddUniqueFakeRoleToUserRequest request)
-    {
-        var user = await _mainDatabase.Users.GetByIdAsync(request.UserId);
-        var role = await _mainDatabase.Roles.GetByIdAsync(request.RoleId);
-
-        _mainDatabase.Users.AddUserToRole(user!, role!);
-
-        await _mainDatabase.CommitChangesAsync();
-
-        return Ok();
-    }
-}
-
-public class AddUniqueFakeRoleToUserRequest
-{
-    public Guid RoleId { get; set; }
-
-    public Guid UserId { get; set; }
 }

@@ -49,7 +49,7 @@ public class TenantController : ApiControllerBase
             string.IsNullOrEmpty(createTenantModel.AdminPassword))
             return BadRequest("Passed data is invalid. All properties are required.");
 
-        var serviceResult =  await _tenantService.CreateTenantAsync(createTenantModel);
+        var serviceResult = await _tenantService.CreateTenantAsync(createTenantModel);
 
         if (!serviceResult.IsSucceeded || serviceResult.Data == null)
             return BadRequest(serviceResult);
