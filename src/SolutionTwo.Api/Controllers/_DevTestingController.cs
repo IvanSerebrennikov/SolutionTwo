@@ -31,7 +31,7 @@ public class DevTestingController : ApiControllerBase
         }
 
         var name = "su";
-        var pass = "b9c0ee39-f058-49db-9b3a-ec046c2068e1";
+        var pass = Guid.NewGuid().ToString();
         
         var existingUserEntity = await _mainDatabase.Users.GetSingleAsync(x => x.Username == name);
         if (existingUserEntity != null)
@@ -58,6 +58,6 @@ public class DevTestingController : ApiControllerBase
         
         await _mainDatabase.CommitChangesAsync();
 
-        return Ok(userEntity.Id);
+        return Ok(pass);
     }
 }
