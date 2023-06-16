@@ -6,7 +6,7 @@ using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
 
 namespace SolutionTwo.Data.MainDatabase.Repositories;
 
-public class UserRepository : BaseRepository<MainDatabaseContext, UserEntity, Guid>, IUserRepository
+public class UserRepository : BaseRepository<UserEntity, Guid>, IUserRepository
 {
     public UserRepository(MainDatabaseContext context) : base(context)
     {

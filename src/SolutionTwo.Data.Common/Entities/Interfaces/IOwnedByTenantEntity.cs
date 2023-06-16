@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Data.Common.MultiTenancy.Entities.Interfaces;
+﻿namespace SolutionTwo.Data.Common.Entities.Interfaces;
 
 public interface IOwnedByTenantEntity
 {

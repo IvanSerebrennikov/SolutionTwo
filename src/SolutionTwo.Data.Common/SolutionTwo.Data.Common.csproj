@@ -10,4 +10,8 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.16" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\SolutionTwo.Common.MultiTenancy\SolutionTwo.Common.MultiTenancy.csproj" />
+    </ItemGroup>
+
 </Project>

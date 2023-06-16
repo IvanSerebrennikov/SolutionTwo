@@ -1,15 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SolutionTwo.Common.MultiTenancy;
-using SolutionTwo.Data.Common.MultiTenancy.Context;
+using SolutionTwo.Data.Common.Context;
+using SolutionTwo.Data.Common.ContextBehaviors;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.Entities.ManyToMany;
 
 namespace SolutionTwo.Data.MainDatabase.Context;
 
-public class MainDatabaseContext : MultiTenancyDbContext
+public class MainDatabaseContext : BaseDbContext
 {
-    public MainDatabaseContext(DbContextOptions options, ITenantAccessGetter tenantAccessGetter) : base(options,
-        tenantAccessGetter)
+    public MainDatabaseContext(
+        DbContextOptions options, 
+        ITenantAccessGetter tenantAccessGetter) : 
+        base(options,
+        new SoftDeletionContextBehavior(), 
+        new MultiTenancyContextBehavior(tenantAccessGetter))
     {
     }
 

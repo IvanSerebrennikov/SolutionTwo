@@ -5,7 +5,7 @@ using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
 
 namespace SolutionTwo.Data.MainDatabase.Repositories;
 
-public class TenantRepository : BaseRepository<MainDatabaseContext, TenantEntity, Guid>, ITenantRepository
+public class TenantRepository : BaseRepository<TenantEntity, Guid>, ITenantRepository
 {
     public TenantRepository(MainDatabaseContext context) : base(context)
     {

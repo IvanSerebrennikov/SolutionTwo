@@ -1,44 +1,29 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SolutionTwo.Common.MultiTenancy;
-using SolutionTwo.Data.Common.Context;
+using SolutionTwo.Data.Common.ContextBehaviors.Base.Interfaces;
+using SolutionTwo.Data.Common.Entities.Interfaces;
 using SolutionTwo.Data.Common.Extensions;
-using SolutionTwo.Data.Common.MultiTenancy.Entities.Interfaces;
 
-namespace SolutionTwo.Data.Common.MultiTenancy.Context;
+namespace SolutionTwo.Data.Common.ContextBehaviors;
 
-public class MultiTenancyDbContext : BaseDbContext
+public class MultiTenancyContextBehavior : IContextBehavior
 {
     private readonly ITenantAccessGetter _tenantAccessGetter;
-    
-    public MultiTenancyDbContext(DbContextOptions options, ITenantAccessGetter tenantAccessGetter) : base(options)
+
+    public MultiTenancyContextBehavior(ITenantAccessGetter tenantAccessGetter)
     {
         _tenantAccessGetter = tenantAccessGetter;
     }
-    
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        HandleMultiTenancyBeforeSaveChanges();
 
-        return await base.SaveChangesAsync(cancellationToken);
-    }
-    
-    public override int SaveChanges()
-    {
-        HandleMultiTenancyBeforeSaveChanges();
-
-        return base.SaveChanges();
-    }
-    
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.AppendGlobalQueryFilter<IOwnedByTenantEntity>(x =>
             _tenantAccessGetter.AllTenantsAccessible ||
             x.TenantId == (_tenantAccessGetter.TenantId ?? Guid.Empty));
-        
-        base.OnModelCreating(modelBuilder);
     }
 
-    private void HandleMultiTenancyBeforeSaveChanges()
+    public void BeforeSaveChanges(ChangeTracker changeTracker)
     {
         if (_tenantAccessGetter.AllTenantsAccessible)
         {
@@ -50,7 +35,7 @@ public class MultiTenancyDbContext : BaseDbContext
             throw new ApplicationException("TenantAccessGetter can't provide access to any tenant");
         }
 
-        foreach (var entry in ChangeTracker.Entries<IOwnedByTenantEntity>()
+        foreach (var entry in changeTracker.Entries<IOwnedByTenantEntity>()
                      .Where(entry => entry.State == EntityState.Added))
         {
             entry.Entity.TenantId = _tenantAccessGetter.TenantId.Value;

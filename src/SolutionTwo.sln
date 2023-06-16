@@ -24,8 +24,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data.InMemory.M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Common.MultiTenancy", "SolutionTwo.Common.MultiTenancy\SolutionTwo.Common.MultiTenancy.csproj", "{500EA4EE-5996-4D0A-956C-BC4B84424649}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data.Common.MultiTenancy", "SolutionTwo.Data.Common.MultiTenancy\SolutionTwo.Data.Common.MultiTenancy.csproj", "{9B127B72-CC82-4091-B9CC-9F759BDAF32B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Business.MultiTenancy", "SolutionTwo.Business.MultiTenancy\SolutionTwo.Business.MultiTenancy.csproj", "{3AA278DB-32C1-41E8-BEF5-247CC08D69C8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InMemoryDb", "InMemoryDb", "{7DBA6C01-009E-458A-8B5F-163200125B6E}"
@@ -76,10 +74,6 @@ Global
 		{500EA4EE-5996-4D0A-956C-BC4B84424649}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{500EA4EE-5996-4D0A-956C-BC4B84424649}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{500EA4EE-5996-4D0A-956C-BC4B84424649}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B127B72-CC82-4091-B9CC-9F759BDAF32B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B127B72-CC82-4091-B9CC-9F759BDAF32B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B127B72-CC82-4091-B9CC-9F759BDAF32B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B127B72-CC82-4091-B9CC-9F759BDAF32B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3AA278DB-32C1-41E8-BEF5-247CC08D69C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3AA278DB-32C1-41E8-BEF5-247CC08D69C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AA278DB-32C1-41E8-BEF5-247CC08D69C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
