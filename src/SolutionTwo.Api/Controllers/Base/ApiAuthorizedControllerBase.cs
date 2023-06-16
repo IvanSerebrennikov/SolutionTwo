@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using SolutionTwo.Business.Common.Constants;
-using SolutionTwo.Common.MultiTenancy;
+using SolutionTwo.Common.Constants;
 
 namespace SolutionTwo.Api.Controllers.Base;
 
@@ -22,7 +22,7 @@ public class ApiAuthorizedControllerBase : ApiControllerBase
     {
         get
         {
-            var claimValue = GetClaimValue(MultiTenancyClaimNames.TenantId);
+            var claimValue = GetClaimValue(SolutionTwoClaimNames.TenantId);
             if (!string.IsNullOrEmpty(claimValue) && Guid.TryParse(claimValue, out var tenantId)) 
                 return tenantId;
 

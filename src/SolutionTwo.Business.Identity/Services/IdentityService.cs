@@ -8,7 +8,7 @@ using SolutionTwo.Business.Identity.Models.Auth.Outgoing;
 using SolutionTwo.Business.Identity.Services.Interfaces;
 using SolutionTwo.Business.Identity.TokenProvider.Interfaces;
 using SolutionTwo.Business.Identity.TokenStore.Interfaces;
-using SolutionTwo.Common.MultiTenancy;
+using SolutionTwo.Common.Constants;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
@@ -153,7 +153,9 @@ public class IdentityService : IIdentityService
         
         claims.Add((ClaimTypes.Name, userWithRolesEntity.Username));
         
-        claims.Add((MultiTenancyClaimNames.TenantId, userWithRolesEntity.TenantId.ToString()));
+        claims.Add((ClaimTypes.NameIdentifier, userWithRolesEntity.Id.ToString()));
+        
+        claims.Add((SolutionTwoClaimNames.TenantId, userWithRolesEntity.TenantId.ToString()));
         
         var authToken =
             _tokenProvider.GenerateAuthToken(claims, out authTokenId);

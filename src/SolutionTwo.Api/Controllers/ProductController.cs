@@ -42,7 +42,9 @@ namespace SolutionTwo.Api.Controllers;
 // косяка самого юзера, стороннего сервиса, UI приложения, etc).
 // но при релизе скедулером пусть еще проставляется параметр типо IsForceRelease = true
 
-// еак же продукт сделать как IAuditableEntity и добавить для этого новый бехавиор контекста
+// заодно скедулер для удаления старых рефреш токенов можно сделать за компанию
+
+// так же продукт сделать как IAuditableEntity и добавить для этого новый бехавиор контекста
 
 /// <summary>
 /// <see cref="UseProduct"/> and <see cref="ReleaseProduct"/> simulates some business flow

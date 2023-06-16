@@ -22,7 +22,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data.InMemory.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Data.InMemory.MainDatabase", "Tests\Unit\InMemoryDb\SolutionTwo.Data.InMemory.MainDatabase\SolutionTwo.Data.InMemory.MainDatabase.csproj", "{6E7AA595-14E6-4E9A-BEDA-C6EE345EA1CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Common.MultiTenancy", "SolutionTwo.Common.MultiTenancy\SolutionTwo.Common.MultiTenancy.csproj", "{500EA4EE-5996-4D0A-956C-BC4B84424649}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Common", "SolutionTwo.Common\SolutionTwo.Common.csproj", "{500EA4EE-5996-4D0A-956C-BC4B84424649}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Business.MultiTenancy", "SolutionTwo.Business.MultiTenancy\SolutionTwo.Business.MultiTenancy.csproj", "{3AA278DB-32C1-41E8-BEF5-247CC08D69C8}"
 EndProject

@@ -7,7 +7,8 @@ namespace SolutionTwo.Api.Middlewares;
 
 public class RoleBasedAuthorizationMiddleware
 {
-    private const int BadResultStatusCode = (int)HttpStatusCode.Forbidden;
+    private const int ForbiddenStatusCode = (int)HttpStatusCode.Forbidden;
+    
     private readonly RequestDelegate _next;
 
     public RoleBasedAuthorizationMiddleware(RequestDelegate next)
@@ -26,7 +27,7 @@ public class RoleBasedAuthorizationMiddleware
         var authorized = roles.Any(x => context.User.IsInRole(x));
         if (!authorized)
         {
-            context.Response.StatusCode = BadResultStatusCode;
+            context.Response.StatusCode = ForbiddenStatusCode;
             return;
         }
 

@@ -1,6 +1,8 @@
-﻿namespace SolutionTwo.Common.MultiTenancy;
+﻿using SolutionTwo.Common.MultiTenancy.Interfaces;
 
-public class TenantAccessProvider : ITenantAccessGetter, ITenantAccessSetter
+namespace SolutionTwo.Common.MultiTenancy;
+
+public class TenantAccessor : ITenantAccessGetter, ITenantAccessSetter
 {
     public Guid? TenantId { get; private set; }
     

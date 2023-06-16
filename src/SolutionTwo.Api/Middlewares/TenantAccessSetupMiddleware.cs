@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Http.Features;
 using SolutionTwo.Api.Attributes;
 using SolutionTwo.Business.Common.Constants;
-using SolutionTwo.Common.MultiTenancy;
+using SolutionTwo.Common.Constants;
+using SolutionTwo.Common.MultiTenancy.Interfaces;
 
 namespace SolutionTwo.Api.Middlewares;
 
@@ -23,14 +24,14 @@ public class TenantAccessSetupMiddleware
         }
         else
         {
-            var claimsValue = context.User.Claims.FirstOrDefault(x => x.Type == MultiTenancyClaimNames.TenantId)?.Value;
+            var claimsValue = context.User.Claims.FirstOrDefault(x => x.Type == SolutionTwoClaimNames.TenantId)?.Value;
             if (!string.IsNullOrEmpty(claimsValue) && Guid.TryParse(claimsValue, out var tenantId))
             {
                 tenantAccessSetter.SetAccessToTenant(tenantId);
             }
             else
             {
-                throw new ApplicationException("TenantAccessSetter can't set TenantId");
+                throw new ApplicationException($"{nameof(ITenantAccessSetter)} can't set TenantId");
             }
         }
 

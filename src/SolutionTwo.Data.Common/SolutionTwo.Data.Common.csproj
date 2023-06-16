@@ -11,7 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SolutionTwo.Common.MultiTenancy\SolutionTwo.Common.MultiTenancy.csproj" />
+      <ProjectReference Include="..\SolutionTwo.Common\SolutionTwo.Common.csproj" />
     </ItemGroup>
 
 </Project>
