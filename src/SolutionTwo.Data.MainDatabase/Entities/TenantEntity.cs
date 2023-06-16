@@ -10,5 +10,7 @@ public class TenantEntity : IIdentifiablyEntity<Guid>, ISoftDeletableEntity
 
     public DateTime CreatedDateTimeUtc { get; set; }
     
-    public bool IsDeleted { get; set; }
+    public DateTime? DeletedDateTimeUtc { get; set; }
+    
+    public Guid? DeletedBy { get; set; }
 }

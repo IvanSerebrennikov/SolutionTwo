@@ -27,5 +27,7 @@ public class UserEntity : IIdentifiablyEntity<Guid>, ISoftDeletableEntity, IOwne
     
     public List<RefreshTokenEntity> RefreshTokens { get; set; } = new();
     
-    public bool IsDeleted { get; set; }
+    public DateTime? DeletedDateTimeUtc { get; set; }
+    
+    public Guid? DeletedBy { get; set; }
 }

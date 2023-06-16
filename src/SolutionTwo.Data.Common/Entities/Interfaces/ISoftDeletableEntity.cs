@@ -2,5 +2,7 @@
 
 public interface ISoftDeletableEntity
 {
-    bool IsDeleted { get; set; } // or DateTime? DeletedDateTime (+ may be DeletedBy)
+    DateTime? DeletedDateTimeUtc { get; set; }
+    
+    Guid? DeletedBy { get; set; }
 }

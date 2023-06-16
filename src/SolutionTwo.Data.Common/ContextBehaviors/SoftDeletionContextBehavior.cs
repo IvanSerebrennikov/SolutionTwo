@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SolutionTwo.Data.Common.Context;
 using SolutionTwo.Data.Common.ContextBehaviors.Interfaces;
 using SolutionTwo.Data.Common.Entities.Interfaces;
@@ -11,7 +10,7 @@ public class SoftDeletionContextBehavior : ISoftDeletionContextBehavior
 {
     public void AddGlobalQueryFilter(BaseDbContext context, ModelBuilder modelBuilder)
     {
-        modelBuilder.AppendGlobalQueryFilter<ISoftDeletableEntity>(x => !x.IsDeleted);
+        modelBuilder.AppendGlobalQueryFilter<ISoftDeletableEntity>(x => x.DeletedDateTimeUtc == null);
     }
 
     public void BeforeSaveChanges(BaseDbContext context)
@@ -20,8 +19,8 @@ public class SoftDeletionContextBehavior : ISoftDeletionContextBehavior
                      .Where(entry => entry.State == EntityState.Deleted))
         {
             entry.State = EntityState.Unchanged;
-            entry.Entity.IsDeleted = true;
-            entry.Property(nameof(entry.Entity.IsDeleted)).IsModified = true;
+            entry.Entity.DeletedDateTimeUtc = DateTime.UtcNow;
+            entry.Property(nameof(entry.Entity.DeletedDateTimeUtc)).IsModified = true;
         }
     }
 }
