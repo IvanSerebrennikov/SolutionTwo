@@ -2,13 +2,13 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SolutionTwo.Common.MultiTenancy;
 using SolutionTwo.Data.Common.Context;
-using SolutionTwo.Data.Common.ContextBehaviors.Base.Interfaces;
+using SolutionTwo.Data.Common.ContextBehaviors.Interfaces;
 using SolutionTwo.Data.Common.Entities.Interfaces;
 using SolutionTwo.Data.Common.Extensions;
 
 namespace SolutionTwo.Data.Common.ContextBehaviors;
 
-public class MultiTenancyContextBehavior : IContextBehavior
+public class MultiTenancyContextBehavior : IMultiTenancyContextBehavior
 {
     private readonly ITenantAccessGetter _tenantAccessGetter;
 

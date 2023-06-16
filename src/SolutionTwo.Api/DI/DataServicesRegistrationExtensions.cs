@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SolutionTwo.Api.Extensions;
 using SolutionTwo.Data.Common.Configuration;
+using SolutionTwo.Data.Common.ContextBehaviors;
+using SolutionTwo.Data.Common.ContextBehaviors.Interfaces;
 using SolutionTwo.Data.MainDatabase.Configuration;
 using SolutionTwo.Data.MainDatabase.Context;
 using SolutionTwo.Data.MainDatabase.Repositories;
@@ -20,6 +22,10 @@ public static class DataServicesRegistrationExtensions
         services.AddSingleton(connectionStrings);
         
         services.AddSingleton(mainDatabaseConfiguration);
+        
+        services.AddScoped<ISoftDeletionContextBehavior, SoftDeletionContextBehavior>();
+        
+        services.AddScoped<IMultiTenancyContextBehavior, MultiTenancyContextBehavior>();
         
         services.AddDbContext<MainDatabaseContext>(o =>
             {
