@@ -5,16 +5,16 @@ namespace SolutionTwo.Data.Common.Context;
 
 public class BaseDbContext : DbContext
 {
-    private readonly IReadOnlyList<IContextBehavior> _behaviors;
+    public IReadOnlyList<IContextBehavior> Behaviors { get; }
 
     public BaseDbContext(DbContextOptions options, params IContextBehavior[] behaviors) : base(options)
     {
-        _behaviors = behaviors;
+        Behaviors = behaviors;
     }
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        foreach (var contextBehavior in _behaviors)
+        foreach (var contextBehavior in Behaviors)
         {
             contextBehavior.BeforeSaveChanges(ChangeTracker);
         }
@@ -24,7 +24,7 @@ public class BaseDbContext : DbContext
     
     public override int SaveChanges()
     {
-        foreach (var contextBehavior in _behaviors)
+        foreach (var contextBehavior in Behaviors)
         {
             contextBehavior.BeforeSaveChanges(ChangeTracker);
         }
@@ -34,9 +34,10 @@ public class BaseDbContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        foreach (var contextBehavior in _behaviors)
+        for (var i = 0; i < Behaviors.Count; i++)
         {
-            contextBehavior.OnModelCreating(modelBuilder);
+            var contextBehavior = Behaviors[i];
+            contextBehavior.AddGlobalQueryFilter(modelBuilder, this, i);
         }
     }
 }

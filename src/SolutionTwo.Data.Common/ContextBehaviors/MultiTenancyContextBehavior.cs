@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SolutionTwo.Common.MultiTenancy;
+using SolutionTwo.Data.Common.Context;
 using SolutionTwo.Data.Common.ContextBehaviors.Base.Interfaces;
 using SolutionTwo.Data.Common.Entities.Interfaces;
 using SolutionTwo.Data.Common.Extensions;
@@ -16,11 +17,13 @@ public class MultiTenancyContextBehavior : IContextBehavior
         _tenantAccessGetter = tenantAccessGetter;
     }
 
-    public void OnModelCreating(ModelBuilder modelBuilder)
+    public void AddGlobalQueryFilter(ModelBuilder modelBuilder, BaseDbContext context, int behaviorIndex)
     {
         modelBuilder.AppendGlobalQueryFilter<IOwnedByTenantEntity>(x =>
-            _tenantAccessGetter.AllTenantsAccessible ||
-            x.TenantId == (_tenantAccessGetter.TenantId ?? Guid.Empty));
+            ((MultiTenancyContextBehavior)context.Behaviors[behaviorIndex])._tenantAccessGetter.AllTenantsAccessible ||
+            x.TenantId ==
+            (((MultiTenancyContextBehavior)context.Behaviors[behaviorIndex])._tenantAccessGetter.TenantId ??
+             Guid.Empty));
     }
 
     public void BeforeSaveChanges(ChangeTracker changeTracker)
