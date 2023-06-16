@@ -5,18 +5,18 @@ namespace SolutionTwo.Data.Common.Context;
 
 public class BaseDbContext : DbContext
 {
-    public IReadOnlyList<IContextBehavior> Behaviors { get; }
+    public IReadOnlyDictionary<Type, IContextBehavior> Behaviors { get; }
 
     public BaseDbContext(DbContextOptions options, params IContextBehavior[] behaviors) : base(options)
     {
-        Behaviors = behaviors;
+        Behaviors = behaviors.ToDictionary(x => x.GetType());
     }
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         foreach (var contextBehavior in Behaviors)
         {
-            contextBehavior.BeforeSaveChanges(ChangeTracker);
+            contextBehavior.Value.BeforeSaveChanges(this);
         }
 
         return await base.SaveChangesAsync(cancellationToken);
@@ -26,7 +26,7 @@ public class BaseDbContext : DbContext
     {
         foreach (var contextBehavior in Behaviors)
         {
-            contextBehavior.BeforeSaveChanges(ChangeTracker);
+            contextBehavior.Value.BeforeSaveChanges(this);
         }
 
         return base.SaveChanges();
@@ -34,10 +34,9 @@ public class BaseDbContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        for (var i = 0; i < Behaviors.Count; i++)
+        foreach (var contextBehavior in Behaviors)
         {
-            var contextBehavior = Behaviors[i];
-            contextBehavior.AddGlobalQueryFilter(modelBuilder, this, i);
+            contextBehavior.Value.AddGlobalQueryFilter(this, modelBuilder);
         }
     }
 }

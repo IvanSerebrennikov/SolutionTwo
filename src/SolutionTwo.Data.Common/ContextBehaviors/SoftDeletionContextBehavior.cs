@@ -9,14 +9,14 @@ namespace SolutionTwo.Data.Common.ContextBehaviors;
 
 public class SoftDeletionContextBehavior : ISoftDeletionContextBehavior
 {
-    public void AddGlobalQueryFilter(ModelBuilder modelBuilder, BaseDbContext context, int behaviorIndex)
+    public void AddGlobalQueryFilter(BaseDbContext context, ModelBuilder modelBuilder)
     {
         modelBuilder.AppendGlobalQueryFilter<ISoftDeletableEntity>(x => !x.IsDeleted);
     }
 
-    public void BeforeSaveChanges(ChangeTracker changeTracker)
+    public void BeforeSaveChanges(BaseDbContext context)
     {
-        foreach (var entry in changeTracker.Entries<ISoftDeletableEntity>()
+        foreach (var entry in context.ChangeTracker.Entries<ISoftDeletableEntity>()
                      .Where(entry => entry.State == EntityState.Deleted))
         {
             entry.State = EntityState.Unchanged;

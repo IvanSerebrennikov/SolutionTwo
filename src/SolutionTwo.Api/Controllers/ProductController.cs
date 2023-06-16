@@ -42,6 +42,8 @@ namespace SolutionTwo.Api.Controllers;
 // косяка самого юзера, стороннего сервиса, UI приложения, etc).
 // но при релизе скедулером пусть еще проставляется параметр типо IsForceRelease = true
 
+// еак же продукт сделать как IAuditableEntity и добавить для этого новый бехавиор контекста
+
 /// <summary>
 /// <see cref="UseProduct"/> and <see cref="ReleaseProduct"/> simulates some business flow
 /// where if one action executed, another also should be 100% executed in the nearest future (after 0-1-2-5-10 minutes).

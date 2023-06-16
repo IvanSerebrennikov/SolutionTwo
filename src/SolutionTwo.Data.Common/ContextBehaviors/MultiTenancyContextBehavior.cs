@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SolutionTwo.Common.MultiTenancy;
 using SolutionTwo.Data.Common.Context;
 using SolutionTwo.Data.Common.ContextBehaviors.Interfaces;
@@ -17,16 +16,22 @@ public class MultiTenancyContextBehavior : IMultiTenancyContextBehavior
         _tenantAccessGetter = tenantAccessGetter;
     }
 
-    public void AddGlobalQueryFilter(ModelBuilder modelBuilder, BaseDbContext context, int behaviorIndex)
+    public void AddGlobalQueryFilter(BaseDbContext context, ModelBuilder modelBuilder)
     {
+        // _tenantAccessGetter should be accessed through context.Behaviors[...] because
+        // if global query expression uses some service then this service should be accessed through context
+        // to make it possible for EF to translate expression into SQL
+        
         modelBuilder.AppendGlobalQueryFilter<IOwnedByTenantEntity>(x =>
-            ((MultiTenancyContextBehavior)context.Behaviors[behaviorIndex])._tenantAccessGetter.AllTenantsAccessible ||
+            (((MultiTenancyContextBehavior)context.Behaviors[typeof(MultiTenancyContextBehavior)])._tenantAccessGetter
+            .AllTenantsAccessible) ||
             x.TenantId ==
-            (((MultiTenancyContextBehavior)context.Behaviors[behaviorIndex])._tenantAccessGetter.TenantId ??
+            (((MultiTenancyContextBehavior)context.Behaviors[typeof(MultiTenancyContextBehavior)])._tenantAccessGetter
+             .TenantId ??
              Guid.Empty));
     }
 
-    public void BeforeSaveChanges(ChangeTracker changeTracker)
+    public void BeforeSaveChanges(BaseDbContext context)
     {
         if (_tenantAccessGetter.AllTenantsAccessible)
         {
@@ -38,7 +43,7 @@ public class MultiTenancyContextBehavior : IMultiTenancyContextBehavior
             throw new ApplicationException("TenantAccessGetter can't provide access to any tenant");
         }
 
-        foreach (var entry in changeTracker.Entries<IOwnedByTenantEntity>()
+        foreach (var entry in context.ChangeTracker.Entries<IOwnedByTenantEntity>()
                      .Where(entry => entry.State == EntityState.Added))
         {
             entry.Entity.TenantId = _tenantAccessGetter.TenantId.Value;
