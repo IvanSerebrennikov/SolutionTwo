@@ -88,16 +88,7 @@ public abstract class BaseRepository<TContext, TEntity, TId> : IBaseRepository<T
 
     public void Delete(TEntity entity)
     {
-        if (entity is ISoftDeletableEntity softDeletableEntity)
-        {
-            softDeletableEntity.IsDeleted = true;
-            var dbEntityEntry = Context.Entry(entity);
-            dbEntityEntry.Property(nameof(softDeletableEntity.IsDeleted)).IsModified = true;
-        }
-        else
-        {
-            Context.Set<TEntity>().Remove(entity);
-        }
+        Context.Set<TEntity>().Remove(entity);
     }
 
     public async Task DeleteAsync(TId id)
