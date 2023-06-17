@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Data;
+using Microsoft.Extensions.Logging;
 using SolutionTwo.Business.Common.Models;
 using SolutionTwo.Business.Core.Models.Product.Incoming;
 using SolutionTwo.Business.Core.Models.Product.Outgoing;
@@ -66,30 +67,36 @@ public class ProductService : IProductService
     public async Task<IServiceResult> UpdateProductAsync(
         UpdateProductModel updateProductModel)
     {
-        // TODO: нужна транзакция чтобы не поставить MaxNumberOfSimultaneousUsages 
-        // TODO: в меньшее значение, чем сейчас активных юсейджей, если добавится новый юсейдж
-        // TODO: в момент между получением productEntity и его сохранением 
+        var result = await _mainDatabase.ExecuteInTransactionAsync(async () =>
+            {
+                var productEntity = await _mainDatabase.Products.GetByIdAsync(updateProductModel.Id,
+                    include: x => x.ProductUsages.Where(u => u.ReleaseDateTimeUtc == null));
+                if (productEntity == null)
+                {
+                    return ServiceResult.Error(
+                        "Product was not found");
+                }
 
-        var productEntity = await _mainDatabase.Products.GetByIdAsync(updateProductModel.Id,
-            include: x => x.ProductUsages.Where(u => u.ReleaseDateTimeUtc == null));
-        if (productEntity == null)
-        {
-            return ServiceResult.Error(
-                "Product was not found");
-        }
-        if (updateProductModel.MaxNumberOfSimultaneousUsages < productEntity.ProductUsages.Count)
-        {
-            return ServiceResult.Error(
-                "Product has more current active usages than provided in new value for MaxNumberOfSimultaneousUsages");
-        }
+                if (updateProductModel.MaxNumberOfSimultaneousUsages < productEntity.ProductUsages.Count)
+                {
+                    return ServiceResult.Error(
+                        "Product has more current active usages " +
+                        "than provided in new value for MaxNumberOfSimultaneousUsages");
+                }
 
-        productEntity.Name = updateProductModel.Name;
-        productEntity.MaxNumberOfSimultaneousUsages = updateProductModel.MaxNumberOfSimultaneousUsages;
-        
-        _mainDatabase.Products.Update(productEntity, x => x.Name, x => x.MaxNumberOfSimultaneousUsages);
-        await _mainDatabase.CommitChangesAsync();
-        
-        return ServiceResult.Success();
+                productEntity.Name = updateProductModel.Name;
+                productEntity.MaxNumberOfSimultaneousUsages = updateProductModel.MaxNumberOfSimultaneousUsages;
+
+                _mainDatabase.Products.Update(productEntity, x => x.Name, x => x.MaxNumberOfSimultaneousUsages);
+
+                await _mainDatabase.CommitChangesAsync();
+                
+                return ServiceResult.Success();
+            },
+            isolationLevel: IsolationLevel.RepeatableRead,
+            delayBetweenRetries: TimeSpan.FromMilliseconds(300));
+
+        return result ?? ServiceResult.Error("Error occured during DB transaction executing");
     }
 
     public async Task<IServiceResult> DeleteProductAsync(Guid id)
