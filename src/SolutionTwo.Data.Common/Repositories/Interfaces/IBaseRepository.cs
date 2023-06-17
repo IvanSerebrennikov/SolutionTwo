@@ -37,6 +37,8 @@ public interface IBaseRepository<TEntity, TId>
         int? take = null, 
         bool withTracking = false);
 
+    Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> filter);
+    
     void Create(TEntity entity);
 
     void Update(TEntity entity, params Expression<Func<TEntity, object>>[] updatedProperties);

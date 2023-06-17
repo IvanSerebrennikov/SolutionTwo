@@ -19,7 +19,7 @@ public class IdentityService : IIdentityService
     private readonly IdentityConfiguration _identityConfiguration;
     private readonly IMainDatabase _mainDatabase;
     private readonly ITokenProvider _tokenProvider;
-    private readonly IRevokedTokenStore _revokedTokenStore;
+    private readonly IDeactivatedTokenStore _deactivatedTokenStore;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ILogger<IdentityService> _logger;
 
@@ -27,7 +27,7 @@ public class IdentityService : IIdentityService
         IdentityConfiguration identityConfiguration,
         IMainDatabase mainDatabase, 
         ITokenProvider tokenProvider, 
-        IRevokedTokenStore revokedTokenStore,
+        IDeactivatedTokenStore deactivatedTokenStore,
         ILogger<IdentityService> logger, 
         IPasswordHasher passwordHasher)
     {
@@ -36,7 +36,7 @@ public class IdentityService : IIdentityService
         _tokenProvider = tokenProvider;
         _logger = logger;
         _passwordHasher = passwordHasher;
-        _revokedTokenStore = revokedTokenStore;
+        _deactivatedTokenStore = deactivatedTokenStore;
     }
 
     public async Task<IServiceResult<AuthResult>> ValidateCredentialsAndCreateTokensPairAsync(
@@ -111,7 +111,7 @@ public class IdentityService : IIdentityService
 
         if (claimsPrincipal == null ||
             authTokenId == null ||
-            _revokedTokenStore.IsAuthTokenRevoked(authTokenId.Value))
+            _deactivatedTokenStore.IsAuthTokenDeactivated(authTokenId.Value))
         {
             return ServiceResult<ClaimsPrincipal>.Error();
         }
@@ -119,14 +119,12 @@ public class IdentityService : IIdentityService
         return ServiceResult<ClaimsPrincipal>.Success(claimsPrincipal);
     }
 
-    public async Task RevokeAllActiveTokensForUserAsync(Guid userId)
+    public async Task ResetUserAccessAsync(Guid userId)
     {
-        throw new NotImplementedException();
-    }
+        await SetAllActiveRefreshTokensAsRevokedAndDeactivateRelatedAuthTokensForUserAsync(
+            userId);
 
-    public async Task DeactivateUserAsync(Guid userId)
-    {
-        throw new NotImplementedException();
+        await _mainDatabase.CommitChangesAsync();
     }
 
     private async Task<UserEntity?> GetUserWithRolesByCredentialsAsync(UserCredentialsModel userCredentials)
@@ -196,7 +194,8 @@ public class IdentityService : IIdentityService
             _logger.LogWarning(
                 $"Attempt to refresh already used token. " +
                 $"RefreshTokenId: {refreshTokenEntity.Id}, UserId: {refreshTokenEntity.UserId}.");
-            await RevokeProvidedAndAllActiveTokensForUserAsync(refreshTokenEntity.Id, refreshTokenEntity.UserId);
+            await SetProvidedAndAllActiveRefreshTokensAsRevokedAndDeactivateRelatedAuthTokensForUserAsync(
+                refreshTokenEntity);
             
             await _mainDatabase.CommitChangesAsync();
             
@@ -206,22 +205,30 @@ public class IdentityService : IIdentityService
         return "";
     }
     
-    private async Task RevokeProvidedAndAllActiveTokensForUserAsync(Guid tokenId, Guid userId)
+    private async Task SetProvidedAndAllActiveRefreshTokensAsRevokedAndDeactivateRelatedAuthTokensForUserAsync(
+        RefreshTokenEntity providedRefreshTokenEntity)
     {
-        var refreshTokenEntities = await _mainDatabase.RefreshTokens.GetAsync(
-            x => x.Id == tokenId || (
-                x.UserId == userId && !x.IsUsed && x.ExpiresDateTimeUtc > DateTime.UtcNow));
+        SetRefreshTokenAsRevokedAndDeactivateRelatedAuthToken(providedRefreshTokenEntity);
+
+        await SetAllActiveRefreshTokensAsRevokedAndDeactivateRelatedAuthTokensForUserAsync(
+            providedRefreshTokenEntity.UserId);
+    }
+    
+    private async Task SetAllActiveRefreshTokensAsRevokedAndDeactivateRelatedAuthTokensForUserAsync(Guid userId)
+    {
+        var refreshTokenEntities = await _mainDatabase.RefreshTokens.GetAsync(x =>
+            x.UserId == userId && !x.IsUsed && x.ExpiresDateTimeUtc > DateTime.UtcNow);
 
         foreach (var refreshTokenEntity in refreshTokenEntities)
         {
-            RevokeTokens(refreshTokenEntity);
+            SetRefreshTokenAsRevokedAndDeactivateRelatedAuthToken(refreshTokenEntity);
         }
     }
 
-    private void RevokeTokens(RefreshTokenEntity refreshTokenEntity)
+    private void SetRefreshTokenAsRevokedAndDeactivateRelatedAuthToken(RefreshTokenEntity refreshTokenEntity)
     {
         refreshTokenEntity.IsRevoked = true;
         _mainDatabase.RefreshTokens.Update(refreshTokenEntity, x => x.IsRevoked);
-        _revokedTokenStore.RevokeAuthToken(refreshTokenEntity.AuthTokenId);
+        _deactivatedTokenStore.DeactivateAuthToken(refreshTokenEntity.AuthTokenId);
     }
 }

@@ -63,6 +63,11 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
             .ToListAsync();
     }
 
+    public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> filter)
+    {
+        return await GetQueryable(filter).AnyAsync();
+    }
+
     public void Create(TEntity entity)
     {
         Context.Set<TEntity>().Add(entity);

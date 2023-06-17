@@ -25,7 +25,7 @@ public static class BusinessIdentityServicesRegistrationExtensions
         
         services.AddSingleton<ITokenProvider, JwtProvider>();
         
-        services.AddSingleton<IRevokedTokenStore, RevokedTokenMemoryCacheStore>();
+        services.AddSingleton<IDeactivatedTokenStore, DeactivatedTokenMemoryCacheStore>();
 
         services.AddScoped<IIdentityService, IdentityService>();
     }

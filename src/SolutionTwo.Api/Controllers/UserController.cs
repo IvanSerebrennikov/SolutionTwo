@@ -5,6 +5,7 @@ using SolutionTwo.Business.Common.Constants;
 using SolutionTwo.Business.Core.Models.User.Incoming;
 using SolutionTwo.Business.Core.Models.User.Outgoing;
 using SolutionTwo.Business.Core.Services.Interfaces;
+using SolutionTwo.Business.Identity.Services.Interfaces;
 
 namespace SolutionTwo.Api.Controllers;
 
@@ -14,10 +15,12 @@ namespace SolutionTwo.Api.Controllers;
 public class UserController : ApiAuthorizedControllerBase
 {
     private readonly IUserService _userService;
+    private readonly IIdentityService _identityService;
 
-    public UserController(IUserService userService)
+    public UserController(IUserService userService, IIdentityService identityService)
     {
         _userService = userService;
+        _identityService = identityService;
     }
     
     [HttpGet("me")]
@@ -83,6 +86,24 @@ public class UserController : ApiAuthorizedControllerBase
             return BadRequest(result.Message);
         }
 
+        await _identityService.ResetUserAccessAsync(id);
+
+        return Ok();
+    }
+    
+    [SolutionTwoAuthorize(UserRoles.SuperAdmin, UserRoles.TenantAdmin)]
+    [HttpPost("{id}/logout")]
+    public async Task<ActionResult> LogOutUser(Guid id)
+    {
+        var userExists = await _userService.UserExistsAsync(id);
+
+        if (!userExists)
+        {
+            return BadRequest("User was not found");
+        }
+        
+        await _identityService.ResetUserAccessAsync(id);
+        
         return Ok();
     }
 }

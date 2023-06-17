@@ -75,6 +75,12 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
         return await Task.FromResult(result);
     }
 
+    public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> filter)
+    {
+        var result = GetEnumerable(filter).Any();
+        return await Task.FromResult(result);
+    }
+
     public void Create(TEntity entity)
     {
         _entities.Add(entity);

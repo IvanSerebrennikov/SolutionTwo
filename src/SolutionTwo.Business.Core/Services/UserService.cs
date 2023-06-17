@@ -26,6 +26,11 @@ public class UserService : IUserService
         _logger = logger;
     }
 
+    public async Task<bool> UserExistsAsync(Guid id)
+    {
+        return await _mainDatabase.Users.ExistsAsync(x => x.Id == id);
+    }
+
     public async Task<UserWithRolesModel?> GetUserWithRolesByIdAsync(Guid id)
     {
         var userEntity = await _mainDatabase.Users.GetByIdAsync(id, include: x => x.Roles);
@@ -93,5 +98,10 @@ public class UserService : IUserService
         await _mainDatabase.CommitChangesAsync();
 
         return ServiceResult.Success();
+    }
+
+    public async Task DeactivateUserAsync(Guid userId)
+    {
+        throw new NotImplementedException();
     }
 }

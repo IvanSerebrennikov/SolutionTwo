@@ -14,7 +14,5 @@ public interface IIdentityService
     
     IServiceResult<ClaimsPrincipal> VerifyAuthTokenAndGetPrincipal(string authToken);
 
-    Task RevokeAllActiveTokensForUserAsync(Guid userId);
-    
-    Task DeactivateUserAsync(Guid userId);
+    Task ResetUserAccessAsync(Guid userId);
 }

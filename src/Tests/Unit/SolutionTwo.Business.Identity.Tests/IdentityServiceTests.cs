@@ -38,7 +38,7 @@ public class IdentityServiceTests
         FakeInMemoryDatabase();
 
         var tokenProvider = MockTokenProvider();
-        var revokedTokenStore = MockRevokedTokenStore();
+        var revokedTokenStore = MockDeactivatedTokenStore();
         var logger = MockLogger();
         var passwordHasher = MockPasswordHasher();
 
@@ -245,18 +245,18 @@ public class IdentityServiceTests
         return passwordHasher;
     }
 
-    private static IRevokedTokenStore MockRevokedTokenStore()
+    private static IDeactivatedTokenStore MockDeactivatedTokenStore()
     {
-        var revokedTokens = new List<Guid>();
-        var revokedTokenStoreMock = new Mock<IRevokedTokenStore>();
-        revokedTokenStoreMock.Setup(x => x.RevokeAuthToken(It.IsAny<Guid>())).Callback((Guid authTokenId) =>
+        var deactivatedTokens = new List<Guid>();
+        var deactivatedTokenStoreMock = new Mock<IDeactivatedTokenStore>();
+        deactivatedTokenStoreMock.Setup(x => x.DeactivateAuthToken(It.IsAny<Guid>())).Callback((Guid authTokenId) =>
         {
-            revokedTokens.Add(authTokenId);
+            deactivatedTokens.Add(authTokenId);
         });
-        revokedTokenStoreMock.Setup(x => x.IsAuthTokenRevoked(It.IsAny<Guid>()))
-            .Returns((Guid authTokenId) => revokedTokens.Contains(authTokenId));
-        var revokedTokenStore = revokedTokenStoreMock.Object;
-        return revokedTokenStore;
+        deactivatedTokenStoreMock.Setup(x => x.IsAuthTokenDeactivated(It.IsAny<Guid>()))
+            .Returns((Guid authTokenId) => deactivatedTokens.Contains(authTokenId));
+        var deactivatedTokenStore = deactivatedTokenStoreMock.Object;
+        return deactivatedTokenStore;
     }
 
     private static ILogger<IdentityService> MockLogger()
