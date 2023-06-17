@@ -8,7 +8,10 @@ public static class ApiServicesRegistrationExtensions
 {
     public static void AddApiServices(this IServiceCollection services)
     {
+        // Controllers
         services.AddControllers();
+        
+        // Model state error (DataAnnotations validation error) response
         services.Configure<ApiBehaviorOptions>(o =>
         {
             o.InvalidModelStateResponseFactory = actionContext =>
@@ -19,6 +22,8 @@ public static class ApiServicesRegistrationExtensions
                 return new BadRequestObjectResult(new ErrorResponse(errorMessage.ToArray(), traceId));
             };
         });
+        
+        // Open Api (Swagger)
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {

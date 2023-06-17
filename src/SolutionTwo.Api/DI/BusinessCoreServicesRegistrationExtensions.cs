@@ -8,5 +8,7 @@ public static class BusinessCoreServicesRegistrationExtensions
     public static void AddBusinessCoreServices(this IServiceCollection services)
     {
         services.AddScoped<IUserService, UserService>();
+        
+        services.AddScoped<IProductService, ProductService>();
     }
 }

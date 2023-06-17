@@ -9,8 +9,6 @@ public interface IUserService
     Task<bool> UserExistsAsync(Guid id);
     
     Task<UserWithRolesModel?> GetUserWithRolesByIdAsync(Guid id);
-
-    Task<UserWithRolesModel?> GetUserWithRolesAsync(string username);
     
     Task<IReadOnlyList<UserWithRolesModel>> GetAllUsersWithRolesAsync();
 

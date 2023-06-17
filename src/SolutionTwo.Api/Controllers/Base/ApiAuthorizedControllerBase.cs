@@ -6,15 +6,15 @@ namespace SolutionTwo.Api.Controllers.Base;
 
 public class ApiAuthorizedControllerBase : ApiControllerBase
 {
-    protected string CurrentUserUsername
+    protected Guid CurrentUserId
     {
         get
         {
-            var claimValue = GetClaimValue(ClaimTypes.Name);
-            if (!string.IsNullOrEmpty(claimValue)) 
-                return claimValue;
+            var claimValue = GetClaimValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(claimValue) && Guid.TryParse(claimValue, out var userId)) 
+                return userId;
             
-            throw new ApplicationException("Username doesn't exist in Claims");
+            throw new ApplicationException("UserId doesn't exist in Claims");
         }
     }
 

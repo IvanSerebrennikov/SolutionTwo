@@ -6,35 +6,35 @@ using SolutionTwo.Data.Common.Interfaces;
 
 namespace SolutionTwo.Data.MainDatabase.Entities;
 
-public class UserEntity : IIdentifiablyEntity<Guid>, ISoftDeletableEntity, IOwnedByTenantEntity
+public class ProductEntity : 
+    IIdentifiablyEntity<Guid>, 
+    IOwnedByTenantEntity, 
+    ISoftDeletableEntity, 
+    IAuditableOnCreateEntity, 
+    IAuditableOnUpdateEntity
 {
     public Guid Id { get; set; }
-
+    
     public Guid TenantId { get; set; }
-
-    [MaxLength(256)]
-    public string FirstName { get; set; } = null!;
     
     [MaxLength(256)]
-    public string LastName { get; set; } = null!;
+    public string Name { get; set; } = null!;
 
-    [MaxLength(256)]
-    public string Username { get; set; } = null!;
-
-    [MaxLength(1024)]
-    public string PasswordHash { get; set; } = null!;
+    public int MaxNumberOfSimultaneousUsages { get; set; }
 
     public DateTime CreatedDateTimeUtc { get; set; }
+    
+    public Guid CreatedBy { get; set; }
+    
+    public DateTime? LastModifiedDateTimeUtc { get; set; }
+    
+    public Guid? LastModifiedBy { get; set; }
     
     [IgnoreAudit]
     public DateTime? DeletedDateTimeUtc { get; set; }
     
     [IgnoreAudit]
     public Guid? DeletedBy { get; set; }
-    
-    public List<RoleEntity> Roles { get; set; } = new();
-    
-    public List<RefreshTokenEntity> RefreshTokens { get; set; } = new();
     
     public List<ProductUsageEntity> ProductUsages { get; set; } = new();
 }

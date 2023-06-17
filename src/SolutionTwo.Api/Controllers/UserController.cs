@@ -26,7 +26,7 @@ public class UserController : ApiAuthorizedControllerBase
     [HttpGet("me")]
     public async Task<ActionResult<UserWithRolesModel>> GetMe()
     {
-        var userModel = await _userService.GetUserWithRolesAsync(CurrentUserUsername);
+        var userModel = await _userService.GetUserWithRolesByIdAsync(CurrentUserId);
 
         if (userModel == null)
             return NotFound();
@@ -38,12 +38,6 @@ public class UserController : ApiAuthorizedControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateTenantUser(CreateUserModel createUserModel)
     {
-        if (string.IsNullOrEmpty(createUserModel.FirstName) ||
-            string.IsNullOrEmpty(createUserModel.LastName) ||
-            string.IsNullOrEmpty(createUserModel.Username) ||
-            string.IsNullOrEmpty(createUserModel.Password))
-            return BadRequest("Passed data is invalid. All properties are required.");
-
         var serviceResult = await _userService.CreateTenantUserAsync(createUserModel);
         
         if (!serviceResult.IsSucceeded || serviceResult.Data == null)
@@ -82,9 +76,7 @@ public class UserController : ApiAuthorizedControllerBase
         var result = await _userService.DeleteUserAsync(id);
 
         if (!result.IsSucceeded)
-        {
             return BadRequest(result.Message);
-        }
 
         await _identityService.ResetUserAccessAsync(id);
 
@@ -98,9 +90,7 @@ public class UserController : ApiAuthorizedControllerBase
         var userExists = await _userService.UserExistsAsync(id);
 
         if (!userExists)
-        {
             return BadRequest("User was not found");
-        }
         
         await _identityService.ResetUserAccessAsync(id);
         

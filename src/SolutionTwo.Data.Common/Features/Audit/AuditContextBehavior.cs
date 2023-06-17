@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using SolutionTwo.Common.LoggedInUserAccessor.Interfaces;
 using SolutionTwo.Data.Common.Context;
 
@@ -34,7 +35,8 @@ public class AuditContextBehavior : IAuditContextBehavior
                      .Where(entry => entry.State == EntityState.Modified))
         {
             if (entry.Properties.Any(p =>
-                    p.IsModified && p.Metadata.FindAnnotation(nameof(IgnoreAuditAttribute)) == null))
+                    p.IsModified && p.Metadata.PropertyInfo != null &&
+                    p.Metadata.PropertyInfo.GetCustomAttribute(typeof(IgnoreAuditAttribute)) == null))
             {
                 entry.Entity.LastModifiedDateTimeUtc = dateTimeNow;
                 entry.Entity.LastModifiedBy = loggedInUserId ?? Guid.Empty;

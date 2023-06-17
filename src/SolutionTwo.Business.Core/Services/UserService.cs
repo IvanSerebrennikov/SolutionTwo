@@ -38,15 +38,6 @@ public class UserService : IUserService
         return userEntity != null ? new UserWithRolesModel(userEntity) : null;
     }
 
-    public async Task<UserWithRolesModel?> GetUserWithRolesAsync(string username)
-    {
-        var userEntity = await _mainDatabase.Users.GetSingleAsync(
-            x => x.Username == username,
-            include: x => x.Roles);
-
-        return userEntity != null ? new UserWithRolesModel(userEntity) : null;
-    }
-
     public async Task<IReadOnlyList<UserWithRolesModel>> GetAllUsersWithRolesAsync()
     {
         var userEntities = await _mainDatabase.Users.GetAsync(include: x => x.Roles);

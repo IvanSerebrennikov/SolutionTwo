@@ -13,13 +13,15 @@ public class MainDatabase : IMainDatabase
         ITenantRepository tenantRepository,
         IUserRepository userRepository,
         IRoleRepository roleRepository,
-        IRefreshTokenRepository refreshTokenRepository)
+        IRefreshTokenRepository refreshTokenRepository,
+        IProductRepository productRepository)
     {
         _context = context;
         Tenants = tenantRepository;
         Users = userRepository;
         Roles = roleRepository;
         RefreshTokens = refreshTokenRepository;
+        Products = productRepository;
     }
 
     public ITenantRepository Tenants { get; }
@@ -29,6 +31,8 @@ public class MainDatabase : IMainDatabase
     public IRoleRepository Roles { get; }
 
     public IRefreshTokenRepository RefreshTokens { get; }
+    
+    public IProductRepository Products { get; }
 
     public async Task CommitChangesAsync()
     {

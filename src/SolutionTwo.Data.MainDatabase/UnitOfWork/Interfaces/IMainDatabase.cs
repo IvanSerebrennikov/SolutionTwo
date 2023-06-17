@@ -12,6 +12,8 @@ public interface IMainDatabase
     
     IRefreshTokenRepository RefreshTokens { get; }
     
+    IProductRepository Products { get; }
+    
     Task CommitChangesAsync();
 
     void CommitChanges();

@@ -29,6 +29,10 @@ public class MainDatabaseContext : BaseDbContext
     public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
 
     public DbSet<TenantEntity> Tenants => Set<TenantEntity>();
+    
+    public DbSet<ProductEntity> Products => Set<ProductEntity>();
+    
+    public DbSet<ProductUsageEntity> ProductUsages => Set<ProductUsageEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

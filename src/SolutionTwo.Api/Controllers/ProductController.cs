@@ -2,6 +2,9 @@
 using SolutionTwo.Api.Attributes;
 using SolutionTwo.Api.Controllers.Base;
 using SolutionTwo.Business.Common.Constants;
+using SolutionTwo.Business.Core.Models.Product.Incoming;
+using SolutionTwo.Business.Core.Models.Product.Outgoing;
+using SolutionTwo.Business.Core.Services.Interfaces;
 
 namespace SolutionTwo.Api.Controllers;
 
@@ -65,6 +68,13 @@ namespace SolutionTwo.Api.Controllers;
 [ApiController]
 public class ProductController : ApiAuthorizedControllerBase
 {
+    private readonly IProductService _productService;
+
+    public ProductController(IProductService productService)
+    {
+        _productService = productService;
+    }
+
     /// <summary>
     /// Simulates some business flow that can be broken because of parallel user access.
     /// For example Product has MaxNumberOfSimultaneousUsages = 3, so if current User want to use provided Product,
@@ -102,8 +112,60 @@ public class ProductController : ApiAuthorizedControllerBase
     
     [SolutionTwoAuthorize(UserRoles.TenantAdmin)]
     [HttpPost]
-    public async Task<ActionResult> CreateProduct()
+    public async Task<ActionResult> CreateProduct(CreateProductModel createProductModel)
     {
+        var serviceResult = await _productService.CreateProductAsync(createProductModel);
+        
+        if (!serviceResult.IsSucceeded || serviceResult.Data == null)
+            return BadRequest(serviceResult);
+        
+        var productModel = serviceResult.Data;
+
+        return CreatedAtAction(nameof(GetById), new { id = productModel.Id }, productModel);
+    }
+    
+    [SolutionTwoAuthorize(UserRoles.TenantAdmin)]
+    [HttpPut]
+    public async Task<ActionResult> UpdateProduct(UpdateProductModel updateProductModel)
+    {
+        var serviceResult = await _productService.UpdateProductAsync(updateProductModel);
+        
+        if (!serviceResult.IsSucceeded)
+            return BadRequest(serviceResult);
+        
+        return Ok();
+    }
+    
+    [SolutionTwoAuthorize(UserRoles.TenantAdmin)]
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ProductWithCurrentUsagesModel>>> GetAll()
+    {
+        var productModels = await _productService.GetAllProductsWithCurrentUsagesAsync();
+
+        return Ok(productModels);
+    }
+
+    [SolutionTwoAuthorize(UserRoles.TenantAdmin)]
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ProductWithCurrentUsagesModel>> GetById(Guid id)
+    {
+        var productModel = await _productService.GetProductWithCurrentUsagesByIdAsync(id);
+
+        if (productModel == null)
+            return NotFound();
+        
+        return Ok(productModel);
+    }
+
+    [SolutionTwoAuthorize(UserRoles.TenantAdmin)]
+    [HttpDelete]
+    public async Task<ActionResult> DeleteUser(Guid id)
+    {
+        var result = await _productService.DeleteProductAsync(id);
+
+        if (!result.IsSucceeded)
+            return BadRequest(result.Message);
+
         return Ok();
     }
 }
