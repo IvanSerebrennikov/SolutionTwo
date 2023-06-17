@@ -78,15 +78,15 @@ public class ProductController : ApiAuthorizedControllerBase
     /// <summary>
     /// Simulates some business flow that can be broken because of parallel user access.
     /// For example Product has MaxNumberOfSimultaneousUsages = 3, so if current User want to use provided Product,
-    /// but 3 other Users already use it, current User should not pass ProductUsages checking and
+    /// but 3 other Users are already using it, current User should not pass ProductUsages checking and
     /// receive corresponding message.
-    /// But if for example only 2 other Users already use this Product, user should successfully pass ProductUsages
+    /// But if only 2 other Users are already using this Product, user should successfully pass ProductUsages
     /// checking and new ProductUsage entry should be created for him. But if there will be 2 such requests in
     /// approximately the same moment, it can be possible if both 2 Users successfully pass ProductUsages checking and
     /// new ProductUsage entries will be created for both of them, and as result there will be 4 simultaneous usages
     /// for this product, that is incorrect.
-    /// So need to handle this with DB transaction that will lock access to ProductUsages table during ProductUsages
-    /// checking and new ProductUsage entry creation.
+    /// So need to handle this with DB transaction that will lock write access to ProductUsages table during
+    /// ProductUsages checking and new ProductUsage entry creation.
     ///
     /// TODO: тут скорее всего придется делать 4 уровень изоляции на лок всей ProductUsages таблицы. Может подумать
     /// TODO: над оптимизацией и сделать небольшую денормализацию и добавить еще в продукт св-во CurrentNumberOfSimultaneousUsages

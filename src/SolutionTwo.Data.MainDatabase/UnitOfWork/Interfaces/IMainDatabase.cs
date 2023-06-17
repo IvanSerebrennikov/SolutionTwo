@@ -1,9 +1,9 @@
-﻿using System.Data;
+﻿using SolutionTwo.Data.Common.UnitOfWork.Interfaces;
 using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
 
 namespace SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
-public interface IMainDatabase
+public interface IMainDatabase : IBaseUnitOfWork
 {
     ITenantRepository Tenants { get; }
     
@@ -14,20 +14,4 @@ public interface IMainDatabase
     IRefreshTokenRepository RefreshTokens { get; }
     
     IProductRepository Products { get; }
-    
-    Task CommitChangesAsync();
-
-    void CommitChanges();
-
-    TResult? ExecuteInTransaction<TResult>(
-        Func<TResult> funcToBeExecuted,
-        IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
-        int maxRetryCount = 3,
-        TimeSpan delayBetweenRetries = default);
-
-    Task<TResult?> ExecuteInTransactionAsync<TResult>(
-        Func<Task<TResult>> funcToBeExecuted,
-        IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
-        int maxRetryCount = 3,
-        TimeSpan delayBetweenRetries = default);
 }
