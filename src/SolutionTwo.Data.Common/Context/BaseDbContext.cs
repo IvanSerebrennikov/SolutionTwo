@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SolutionTwo.Data.Common.ContextBehaviors.Base.Interfaces;
+using SolutionTwo.Data.Common.Interfaces;
 
 namespace SolutionTwo.Data.Common.Context;
 

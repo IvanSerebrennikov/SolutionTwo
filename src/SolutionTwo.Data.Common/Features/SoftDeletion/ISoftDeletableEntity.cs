@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Data.Common.Entities.Interfaces;
+﻿namespace SolutionTwo.Data.Common.Features.SoftDeletion;
 
 public interface ISoftDeletableEntity
 {

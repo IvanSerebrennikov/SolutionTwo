@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SolutionTwo.Data.Common.Context;
-using SolutionTwo.Data.Common.ContextBehaviors.Interfaces;
+using SolutionTwo.Data.Common.Features.Audit;
+using SolutionTwo.Data.Common.Features.MultiTenancy;
+using SolutionTwo.Data.Common.Features.SoftDeletion;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.Entities.ManyToMany;
 
@@ -11,9 +13,11 @@ public class MainDatabaseContext : BaseDbContext
     public MainDatabaseContext(
         DbContextOptions options,
         ISoftDeletionContextBehavior softDeletionContextBehavior,
+        IAuditContextBehavior auditContextBehavior,
         IMultiTenancyContextBehavior multiTenancyContextBehavior) :
         base(options,
             softDeletionContextBehavior,
+            auditContextBehavior,
             multiTenancyContextBehavior)
     {
     }

@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using SolutionTwo.Data.Common.Entities.Interfaces;
+using SolutionTwo.Data.Common.Interfaces;
 
 namespace SolutionTwo.Data.Common.Repositories.Interfaces;
 

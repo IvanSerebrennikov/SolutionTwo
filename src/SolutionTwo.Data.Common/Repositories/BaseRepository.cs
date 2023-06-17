@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using SolutionTwo.Data.Common.Entities.Interfaces;
+using SolutionTwo.Data.Common.Interfaces;
 using SolutionTwo.Data.Common.Repositories.Interfaces;
 
 namespace SolutionTwo.Data.Common.Repositories;

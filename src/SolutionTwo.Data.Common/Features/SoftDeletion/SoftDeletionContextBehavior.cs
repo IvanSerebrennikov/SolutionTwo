@@ -1,11 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SolutionTwo.Common.LoggedInUserAccessor.Interfaces;
 using SolutionTwo.Data.Common.Context;
-using SolutionTwo.Data.Common.ContextBehaviors.Interfaces;
-using SolutionTwo.Data.Common.Entities.Interfaces;
 using SolutionTwo.Data.Common.Extensions;
 
-namespace SolutionTwo.Data.Common.ContextBehaviors;
+namespace SolutionTwo.Data.Common.Features.SoftDeletion;
 
 public class SoftDeletionContextBehavior : ISoftDeletionContextBehavior
 {
