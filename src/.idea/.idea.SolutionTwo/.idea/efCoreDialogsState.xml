@@ -6,7 +6,6 @@
         <entry key="Common:0d475a0d-a5af-4160-96ea-8230b031f36a:dbContext" value="SolutionTwo.Data.MainDatabase.Context.MainDatabaseContext" />
         <entry key="Common:3aa278db-32c1-41e8-bef5-247cc08d69c8:dbContext" value="SolutionTwo.Data.MainDatabase.Context.MainDatabaseContext" />
         <entry key="Common:buildConfiguration" value="Release" />
-        <entry key="Common:d0c92fd4-da14-44a8-880a-e053a26e26ec:dbContext" value="SolutionTwo.Data.Common.Context.BaseDbContext" />
         <entry key="Common:noBuild" value="false" />
         <entry key="Common:outputFolder" value="Migrations" />
         <entry key="Common:targetFramework" value="net6.0" />
