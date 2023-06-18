@@ -3,6 +3,7 @@ using SolutionTwo.Api.Extensions;
 using SolutionTwo.Data.Common.Configuration;
 using SolutionTwo.Data.Common.Features.Audit;
 using SolutionTwo.Data.Common.Features.MultiTenancy;
+using SolutionTwo.Data.Common.Features.OptimisticConcurrency;
 using SolutionTwo.Data.Common.Features.SoftDeletion;
 using SolutionTwo.Data.MainDatabase.Configuration;
 using SolutionTwo.Data.MainDatabase.Context;
@@ -29,6 +30,8 @@ public static class DataServicesRegistrationExtensions
         services.AddScoped<IMultiTenancyContextBehavior, MultiTenancyContextBehavior>();
         
         services.AddScoped<IAuditContextBehavior, AuditContextBehavior>();
+        
+        services.AddScoped<IOptimisticConcurrencyContextBehavior, OptimisticConcurrencyContextBehavior>();
         
         services.AddDbContext<MainDatabaseContext>(o =>
             {

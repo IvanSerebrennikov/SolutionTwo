@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SolutionTwo.Data.Common.Features.Audit;
 using SolutionTwo.Data.Common.Features.MultiTenancy;
+using SolutionTwo.Data.Common.Features.OptimisticConcurrency;
 using SolutionTwo.Data.Common.Features.SoftDeletion;
 using SolutionTwo.Data.Common.Interfaces;
 
@@ -11,7 +12,8 @@ public class ProductEntity :
     IOwnedByTenantEntity, 
     ISoftDeletableEntity, 
     IAuditableOnCreateEntity, 
-    IAuditableOnUpdateEntity
+    IAuditableOnUpdateEntity,
+    IVersionedEntity
 {
     public Guid Id { get; set; }
     
@@ -20,6 +22,7 @@ public class ProductEntity :
     [MaxLength(256)]
     public string Name { get; set; } = null!;
 
+    [VersionChangedOnUpdate]
     public int MaxNumberOfSimultaneousUsages { get; set; }
 
     public DateTime CreatedDateTimeUtc { get; set; }
@@ -30,11 +33,16 @@ public class ProductEntity :
     
     public Guid? LastModifiedBy { get; set; }
     
+    [ConcurrencyCheck]
     [IgnoreAudit]
     public DateTime? DeletedDateTimeUtc { get; set; }
     
+    [ConcurrencyCheck]
     [IgnoreAudit]
     public Guid? DeletedBy { get; set; }
+    
+    [ConcurrencyCheck]
+    public Guid Version { get; set; }
     
     public List<ProductUsageEntity> ProductUsages { get; set; } = new();
 }

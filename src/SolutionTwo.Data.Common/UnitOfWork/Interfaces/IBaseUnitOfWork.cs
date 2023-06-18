@@ -8,13 +8,13 @@ public interface IBaseUnitOfWork
 
     void CommitChanges();
 
-    TResult? ExecuteInTransaction<TResult>(
+    TResult? ExecuteInTransactionWithRetry<TResult>(
         Func<TResult> funcToBeExecuted,
         IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
         int maxRetryCount = 3,
         TimeSpan delayBetweenRetries = default);
 
-    Task<TResult?> ExecuteInTransactionAsync<TResult>(
+    Task<TResult?> ExecuteInTransactionWithRetryAsync<TResult>(
         Func<Task<TResult>> funcToBeExecuted,
         IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
         int maxRetryCount = 3,

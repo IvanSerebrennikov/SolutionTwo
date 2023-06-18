@@ -2,6 +2,7 @@
 using SolutionTwo.Data.Common.Context;
 using SolutionTwo.Data.Common.Features.Audit;
 using SolutionTwo.Data.Common.Features.MultiTenancy;
+using SolutionTwo.Data.Common.Features.OptimisticConcurrency;
 using SolutionTwo.Data.Common.Features.SoftDeletion;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.Entities.ManyToMany;
@@ -14,10 +15,12 @@ public class MainDatabaseContext : BaseDbContext
         DbContextOptions options,
         ISoftDeletionContextBehavior softDeletionContextBehavior,
         IAuditContextBehavior auditContextBehavior,
+        IOptimisticConcurrencyContextBehavior optimisticConcurrencyContextBehavior,
         IMultiTenancyContextBehavior multiTenancyContextBehavior) :
         base(options,
             softDeletionContextBehavior,
             auditContextBehavior,
+            optimisticConcurrencyContextBehavior,
             multiTenancyContextBehavior)
     {
     }

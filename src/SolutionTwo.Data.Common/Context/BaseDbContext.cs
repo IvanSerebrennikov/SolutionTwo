@@ -7,9 +7,9 @@ public class BaseDbContext : DbContext
 {
     public IReadOnlyDictionary<Type, IContextBehavior> Behaviors { get; }
 
-    public BaseDbContext(DbContextOptions options, params IContextBehavior[] behaviors) : base(options)
+    public BaseDbContext(DbContextOptions options, params IContextBehavior[] contextBehaviors) : base(options)
     {
-        Behaviors = behaviors.ToDictionary(x => x.GetType());
+        Behaviors = contextBehaviors.ToDictionary(x => x.GetType());
     }
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

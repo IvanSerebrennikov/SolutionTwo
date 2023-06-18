@@ -26,7 +26,7 @@ public class BaseUnitOfWork : IBaseUnitOfWork
         _context.SaveChanges();
     }
     
-    public TResult? ExecuteInTransaction<TResult>(
+    public TResult? ExecuteInTransactionWithRetry<TResult>(
         Func<TResult> funcToBeExecuted,
         IsolationLevel isolationLevel = IsolationLevel.ReadCommitted, 
         int maxRetryCount = 3, 
@@ -74,7 +74,7 @@ public class BaseUnitOfWork : IBaseUnitOfWork
         return result;
     }
     
-    public async Task<TResult?> ExecuteInTransactionAsync<TResult>(
+    public async Task<TResult?> ExecuteInTransactionWithRetryAsync<TResult>(
         Func<Task<TResult>> funcToBeExecuted,
         IsolationLevel isolationLevel = IsolationLevel.ReadCommitted, 
         int maxRetryCount = 3, 

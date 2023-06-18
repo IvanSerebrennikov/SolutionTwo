@@ -67,7 +67,7 @@ public class ProductService : IProductService
     public async Task<IServiceResult> UpdateProductAsync(
         UpdateProductModel updateProductModel)
     {
-        var result = await _mainDatabase.ExecuteInTransactionAsync(async () =>
+        var result = await _mainDatabase.ExecuteInTransactionWithRetryAsync(async () =>
             {
                 var productEntity = await _mainDatabase.Products.GetByIdAsync(updateProductModel.Id,
                     include: x => x.ProductUsages.Where(u => u.ReleaseDateTimeUtc == null));
@@ -83,17 +83,27 @@ public class ProductService : IProductService
                         "Product has more current active usages " +
                         "than provided in new value for MaxNumberOfSimultaneousUsages");
                 }
-
+                
                 productEntity.Name = updateProductModel.Name;
-                productEntity.MaxNumberOfSimultaneousUsages = updateProductModel.MaxNumberOfSimultaneousUsages;
+                _mainDatabase.Products.Update(productEntity, x => x.Name);
 
-                _mainDatabase.Products.Update(productEntity, x => x.Name, x => x.MaxNumberOfSimultaneousUsages);
-
+                if (productEntity.MaxNumberOfSimultaneousUsages != updateProductModel.MaxNumberOfSimultaneousUsages)
+                {
+                    productEntity.MaxNumberOfSimultaneousUsages = updateProductModel.MaxNumberOfSimultaneousUsages;
+                    _mainDatabase.Products.Update(productEntity, x => x.MaxNumberOfSimultaneousUsages);
+                }
+                
                 await _mainDatabase.CommitChangesAsync();
                 
                 return ServiceResult.Success();
             },
-            isolationLevel: IsolationLevel.RepeatableRead,
+            // default isolation level ReadCommitted is enough here because of Optimistic Concurrency
+            // is implemented for Product. So ExecuteInTransaction is used just for retry.
+            // Also inside ExecuteInTransaction there is possible to call CommitChanges multiple times
+            // (if it is required) and be sure that whole transaction will be rolled back if any CommitChanges
+            // throw exception because of Concurrency error.
+            //
+            // Without Optimistic Concurrency feature RepeatableRead (or Snapshot) isolation level should be passed here. 
             delayBetweenRetries: TimeSpan.FromMilliseconds(300));
 
         return result ?? ServiceResult.Error("Error occured during DB transaction executing");
