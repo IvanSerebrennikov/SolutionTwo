@@ -2,5 +2,5 @@
 
 public interface IVersionedEntity
 {
-    Guid Version { get; set; }
+    Guid ConcurrencyVersion { get; set; }
 }

@@ -17,11 +17,13 @@ public class OptimisticConcurrencyContextBehavior : IOptimisticConcurrencyContex
         {
             if (entry.State == EntityState.Deleted ||
                 (entry.State == EntityState.Modified && entry.Properties.Any(p =>
-                    p.IsModified && p.Metadata.PropertyInfo != null &&
-                    p.Metadata.PropertyInfo.GetCustomAttribute(typeof(VersionChangedOnUpdateAttribute)) != null)))
+                    p.IsModified && 
+                    p.Metadata.PropertyInfo != null &&
+                    p.Metadata.PropertyInfo
+                        .GetCustomAttribute(typeof(ConcurrencyVersionChangedOnUpdateAttribute)) != null)))
             {
-                entry.Entity.Version = Guid.NewGuid();
-                entry.Property(nameof(entry.Entity.Version)).IsModified = true;
+                entry.Entity.ConcurrencyVersion = Guid.NewGuid();
+                entry.Property(nameof(entry.Entity.ConcurrencyVersion)).IsModified = true;
             }
         }
     }

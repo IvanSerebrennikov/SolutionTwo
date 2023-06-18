@@ -22,7 +22,7 @@ public class ProductEntity :
     [MaxLength(256)]
     public string Name { get; set; } = null!;
 
-    [VersionChangedOnUpdate]
+    [ConcurrencyVersionChangedOnUpdate]
     public int MaxNumberOfSimultaneousUsages { get; set; }
 
     public DateTime CreatedDateTimeUtc { get; set; }
@@ -33,16 +33,16 @@ public class ProductEntity :
     
     public Guid? LastModifiedBy { get; set; }
     
-    [ConcurrencyCheck]
+    [ConcurrencyVersionChangedOnUpdate]
     [IgnoreAudit]
     public DateTime? DeletedDateTimeUtc { get; set; }
     
-    [ConcurrencyCheck]
+    [ConcurrencyVersionChangedOnUpdate]
     [IgnoreAudit]
     public Guid? DeletedBy { get; set; }
     
     [ConcurrencyCheck]
-    public Guid Version { get; set; }
+    public Guid ConcurrencyVersion { get; set; }
     
     public List<ProductUsageEntity> ProductUsages { get; set; } = new();
 }
