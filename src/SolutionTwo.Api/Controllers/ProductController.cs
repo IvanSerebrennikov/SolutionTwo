@@ -14,7 +14,7 @@ namespace SolutionTwo.Api.Controllers;
 
 // один юзер не может дважды заюзать один и тот же продукт. 
 // один продукт не может быть заюзан более чем определенным кол-вом юзеров (=определенное кол-во раз) одноврменно
-// которое указано в одном из свойств продукта (MaxNumberOfSimultaneousUsages)
+// которое указано в одном из свойств продукта (MaxActiveUsagesCount)
 
 // надо добавить какой-то параметр в базу/конфиг/синглтон сервис, который будет выставляться 
 // через колл на определенный ендпоинт через бейзик аус (с релиз пайплайна),
@@ -36,7 +36,7 @@ namespace SolutionTwo.Api.Controllers;
 // контроллер который будет содержать эти 3 новых ендпоинта кинуть в отдельную папку типо Internal, 
 // и _дев тестинг туда же перенести, норм переименовать и бейзик аус на него повесить. 
 
-// еще на примере этой фичи с продуктами и MaxNumberOfSimultaneousUsages 
+// еще на примере этой фичи с продуктами и MaxActiveUsagesCount 
 // можно будет поиграться в имплемент транзакций с 3+ изолейшен левелом 
 // тут скорее всего нужен будет 4 лвл, так как записи ProductUsage не только меняются, но и добавляются 
 
@@ -77,7 +77,7 @@ public class ProductController : ApiAuthorizedControllerBase
 
     /// <summary>
     /// Simulates some business flow that can be broken because of parallel user access.
-    /// For example Product has MaxNumberOfSimultaneousUsages = 3, so if current User want to use provided Product,
+    /// For example Product has MaxActiveUsagesCount = 3, so if current User want to use provided Product,
     /// but 3 other Users are already using it, current User should not pass ProductUsages checking and
     /// receive corresponding message.
     /// But if only 2 other Users are already using this Product, user should successfully pass ProductUsages
@@ -100,6 +100,11 @@ public class ProductController : ApiAuthorizedControllerBase
     [HttpPost("{id}/use")]
     public async Task<ActionResult> UseProduct(Guid id)
     {
+        var result = await _productService.UseProductAsync(id);
+
+        if (!result.IsSucceeded)
+            return BadRequest(result.Message);
+
         return Ok();
     }
     
@@ -107,6 +112,11 @@ public class ProductController : ApiAuthorizedControllerBase
     [HttpPost("{id}/release")]
     public async Task<ActionResult> ReleaseProduct(Guid id)
     {
+        var result = await _productService.ReleaseProductAsync(id);
+
+        if (!result.IsSucceeded)
+            return BadRequest(result.Message);
+
         return Ok();
     }
     
@@ -138,18 +148,18 @@ public class ProductController : ApiAuthorizedControllerBase
     
     [SolutionTwoAuthorize(UserRoles.TenantAdmin)]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductWithCurrentUsagesModel>>> GetAll()
+    public async Task<ActionResult<IEnumerable<ProductWithActiveUsagesModel>>> GetAll()
     {
-        var productModels = await _productService.GetAllProductsWithCurrentUsagesAsync();
+        var productModels = await _productService.GetAllProductsWithActiveUsagesAsync();
 
         return Ok(productModels);
     }
 
     [SolutionTwoAuthorize(UserRoles.TenantAdmin)]
     [HttpGet("{id}")]
-    public async Task<ActionResult<ProductWithCurrentUsagesModel>> GetById(Guid id)
+    public async Task<ActionResult<ProductWithActiveUsagesModel>> GetById(Guid id)
     {
-        var productModel = await _productService.GetProductWithCurrentUsagesByIdAsync(id);
+        var productModel = await _productService.GetProductWithActiveUsagesByIdAsync(id);
 
         if (productModel == null)
             return NotFound();

@@ -10,5 +10,5 @@ public class CreateProductModel
 
     [Required]
     [Range(1, int.MaxValue)]
-    public int MaxNumberOfSimultaneousUsages { get; set; }
+    public int MaxActiveUsagesCount { get; set; }
 }

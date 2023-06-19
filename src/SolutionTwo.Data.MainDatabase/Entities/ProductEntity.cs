@@ -13,7 +13,7 @@ public class ProductEntity :
     ISoftDeletableEntity, 
     IAuditableOnCreateEntity, 
     IAuditableOnUpdateEntity,
-    IVersionedEntity
+    IConcurrencyVersionedEntity
 {
     public Guid Id { get; set; }
     
@@ -22,8 +22,12 @@ public class ProductEntity :
     [MaxLength(256)]
     public string Name { get; set; } = null!;
 
-    [ConcurrencyVersionChangedOnUpdate]
-    public int MaxNumberOfSimultaneousUsages { get; set; }
+    [ChangeConcurrencyVersionOnUpdate]
+    public int MaxActiveUsagesCount { get; set; }
+
+    [ChangeConcurrencyVersionOnUpdate]
+    [IgnoreAudit]
+    public int CurrentActiveUsagesCount { get; set; }
 
     public DateTime CreatedDateTimeUtc { get; set; }
     
@@ -33,11 +37,11 @@ public class ProductEntity :
     
     public Guid? LastModifiedBy { get; set; }
     
-    [ConcurrencyVersionChangedOnUpdate]
+    [ChangeConcurrencyVersionOnUpdate]
     [IgnoreAudit]
     public DateTime? DeletedDateTimeUtc { get; set; }
     
-    [ConcurrencyVersionChangedOnUpdate]
+    [ChangeConcurrencyVersionOnUpdate]
     [IgnoreAudit]
     public Guid? DeletedBy { get; set; }
     

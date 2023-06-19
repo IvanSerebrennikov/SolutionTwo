@@ -16,7 +16,7 @@ namespace SolutionTwo.Data.MainDatabase.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    MaxNumberOfSimultaneousUsages = table.Column<int>(type: "int", nullable: false),
+                    MaxActiveUsagesCount = table.Column<int>(type: "int", nullable: false),
                     CreatedDateTimeUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LastModifiedDateTimeUtc = table.Column<DateTime>(type: "datetime2", nullable: true),

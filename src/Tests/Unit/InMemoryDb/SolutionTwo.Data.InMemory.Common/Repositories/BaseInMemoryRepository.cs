@@ -86,7 +86,7 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
         _entities.Add(entity);
     }
 
-    public void Update(TEntity entity, params Expression<Func<TEntity, object>>[] updatedProperties)
+    public void Update(TEntity entity, params Expression<Func<TEntity, object?>>[] updatedProperties)
     {
     }
 

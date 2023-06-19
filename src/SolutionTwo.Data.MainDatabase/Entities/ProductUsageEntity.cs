@@ -12,9 +12,9 @@ public class ProductUsageEntity : IIdentifiablyEntity<Guid>
 
     public DateTime UsageStartDateTimeUtc { get; set; }
 
-    public DateTime? ReleaseDateTimeUtc { get; set; }
+    public DateTime? ReleasedDateTimeUtc { get; set; }
 
-    public bool? IsForceRelease { get; set; }
+    public bool? IsForceReleased { get; set; }
     
     public ProductEntity? Product { get; set; }
 

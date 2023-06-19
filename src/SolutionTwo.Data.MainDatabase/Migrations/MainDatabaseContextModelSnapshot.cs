@@ -53,6 +53,9 @@ namespace SolutionTwo.Data.MainDatabase.Migrations
                     b.Property<DateTime>("CreatedDateTimeUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("CurrentActiveUsagesCount")
+                        .HasColumnType("int");
+
                     b.Property<Guid?>("DeletedBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -65,7 +68,7 @@ namespace SolutionTwo.Data.MainDatabase.Migrations
                     b.Property<DateTime?>("LastModifiedDateTimeUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("MaxNumberOfSimultaneousUsages")
+                    b.Property<int>("MaxActiveUsagesCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -87,13 +90,13 @@ namespace SolutionTwo.Data.MainDatabase.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("IsForceRelease")
+                    b.Property<bool?>("IsForceReleased")
                         .HasColumnType("bit");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("ReleaseDateTimeUtc")
+                    b.Property<DateTime?>("ReleasedDateTimeUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("UsageStartDateTimeUtc")

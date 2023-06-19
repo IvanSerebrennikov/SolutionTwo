@@ -13,14 +13,14 @@ public class OptimisticConcurrencyContextBehavior : IOptimisticConcurrencyContex
 
     public void BeforeSaveChanges(BaseDbContext context)
     {
-        foreach (var entry in context.ChangeTracker.Entries<IVersionedEntity>())
+        foreach (var entry in context.ChangeTracker.Entries<IConcurrencyVersionedEntity>())
         {
             if (entry.State == EntityState.Deleted ||
                 (entry.State == EntityState.Modified && entry.Properties.Any(p =>
                     p.IsModified && 
                     p.Metadata.PropertyInfo != null &&
                     p.Metadata.PropertyInfo
-                        .GetCustomAttribute(typeof(ConcurrencyVersionChangedOnUpdateAttribute)) != null)))
+                        .GetCustomAttribute(typeof(ChangeConcurrencyVersionOnUpdateAttribute)) != null)))
             {
                 entry.Entity.ConcurrencyVersion = Guid.NewGuid();
                 entry.Property(nameof(entry.Entity.ConcurrencyVersion)).IsModified = true;

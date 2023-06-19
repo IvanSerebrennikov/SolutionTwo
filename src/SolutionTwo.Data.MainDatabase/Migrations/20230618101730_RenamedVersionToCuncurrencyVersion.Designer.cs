@@ -67,7 +67,7 @@ namespace SolutionTwo.Data.MainDatabase.Migrations
                     b.Property<DateTime?>("LastModifiedDateTimeUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("MaxNumberOfSimultaneousUsages")
+                    b.Property<int>("MaxActiveUsagesCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")

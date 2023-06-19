@@ -6,11 +6,15 @@ namespace SolutionTwo.Business.Core.Services.Interfaces;
 
 public interface IProductService
 {
-    Task<ProductWithCurrentUsagesModel?> GetProductWithCurrentUsagesByIdAsync(Guid id);
+    Task<IServiceResult> UseProductAsync(Guid id);
     
-    Task<IReadOnlyList<ProductWithCurrentUsagesModel>> GetAllProductsWithCurrentUsagesAsync();
+    Task<IServiceResult> ReleaseProductAsync(Guid id);
     
-    Task<IServiceResult<ProductWithCurrentUsagesModel>> CreateProductAsync(CreateProductModel createProductModel);
+    Task<ProductWithActiveUsagesModel?> GetProductWithActiveUsagesByIdAsync(Guid id);
+    
+    Task<IReadOnlyList<ProductWithActiveUsagesModel>> GetAllProductsWithActiveUsagesAsync();
+    
+    Task<IServiceResult<ProductWithActiveUsagesModel>> CreateProductAsync(CreateProductModel createProductModel);
     
     Task<IServiceResult> UpdateProductAsync(UpdateProductModel updateProductModel);
 

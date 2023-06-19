@@ -73,7 +73,7 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         Context.Set<TEntity>().Add(entity);
     }
 
-    public void Update(TEntity entity, params Expression<Func<TEntity, object>>[] updatedProperties)
+    public void Update(TEntity entity, params Expression<Func<TEntity, object?>>[] updatedProperties)
     {
         var dbEntityEntry = Context.Entry(entity);
         if (updatedProperties.Any())

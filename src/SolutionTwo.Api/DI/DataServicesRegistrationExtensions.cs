@@ -52,6 +52,7 @@ public static class DataServicesRegistrationExtensions
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<ITenantRepository, TenantRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IProductUsageRepository, ProductUsageRepository>();
         
         services.AddScoped<IMainDatabase, MainDatabase>();
     }

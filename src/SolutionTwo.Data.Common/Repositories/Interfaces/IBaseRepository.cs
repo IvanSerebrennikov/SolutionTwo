@@ -41,7 +41,7 @@ public interface IBaseRepository<TEntity, TId>
     
     void Create(TEntity entity);
 
-    void Update(TEntity entity, params Expression<Func<TEntity, object>>[] updatedProperties);
+    void Update(TEntity entity, params Expression<Func<TEntity, object?>>[] updatedProperties);
 
     void Delete(TEntity entity);
 

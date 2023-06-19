@@ -15,6 +15,7 @@ public class MainDatabase : BaseUnitOfWork, IMainDatabase
         IRoleRepository roleRepository,
         IRefreshTokenRepository refreshTokenRepository,
         IProductRepository productRepository,
+        IProductUsageRepository productUsageRepository,
         ILogger<MainDatabase> logger) : base(context, logger)
     {
         Tenants = tenantRepository;
@@ -22,6 +23,7 @@ public class MainDatabase : BaseUnitOfWork, IMainDatabase
         Roles = roleRepository;
         RefreshTokens = refreshTokenRepository;
         Products = productRepository;
+        ProductUsages = productUsageRepository;
     }
 
     public ITenantRepository Tenants { get; }
@@ -33,4 +35,6 @@ public class MainDatabase : BaseUnitOfWork, IMainDatabase
     public IRefreshTokenRepository RefreshTokens { get; }
     
     public IProductRepository Products { get; }
+    
+    public IProductUsageRepository ProductUsages { get; }
 }

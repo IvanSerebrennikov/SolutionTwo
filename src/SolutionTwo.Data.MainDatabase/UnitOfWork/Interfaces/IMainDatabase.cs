@@ -14,4 +14,6 @@ public interface IMainDatabase : IBaseUnitOfWork
     IRefreshTokenRepository RefreshTokens { get; }
     
     IProductRepository Products { get; }
+    
+    IProductUsageRepository ProductUsages { get; }
 }

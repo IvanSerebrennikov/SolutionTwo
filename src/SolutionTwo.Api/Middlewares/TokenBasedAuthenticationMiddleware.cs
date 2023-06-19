@@ -60,7 +60,7 @@ public class TokenBasedAuthenticationMiddleware
         
         context.User = user;
 
-        SetLoggedInUserId(user, loggedInUserSetter);
+        SetLoggedInUser(user, loggedInUserSetter);
 
         await _next(context);
     }
@@ -112,7 +112,7 @@ public class TokenBasedAuthenticationMiddleware
         return verificationResult.Data;
     }
 
-    private void SetLoggedInUserId(ClaimsPrincipal user, ILoggedInUserSetter loggedInUserSetter)
+    private void SetLoggedInUser(ClaimsPrincipal user, ILoggedInUserSetter loggedInUserSetter)
     {
         var claimsValue = user.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
         if (!string.IsNullOrEmpty(claimsValue) && Guid.TryParse(claimsValue, out var userId))

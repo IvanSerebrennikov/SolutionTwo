@@ -51,7 +51,7 @@ public class IdentityServiceTests
     // TODO: VerifyAuthTokenAndGetPrincipal tests
     
     [Test]
-    public async Task RefreshTokensPairAsyncReturnsSuccessAndCreatesNewActiveTokensPairForUser()
+    public async Task RefreshTokensPairAsync_ReturnsSuccess_AndCreatesNewActiveTokensPairForUser()
     {
         var createTokensResult =
             await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
@@ -85,7 +85,7 @@ public class IdentityServiceTests
     }
 
     [Test]
-    public async Task RefreshTokensPairAsyncReturnsSuccessAndMarksProvidedActiveRefreshTokenAsUsed()
+    public async Task RefreshTokensPairAsync_ReturnsSuccess_AndMarksProvidedActiveRefreshTokenAsUsed()
     {
         var createTokensResult =
             await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
@@ -104,7 +104,7 @@ public class IdentityServiceTests
     }
     
     [Test]
-    public async Task RefreshTokensPairAsyncReturnsErrorWhenCalledTwiceForSameRefreshToken()
+    public async Task RefreshTokensPairAsync_ReturnsError_WhenCalledTwiceForSameRefreshToken()
     {
         var createTokensResult =
             await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
@@ -121,7 +121,7 @@ public class IdentityServiceTests
     }
 
     [Test]
-    public async Task RefreshTokensPairAsyncRevokesAllActiveTokensForUserWhenCalledTwiceForSameRefreshToken()
+    public async Task RefreshTokensPairAsync_RevokesAllActiveTokensForUser_WhenCalledTwiceForSameRefreshToken()
     {
         var createTokensResult1 =
             await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());
@@ -163,7 +163,7 @@ public class IdentityServiceTests
     }
 
     [Test]
-    public async Task RefreshTokensPairAsyncDoesNotRevokeNotActiveTokensForUserWhenCalledTwiceForSameRefreshToken()
+    public async Task RefreshTokensPairAsync_DoesNotRevokeNotActiveTokensForUser_WhenCalledTwiceForSameRefreshToken()
     {
         // provided
         var createTokensResult =
@@ -202,7 +202,7 @@ public class IdentityServiceTests
     }
     
     [Test]
-    public async Task RefreshTokensPairAsyncDoesNotRevokeActiveTokensForOtherUsersWhenCalledTwiceForSameRefreshToken()
+    public async Task RefreshTokensPairAsync_DoesNotRevokeActiveTokensForOtherUsers_WhenCalledTwiceForSameRefreshToken()
     {
         var createTokensResult =
             await _identityService.ValidateCredentialsAndCreateTokensPairAsync(_user1.GetCredentials());

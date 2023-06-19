@@ -2,13 +2,13 @@
 
 namespace SolutionTwo.Business.Core.Models.Product.Outgoing;
 
-public class ProductWithCurrentUsagesModel
+public class ProductWithActiveUsagesModel
 {
-    public ProductWithCurrentUsagesModel(ProductEntity productEntity)
+    public ProductWithActiveUsagesModel(ProductEntity productEntity)
     {
         Id = productEntity.Id;
         Name = productEntity.Name;
-        MaxNumberOfSimultaneousUsages = productEntity.MaxNumberOfSimultaneousUsages;
+        MaxActiveUsagesCount = productEntity.MaxActiveUsagesCount;
         CurrentUsages = productEntity.ProductUsages.Select(x => new ProductUsageModel(x)).ToList();
     }
     
@@ -16,7 +16,7 @@ public class ProductWithCurrentUsagesModel
     
     public string Name { get; set; }
 
-    public int MaxNumberOfSimultaneousUsages { get; set; }
+    public int MaxActiveUsagesCount { get; set; }
 
     public List<ProductUsageModel> CurrentUsages { get; set; }
 }

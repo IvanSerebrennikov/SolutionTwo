@@ -1,6 +1,6 @@
 ﻿namespace SolutionTwo.Data.Common.Features.OptimisticConcurrency;
 
 [AttributeUsage(AttributeTargets.Property)]
-public class ConcurrencyVersionChangedOnUpdateAttribute : Attribute
+public class ChangeConcurrencyVersionOnUpdateAttribute : Attribute
 {
 }

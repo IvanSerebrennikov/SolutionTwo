@@ -12,8 +12,8 @@ using SolutionTwo.Data.MainDatabase.Context;
 namespace SolutionTwo.Data.MainDatabase.Migrations
 {
     [DbContext(typeof(MainDatabaseContext))]
-    [Migration("20230618085316_AddedVersionToProduct")]
-    partial class AddedVersionToProduct
+    [Migration("20230619181415_SmallRenamingForProductUsage")]
+    partial class SmallRenamingForProductUsage
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -45,6 +45,10 @@ namespace SolutionTwo.Data.MainDatabase.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("ConcurrencyVersion")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -74,9 +78,6 @@ namespace SolutionTwo.Data.MainDatabase.Migrations
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("Version")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.ToTable("Products");
@@ -88,13 +89,13 @@ namespace SolutionTwo.Data.MainDatabase.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("IsForceRelease")
+                    b.Property<bool?>("IsForceReleased")
                         .HasColumnType("bit");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("ReleaseDateTimeUtc")
+                    b.Property<DateTime?>("ReleasedDateTimeUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("UsageStartDateTimeUtc")
