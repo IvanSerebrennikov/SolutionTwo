@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Common.MultiTenancy.Interfaces;
+﻿namespace SolutionTwo.Common.TenantAccessor.Interfaces;
 
 public interface ITenantAccessGetter
 {

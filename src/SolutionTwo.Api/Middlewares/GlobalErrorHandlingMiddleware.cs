@@ -1,12 +1,9 @@
-﻿using System.Net;
-using SolutionTwo.Api.Models;
+﻿using SolutionTwo.Api.Models;
 
 namespace SolutionTwo.Api.Middlewares;
 
 public class GlobalErrorHandlingMiddleware
 {
-    private const int InternalServerErrorStatusCode = (int)HttpStatusCode.InternalServerError;
-    
     private readonly RequestDelegate _next;
     
     private readonly ILogger<GlobalErrorHandlingMiddleware> _logger;
@@ -34,7 +31,7 @@ public class GlobalErrorHandlingMiddleware
         _logger.LogError(exception, "Exception has been caught by GlobalErrorHandlingMiddleware: {message}",
             exception.Message);
 
-        context.Response.StatusCode = InternalServerErrorStatusCode;
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
         var traceId = context.TraceIdentifier;
         var errorResponse = new ErrorResponse("Something went wrong.", traceId, exception.GetType().ToString());

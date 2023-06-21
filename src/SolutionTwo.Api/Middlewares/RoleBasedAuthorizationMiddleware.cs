@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using SolutionTwo.Api.Attributes;
 
@@ -7,8 +6,6 @@ namespace SolutionTwo.Api.Middlewares;
 
 public class RoleBasedAuthorizationMiddleware
 {
-    private const int ForbiddenStatusCode = (int)HttpStatusCode.Forbidden;
-    
     private readonly RequestDelegate _next;
 
     public RoleBasedAuthorizationMiddleware(RequestDelegate next)
@@ -27,7 +24,7 @@ public class RoleBasedAuthorizationMiddleware
         var authorized = roles.Any(x => context.User.IsInRole(x));
         if (!authorized)
         {
-            context.Response.StatusCode = ForbiddenStatusCode;
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
             return;
         }
 

@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
@@ -13,7 +12,6 @@ namespace SolutionTwo.Api.Middlewares;
 
 public class TokenBasedAuthenticationMiddleware
 {
-    private const int UnauthorizedStatusCode = (int)HttpStatusCode.Unauthorized;
     private const string AuthenticationScheme = JwtBearerDefaults.AuthenticationScheme;
     
     private readonly RequestDelegate _next;
@@ -54,7 +52,7 @@ public class TokenBasedAuthenticationMiddleware
 
         if (user == null)
         {
-            context.Response.StatusCode = UnauthorizedStatusCode;
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             return;
         }
         

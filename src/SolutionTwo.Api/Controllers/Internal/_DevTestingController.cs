@@ -5,7 +5,7 @@ using SolutionTwo.Business.Common.PasswordHasher.Interfaces;
 using SolutionTwo.Data.MainDatabase.Entities;
 using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
-namespace SolutionTwo.Api.Controllers;
+namespace SolutionTwo.Api.Controllers.Internal;
 
 [Tags("_DevTesting")] // for swagger
 [Route("api/[controller]")]

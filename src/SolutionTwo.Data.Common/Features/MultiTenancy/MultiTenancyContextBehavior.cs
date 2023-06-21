@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SolutionTwo.Common.MultiTenancy.Interfaces;
+using SolutionTwo.Common.TenantAccessor.Interfaces;
 using SolutionTwo.Data.Common.Context;
 using SolutionTwo.Data.Common.Extensions;
 

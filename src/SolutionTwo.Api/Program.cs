@@ -41,6 +41,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseMiddleware<GlobalErrorHandlingMiddleware>();
+app.UseMiddleware<MaintenanceStatusCheckingMiddleware>();
 app.UseMiddleware<TokenBasedAuthenticationMiddleware>();
 app.UseMiddleware<RoleBasedAuthorizationMiddleware>();
 app.UseMiddleware<TenantAccessSetupMiddleware>();

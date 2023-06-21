@@ -5,6 +5,7 @@ using SolutionTwo.Business.Common.Constants;
 using SolutionTwo.Business.Core.Models.Product.Incoming;
 using SolutionTwo.Business.Core.Models.Product.Outgoing;
 using SolutionTwo.Business.Core.Services.Interfaces;
+using SolutionTwo.Common.MaintenanceStatusAccessor.Enums;
 
 namespace SolutionTwo.Api.Controllers;
 
@@ -47,6 +48,8 @@ namespace SolutionTwo.Api.Controllers;
 
 // заодно скедулер для удаления старых рефреш токенов можно сделать за компанию
 
+// скедулер делать как таймер-бейсд ажур функцию
+
 // так же продукт сделать как IAuditableEntity и добавить для этого новый бехавиор контекста.
 // хотя нет, для продукта это не очень подойдет.
 // так как не хотелось бы чтобы аудит поля менялись при изменении CurrentNumberOfSimultaneousUsages.
@@ -62,6 +65,27 @@ namespace SolutionTwo.Api.Controllers;
 ///
 /// TODO: add more info about implementation (attribute, singleton service, middleware, scheduler)
 /// TODO: after implementation will be finished
+///
+/// Also simulates some business flow that can be broken because of parallel user access.
+/// For example Product has MaxActiveUsagesCount = 3, so if current User want to use provided Product,
+/// but 3 other Users are already using it, current User should not pass ProductUsages checking and
+/// receive corresponding message.
+/// But if only 2 other Users are already using this Product, user should successfully pass ProductUsages
+/// checking and new ProductUsage entry should be created for him. But if there will be 2 such requests in
+/// approximately the same moment, it can be possible if both 2 Users successfully pass ProductUsages checking and
+/// new ProductUsage entries will be created for both of them, and as result there will be 4 simultaneous usages
+/// for this product, that is incorrect.
+/// So need to handle this with DB transaction that will lock write access to ProductUsages table during
+/// ProductUsages checking and new ProductUsage entry creation.
+/// Because of there are new DB rows could be created, need to lock whole table and use Serializable isolation level,
+/// but it may significantly affects performance and API accessibility, so added some de-normalization with new
+/// column/property CurrentActiveUsagesCount to the ProductEntity and make it possible to use RepeatableRead or Snapshot
+/// isolation level that will lock only one row in Products table instead of full ProductUsages table lock.
+/// Also now with this de-normalization there is possible to use optimistic concurrency solution
+/// with ConcurrencyVersion column/property in ProductEntity instead of RepeatableRead/Snapshot transaction,
+/// and avoid any DB locks at all.
+/// Check SolutionTwo.Data.Common.Features.OptimisticConcurrency.OptimisticConcurrencyContextBehavior, it's usages
+/// and ProductService.UpdateProductAsync/UseProductAsync/ReleaseProduct methods to see how it works.
 /// </summary>
 [SolutionTwoAuthorize]
 [Route("api/[controller]")]
@@ -74,28 +98,8 @@ public class ProductController : ApiAuthorizedControllerBase
     {
         _productService = productService;
     }
-
-    /// <summary>
-    /// Simulates some business flow that can be broken because of parallel user access.
-    /// For example Product has MaxActiveUsagesCount = 3, so if current User want to use provided Product,
-    /// but 3 other Users are already using it, current User should not pass ProductUsages checking and
-    /// receive corresponding message.
-    /// But if only 2 other Users are already using this Product, user should successfully pass ProductUsages
-    /// checking and new ProductUsage entry should be created for him. But if there will be 2 such requests in
-    /// approximately the same moment, it can be possible if both 2 Users successfully pass ProductUsages checking and
-    /// new ProductUsage entries will be created for both of them, and as result there will be 4 simultaneous usages
-    /// for this product, that is incorrect.
-    /// So need to handle this with DB transaction that will lock write access to ProductUsages table during
-    /// ProductUsages checking and new ProductUsage entry creation.
-    ///
-    /// TODO: тут скорее всего придется делать 4 уровень изоляции на лок всей ProductUsages таблицы. Может подумать
-    /// TODO: над оптимизацией и сделать небольшую денормализацию и добавить еще в продукт св-во CurrentNumberOfSimultaneousUsages
-    /// TODO: и тогда можно будет делать 3 уровень изоляции просто локая ту строку что начала читаться в продукт таблице.
-    /// TODO: но тогда 3 уровень нужно будет делать еще и при релизе продукта, так как в один момент 2+ юзера могут захотеть
-    /// TODO: релизнуть один и тот же продукт.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    
+    [InaccessibleWhenMaintenanceStatus(MaintenanceStatus.LessThen2MinBeforeDeployment)]
     [SolutionTwoAuthorize(UserRoles.TenantAdmin, UserRoles.TenantUser)]
     [HttpPost("{id}/use")]
     public async Task<ActionResult> UseProduct(Guid id)

@@ -1,6 +1,6 @@
-﻿using SolutionTwo.Common.MultiTenancy.Interfaces;
+﻿using SolutionTwo.Common.TenantAccessor.Interfaces;
 
-namespace SolutionTwo.Common.MultiTenancy;
+namespace SolutionTwo.Common.TenantAccessor;
 
 public class TenantAccessor : ITenantAccessGetter, ITenantAccessSetter
 {

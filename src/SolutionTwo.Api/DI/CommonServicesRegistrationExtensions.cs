@@ -1,7 +1,9 @@
 ﻿using SolutionTwo.Common.LoggedInUserAccessor;
 using SolutionTwo.Common.LoggedInUserAccessor.Interfaces;
-using SolutionTwo.Common.MultiTenancy;
-using SolutionTwo.Common.MultiTenancy.Interfaces;
+using SolutionTwo.Common.MaintenanceStatusAccessor;
+using SolutionTwo.Common.MaintenanceStatusAccessor.Interfaces;
+using SolutionTwo.Common.TenantAccessor;
+using SolutionTwo.Common.TenantAccessor.Interfaces;
 
 namespace SolutionTwo.Api.DI;
 
@@ -28,5 +30,15 @@ public static class CommonServicesRegistrationExtensions
         services.AddScoped<ILoggedInUserSetter>(sp =>
             sp.GetService<LoggedInUserAccessor>() ??
             throw new InvalidOperationException($"{nameof(LoggedInUserAccessor)} isn't registered"));
+        
+        services.AddSingleton<MaintenanceStatusAccessor>();
+        
+        services.AddSingleton<IMaintenanceStatusGetter>(sp =>
+            sp.GetService<MaintenanceStatusAccessor>() ??
+            throw new InvalidOperationException($"{nameof(MaintenanceStatusAccessor)} isn't registered"));
+        
+        services.AddSingleton<IMaintenanceStatusSetter>(sp =>
+            sp.GetService<MaintenanceStatusAccessor>() ??
+            throw new InvalidOperationException($"{nameof(MaintenanceStatusAccessor)} isn't registered"));
     }
 }

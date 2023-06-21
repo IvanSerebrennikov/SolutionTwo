@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.Features;
 using SolutionTwo.Api.Attributes;
 using SolutionTwo.Business.Common.Constants;
 using SolutionTwo.Common.Constants;
-using SolutionTwo.Common.MultiTenancy.Interfaces;
+using SolutionTwo.Common.TenantAccessor.Interfaces;
 
 namespace SolutionTwo.Api.Middlewares;
 
