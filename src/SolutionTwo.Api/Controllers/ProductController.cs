@@ -9,6 +9,7 @@ using SolutionTwo.Common.MaintenanceStatusAccessor.Enums;
 
 namespace SolutionTwo.Api.Controllers;
 
+// TODO:
 // чекать ApplicationManagingController.CheckProductsThatAreCurrentlyInActiveUse
 // через какой-то интервал, в цикле или каким-то скедулинком/ретраем в пайплайне. 
 
