@@ -8,7 +8,7 @@ using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 namespace SolutionTwo.Api.Controllers.Internal;
 
 [Tags("_ApplicationSetUp")] // for swagger
-[Route("api/[controller]")]
+[Route("api/application-set-up")]
 [ApiController]
 public class ApplicationSetUpController : ApiControllerBase
 {
@@ -21,7 +21,7 @@ public class ApplicationSetUpController : ApiControllerBase
         _passwordHasher = passwordHasher;
     }
 
-    [HttpPost("CreateRoles")]
+    [HttpPost("create-roles")]
     public async Task<ActionResult<Guid>> CreateRoles()
     {
         var roles = new[]
@@ -57,7 +57,7 @@ public class ApplicationSetUpController : ApiControllerBase
         return Ok(created);
     }
     
-    [HttpPost("CreateSuperAdmin")]
+    [HttpPost("create-super-admin")]
     public async Task<ActionResult<Guid>> CreateSuperAdmin()
     {
         var roleEntity = await _mainDatabase.Roles.GetSingleAsync(x => x.Name == UserRoles.SuperAdmin);

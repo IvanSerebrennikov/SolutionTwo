@@ -9,37 +9,12 @@ using SolutionTwo.Common.MaintenanceStatusAccessor.Enums;
 
 namespace SolutionTwo.Api.Controllers;
 
-// пусть при юзе продукта создается запись в базе (ProductUsage)
-// с продукт айди, юзер айди (кто использует) и временем когда начал использовать 
-// а при релизе в эту запись еще добавится релизд дейт тайм 
-
-// один юзер не может дважды заюзать один и тот же продукт. 
-// один продукт не может быть заюзан более чем определенным кол-вом юзеров (=определенное кол-во раз) одноврменно
-// которое указано в одном из свойств продукта (MaxActiveUsagesCount)
-
-// надо добавить какой-то параметр в базу/конфиг/синглтон сервис, который будет выставляться 
-// через колл на определенный ендпоинт через бейзик аус (с релиз пайплайна),
-// плюс если можно добавить еще возможность бейзик ауса для сваггера чтобы можно было самому 
-// постучать на этот ендпоинт потестить. 
-// и если этот параметр выставлен, то продукт нельзя заюзать.
-// реализовать желательно через какой-то атрибут ([MustBeInaccessibleBeforeMaintenance])
-// который можно будет повесить на этот экшен и на любые подобные потом если надо будет,
-// и новый мидлвеа будет чекать этот атрибут, и если он есть, то через новый сервис лезть в
-// базу/конфиг/синглтон сервис и чекать этот параметр, и если он выствлен, то возвращать 
-// соответствующее сообщение и статус, что сейчас ничего нельзя юзать так как скоро будет обновление приложения.
-// проще и лучше с точки зрения перформанса будет сделать просто через синглтон сервис в апп проекте
-// (плюс значение автоматом обнулится после рестарта прилаги при деплое) 
-// но ендпоинт на отмену этого параметра лучше тоже на всякий добавить.
 // плюс добавить ендпоинт который так же с бейзик аусом с пайплайна будет чекать есть ли сейчас заюзаные но 
 // не зарелиженные продукты (мб с учетом времени когда был заюзан), и если есть, то не начинать деплой и снова
-// чекать через какой-то интервал, в цикле или каким-то скедулинком или ретраем. 
+// чекать через какой-то интервал, в цикле или каким-то скедулинком/ретраем в пайплайне. 
 
 // контроллер который будет содержать эти 3 новых ендпоинта кинуть в отдельную папку типо Internal, 
 // и _дев тестинг туда же перенести, норм переименовать и бейзик аус на него повесить. 
-
-// еще на примере этой фичи с продуктами и MaxActiveUsagesCount 
-// можно будет поиграться в имплемент транзакций с 3+ изолейшен левелом 
-// тут скорее всего нужен будет 4 лвл, так как записи ProductUsage не только меняются, но и добавляются 
 
 // на примере этого всего еще можно будет поиграться и сделать скедулер который будет релизить продукт юсейджи
 // которые уже слишком давно заюзаны но так и не зарелизелись (допустим потенциально такое могло произойти из-за
@@ -50,21 +25,20 @@ namespace SolutionTwo.Api.Controllers;
 
 // скедулер делать как таймер-бейсд ажур функцию
 
-// так же продукт сделать как IAuditableEntity и добавить для этого новый бехавиор контекста.
-// хотя нет, для продукта это не очень подойдет.
-// так как не хотелось бы чтобы аудит поля менялись при изменении CurrentNumberOfSimultaneousUsages.
-// можно добавить какой-то атрибут который бы можно было вешать на св-во и чтобы изменения этого св-ва
-// не трекалось аудитом (чекать в аудит бехейвиор)
-
 /// <summary>
 /// <see cref="UseProduct"/> and <see cref="ReleaseProduct"/> simulates some business flow
 /// where if one action executed, another also should be 100% executed in the nearest future (after 0-1-2-5-10 minutes).
 /// So it should be incorrect and can break business flow if start maintenance/deploy (stop Application)
 /// while the first action has already been executed by some users,
 /// but the associated second action has not yet been executed.
-///
-/// TODO: add more info about implementation (attribute, singleton service, middleware, scheduler)
-/// TODO: after implementation will be finished
+/// To prevent first action requesting before deployment - next components used:
+/// InaccessibleWhenMaintenanceStatusAttribute,
+/// MaintenanceStatusCheckingMiddleware,
+/// MaintenanceStatusAccessor,
+/// ApplicationManagingController.Set/ResetMaintenanceStatus methods (that should be called from Deploy pipeline)
+/// To prevent deployment if first action was requested by any users but related second wasn't - next components used:
+/// ApplicationManagingController.CheckProductsThatAreCurrentlyInActiveUse (that should be called from Deploy pipeline
+/// after ApplicationManagingController.SetMaintenanceStatus was called)
 ///
 /// Also simulates some business flow that can be broken because of parallel user access.
 /// For example Product has MaxActiveUsagesCount = 3, so if current User want to use provided Product,

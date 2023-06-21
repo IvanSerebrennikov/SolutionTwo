@@ -5,7 +5,7 @@ using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 namespace SolutionTwo.Api.Controllers.Internal;
 
 [Tags("__DevTesting")] // for swagger
-[Route("api/[controller]")]
+[Route("api/dev-testing")]
 [ApiController]
 public class DevTestingController : ApiControllerBase
 {
@@ -16,13 +16,13 @@ public class DevTestingController : ApiControllerBase
         _mainDatabase = mainDatabase;
     }
 
-    [HttpGet("TestOk")]
+    [HttpGet("test-ok")]
     public ActionResult TestOk()
     {
         return Ok();
     }
     
-    [HttpGet("TestError")]
+    [HttpGet("test-error")]
     public ActionResult TestError()
     {
         return BadRequest("test error message");
