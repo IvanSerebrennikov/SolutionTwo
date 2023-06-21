@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SolutionTwo.Api.Controllers.Base;
+using SolutionTwo.Business.Core.Models.Product.Outgoing;
 using SolutionTwo.Common.MaintenanceStatusAccessor.Enums;
 using SolutionTwo.Common.MaintenanceStatusAccessor.Interfaces;
+using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
 namespace SolutionTwo.Api.Controllers.Internal;
 
@@ -10,15 +12,18 @@ namespace SolutionTwo.Api.Controllers.Internal;
 [ApiController]
 public class ApplicationManagingController : ApiControllerBase
 {
+    private readonly IMainDatabase _mainDatabase;
     private readonly IMaintenanceStatusSetter _maintenanceStatusSetter;
     private readonly IMaintenanceStatusGetter _maintenanceStatusGetter;
 
     public ApplicationManagingController(
         IMaintenanceStatusSetter maintenanceStatusSetter, 
-        IMaintenanceStatusGetter maintenanceStatusGetter)
+        IMaintenanceStatusGetter maintenanceStatusGetter, 
+        IMainDatabase mainDatabase)
     {
         _maintenanceStatusSetter = maintenanceStatusSetter;
         _maintenanceStatusGetter = maintenanceStatusGetter;
+        _mainDatabase = mainDatabase;
     }
 
     [HttpPost("[action]")]
@@ -51,8 +56,12 @@ public class ApplicationManagingController : ApiControllerBase
     }
 
     [HttpGet("[action]")]
-    public ActionResult CheckProductsThatAreCurrentlyInActiveUse()
+    public async Task<ActionResult<IEnumerable<ProductWithActiveUsagesModel>>> CheckProductsThatAreCurrentlyInActiveUse()
     {
-        return Ok();
+        var productEntities = await _mainDatabase.Products.GetAsync(x => x.CurrentActiveUsagesCount > 0,
+            include: x => x.ProductUsages.Where(u => u.ReleasedDateTimeUtc == null));
+        var productModels = productEntities.Select(x => new ProductWithActiveUsagesModel(x)).ToList();
+        
+        return Ok(productModels);
     }
 }
