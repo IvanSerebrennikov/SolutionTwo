@@ -1,6 +1,7 @@
-﻿using SolutionTwo.Api.Exceptions;
+﻿using Microsoft.Extensions.Configuration;
+using SolutionTwo.Api.Exceptions;
 
-namespace SolutionTwo.Api.Extensions;
+namespace SolutionTwo.Common.Extensions;
 
 public static class ConfigurationExtensions
 {
@@ -8,6 +9,7 @@ public static class ConfigurationExtensions
     /// 
     /// </summary>
     /// <param name="configuration"></param>
+    /// <param name="withValidation"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     /// <exception cref="ConfigurationVerificationException">Throws if any property of T is null or empty</exception>

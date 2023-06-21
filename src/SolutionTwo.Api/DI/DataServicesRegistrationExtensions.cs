@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SolutionTwo.Api.Extensions;
+using SolutionTwo.Common.Extensions;
 using SolutionTwo.Data.Common.Configuration;
 using SolutionTwo.Data.Common.Features.Audit;
 using SolutionTwo.Data.Common.Features.MultiTenancy;

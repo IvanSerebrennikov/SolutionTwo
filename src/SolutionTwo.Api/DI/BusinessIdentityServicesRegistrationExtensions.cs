@@ -1,11 +1,11 @@
-﻿using SolutionTwo.Api.Extensions;
-using SolutionTwo.Business.Identity.Configuration;
+﻿using SolutionTwo.Business.Identity.Configuration;
 using SolutionTwo.Business.Identity.Services;
 using SolutionTwo.Business.Identity.Services.Interfaces;
 using SolutionTwo.Business.Identity.TokenProvider;
 using SolutionTwo.Business.Identity.TokenProvider.Interfaces;
 using SolutionTwo.Business.Identity.TokenStore;
 using SolutionTwo.Business.Identity.TokenStore.Interfaces;
+using SolutionTwo.Common.Extensions;
 
 namespace SolutionTwo.Api.DI;
 
