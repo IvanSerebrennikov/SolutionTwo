@@ -5,7 +5,7 @@ using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 namespace SolutionTwo.Api.Controllers.Internal;
 
 [Tags("__DevTesting")] // for swagger
-[Route("api/dev-testing")]
+[Route("api/[controller]")]
 [ApiController]
 public class DevTestingController : ApiControllerBase
 {
@@ -16,14 +16,20 @@ public class DevTestingController : ApiControllerBase
         _mainDatabase = mainDatabase;
     }
 
-    [HttpGet("test-ok")]
-    public ActionResult TestOk()
+    [HttpGet("[action]")]
+    public ActionResult GetOk()
     {
         return Ok();
     }
     
-    [HttpGet("test-error")]
-    public ActionResult TestError()
+    [HttpGet("[action]/{testMessage}")]
+    public ActionResult GetMessageUppercase(string testMessage)
+    {
+        return Ok($"Message: {testMessage.ToUpper()}");
+    }
+    
+    [HttpGet("[action]")]
+    public ActionResult GetError()
     {
         return BadRequest("test error message");
     }

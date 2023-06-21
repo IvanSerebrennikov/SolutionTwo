@@ -31,7 +31,7 @@ public class AuthController : ApiControllerBase
         return Ok(serviceResult.Data);
     }
 
-    [HttpPost("refresh-token")]
+    [HttpPost("[action]")]
     public async Task<ActionResult<TokensPairModel>> RefreshToken([FromBody] string refreshTokenValue)
     {
         if (string.IsNullOrEmpty(refreshTokenValue))

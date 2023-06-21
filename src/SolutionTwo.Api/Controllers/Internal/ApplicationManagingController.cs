@@ -6,7 +6,7 @@ using SolutionTwo.Common.MaintenanceStatusAccessor.Interfaces;
 namespace SolutionTwo.Api.Controllers.Internal;
 
 [Tags("_ApplicationManaging")] // for swagger
-[Route("api/application-managing")]
+[Route("api/[controller]")]
 [ApiController]
 public class ApplicationManagingController : ApiControllerBase
 {
@@ -21,7 +21,7 @@ public class ApplicationManagingController : ApiControllerBase
         _maintenanceStatusGetter = maintenanceStatusGetter;
     }
 
-    [HttpPost("set-maintenance-status")]
+    [HttpPost("[action]")]
     public ActionResult SetMaintenanceStatus([FromBody]MaintenanceStatus maintenanceStatus)
     {
         if (!Enum.IsDefined(typeof(MaintenanceStatus), maintenanceStatus))
@@ -38,7 +38,7 @@ public class ApplicationManagingController : ApiControllerBase
         return Ok($"New maintenance status: {newMaintenanceStatusString}");
     }
     
-    [HttpPost("reset-maintenance-status")]
+    [HttpPost("[action]")]
     public ActionResult ResetMaintenanceStatus()
     {
         _maintenanceStatusSetter.SetMaintenanceStatus(null);
@@ -50,7 +50,7 @@ public class ApplicationManagingController : ApiControllerBase
         return Ok($"New maintenance status: {newMaintenanceStatusString}");
     }
 
-    [HttpGet("check-products-that-are-currently-in-active-use")]
+    [HttpGet("[action]")]
     public ActionResult CheckProductsThatAreCurrentlyInActiveUse()
     {
         return Ok();

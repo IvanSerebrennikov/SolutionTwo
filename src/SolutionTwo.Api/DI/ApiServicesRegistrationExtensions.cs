@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.OpenApi.Models;
+using SolutionTwo.Api.Helpers;
 using SolutionTwo.Api.Models;
 
 namespace SolutionTwo.Api.DI;
@@ -9,7 +11,10 @@ public static class ApiServicesRegistrationExtensions
     public static void AddApiServices(this IServiceCollection services)
     {
         // Controllers
-        services.AddControllers();
+        services.AddControllers(options => 
+        {
+            options.Conventions.Add(new RouteTokenTransformerConvention(new DashedLowercaseParameterTransformer()));
+        });
         
         // Model state error (DataAnnotations validation error) response
         services.Configure<ApiBehaviorOptions>(o =>
