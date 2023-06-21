@@ -41,9 +41,6 @@ public static class DataServicesRegistrationExtensions
                 // Make sure that "Microsoft.EntityFrameworkCore" category is set to "None" 
                 // for all production logging providers
                 o.EnableSensitiveDataLogging();
-
-                // 'Update' repository method should be called to mark entity/properties as changed
-                o.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             }
         );
 

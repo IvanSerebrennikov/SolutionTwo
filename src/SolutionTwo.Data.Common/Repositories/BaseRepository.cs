@@ -13,6 +13,10 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
     protected BaseRepository(DbContext context)
     {
         Context = context;
+        
+        // 'Update' repository method should be called to mark entity/properties as changed
+        // or entity should be retrieved with .AsTracking() (withTracking = true)
+        context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 
     public async Task<TEntity?> GetByIdAsync(
