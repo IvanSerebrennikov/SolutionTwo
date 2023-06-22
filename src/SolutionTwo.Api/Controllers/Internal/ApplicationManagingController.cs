@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SolutionTwo.Api.Attributes;
 using SolutionTwo.Api.Controllers.Base;
 using SolutionTwo.Business.Core.Models.Product.Outgoing;
 using SolutionTwo.Common.MaintenanceStatusAccessor.Enums;
@@ -7,6 +8,7 @@ using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
 namespace SolutionTwo.Api.Controllers.Internal;
 
+[BasicAuthentication]
 [Tags("_ApplicationManaging")] // for swagger
 [Route("api/[controller]")]
 [ApiController]

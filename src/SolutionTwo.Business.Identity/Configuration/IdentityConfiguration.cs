@@ -2,13 +2,13 @@
 
 public class IdentityConfiguration
 {
-    public string? JwtKey { get; set; }
+    public string JwtKey { get; set; } = null!;
 
-    public int? JwtExpiresMinutes { get; set; }
+    public int JwtExpiresMinutes { get; set; }
 
-    public string? JwtIssuer { get; set; }
+    public string JwtIssuer { get; set; } = null!;
 
-    public string? JwtAudience { get; set; }
+    public string JwtAudience { get; set; } = null!;
     
-    public int? RefreshTokenExpiresDays { get; set; }
+    public int RefreshTokenExpiresDays { get; set; }
 }

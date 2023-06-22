@@ -31,7 +31,7 @@ public class JwtProvider : ITokenProvider
             issuer: _identityConfiguration.JwtIssuer,
             audience: _identityConfiguration.JwtAudience,
             claims: claimsList,
-            expires: DateTime.UtcNow.AddMinutes(_identityConfiguration.JwtExpiresMinutes!.Value),
+            expires: DateTime.UtcNow.AddMinutes(_identityConfiguration.JwtExpiresMinutes),
             notBefore: DateTime.UtcNow,
             signingCredentials: credentials);
         

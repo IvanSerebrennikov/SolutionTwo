@@ -14,15 +14,9 @@ public static class BusinessIdentityServicesRegistrationExtensions
     public static void AddBusinessIdentityServices(this IServiceCollection services, IConfiguration configuration)
     {
         var identityConfiguration = configuration.GetSection<IdentityConfiguration>();
-        var useHardCodedIdentity =
-            configuration.GetValue<bool?>($"{nameof(HardCodedIdentityConfiguration)}:UseHardCodedIdentity");
-        var hardCodedIdentityConfiguration =
-            configuration.GetSection<HardCodedIdentityConfiguration>(withValidation: useHardCodedIdentity == true);
         
         services.AddSingleton(identityConfiguration);
-        
-        services.AddSingleton(hardCodedIdentityConfiguration);
-        
+
         services.AddSingleton<ITokenProvider, JwtProvider>();
         
         services.AddSingleton<IDeactivatedTokenStore, DeactivatedTokenMemoryCacheStore>();

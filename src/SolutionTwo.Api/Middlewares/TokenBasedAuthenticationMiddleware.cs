@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using SolutionTwo.Api.Attributes;
+using SolutionTwo.Api.Configuration;
 using SolutionTwo.Business.Identity.Configuration;
 using SolutionTwo.Business.Identity.Services.Interfaces;
 using SolutionTwo.Common.Constants;

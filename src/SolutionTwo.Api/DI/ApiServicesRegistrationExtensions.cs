@@ -1,14 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.OpenApi.Models;
+using SolutionTwo.Api.Configuration;
 using SolutionTwo.Api.Helpers;
 using SolutionTwo.Api.Models;
+using SolutionTwo.Common.Extensions;
 
 namespace SolutionTwo.Api.DI;
 
 public static class ApiServicesRegistrationExtensions
 {
-    public static void AddApiServices(this IServiceCollection services)
+    public static void AddApiServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Controllers
         services.AddControllers(options => 
@@ -57,5 +59,17 @@ public static class ApiServicesRegistrationExtensions
                 }
             });
         });
+        
+        // Other
+        var useHardCodedIdentity =
+            configuration.GetValue<bool?>($"{nameof(HardCodedIdentityConfiguration)}:UseHardCodedIdentity");
+        var hardCodedIdentityConfiguration =
+            configuration.GetSection<HardCodedIdentityConfiguration>(withValidation: useHardCodedIdentity == true);
+        
+        services.AddSingleton(hardCodedIdentityConfiguration);
+        
+        var basicAuthenticationConfiguration = configuration.GetSection<BasicAuthenticationConfiguration>();
+        
+        services.AddSingleton(basicAuthenticationConfiguration);
     }
 }

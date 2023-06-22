@@ -9,7 +9,7 @@ builder.Services.AddMemoryCache();
 builder.Services.AddCommonServices();
 
 // Api DI
-builder.Services.AddApiServices();
+builder.Services.AddApiServices(builder.Configuration);
 
 // Business.Common DI
 builder.Services.AddBusinessCommonServices();
@@ -42,6 +42,7 @@ app.UseHttpsRedirection();
 
 app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 app.UseMiddleware<MaintenanceStatusCheckingMiddleware>();
+app.UseMiddleware<BasicAuthenticationMiddleware>();
 app.UseMiddleware<TokenBasedAuthenticationMiddleware>();
 app.UseMiddleware<RoleBasedAuthorizationMiddleware>();
 app.UseMiddleware<TenantAccessSetupMiddleware>();

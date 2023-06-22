@@ -1,4 +1,4 @@
-﻿namespace SolutionTwo.Business.Identity.Configuration;
+﻿namespace SolutionTwo.Api.Configuration;
 
 public class HardCodedIdentityConfiguration
 {

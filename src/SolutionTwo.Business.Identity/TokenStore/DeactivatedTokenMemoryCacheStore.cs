@@ -18,7 +18,7 @@ public class DeactivatedTokenMemoryCacheStore : IDeactivatedTokenStore
     public void DeactivateAuthToken(Guid authTokenId)
     {
         _memoryCache.Set(GetRevokedAuthTokenKey(authTokenId), 1,
-            TimeSpan.FromMinutes(_identityConfiguration.JwtExpiresMinutes!.Value));
+            TimeSpan.FromMinutes(_identityConfiguration.JwtExpiresMinutes));
     }
     
     public bool IsAuthTokenDeactivated(Guid authTokenId)

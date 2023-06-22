@@ -168,7 +168,7 @@ public class IdentityService : IIdentityService
             AuthTokenId = authTokenId,
             UserId = userId,
             CreatedDateTimeUtc = DateTime.UtcNow,
-            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(_identityConfiguration.RefreshTokenExpiresDays!.Value)
+            ExpiresDateTimeUtc = DateTime.UtcNow.AddDays(_identityConfiguration.RefreshTokenExpiresDays)
         };
 
         _mainDatabase.RefreshTokens.Create(refreshTokenEntity);

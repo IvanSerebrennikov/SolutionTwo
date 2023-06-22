@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SolutionTwo.Api.Attributes;
 using SolutionTwo.Api.Controllers.Base;
 using SolutionTwo.Business.Common.Constants;
 using SolutionTwo.Business.Common.PasswordHasher.Interfaces;
@@ -7,6 +8,7 @@ using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
 namespace SolutionTwo.Api.Controllers.Internal;
 
+[BasicAuthentication]
 [Tags("_ApplicationSetUp")] // for swagger
 [Route("api/[controller]")]
 [ApiController]
