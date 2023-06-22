@@ -31,6 +31,23 @@ public static class ApiServicesRegistrationExtensions
         });
         
         // Open Api (Swagger)
+        services.ConfigureSwagger();
+        
+        // Other
+        var useHardCodedIdentity =
+            configuration.GetValue<bool?>($"{nameof(HardCodedIdentityConfiguration)}:UseHardCodedIdentity");
+        var hardCodedIdentityConfiguration =
+            configuration.GetSection<HardCodedIdentityConfiguration>(withValidation: useHardCodedIdentity == true);
+        
+        services.AddSingleton(hardCodedIdentityConfiguration);
+        
+        var basicAuthenticationConfiguration = configuration.GetSection<BasicAuthenticationConfiguration>();
+        
+        services.AddSingleton(basicAuthenticationConfiguration);
+    }
+
+    private static void ConfigureSwagger(this IServiceCollection services)
+    {
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {
@@ -58,18 +75,29 @@ public static class ApiServicesRegistrationExtensions
                     new List<string>()
                 }
             });
+            
+            options.AddSecurityDefinition("Basic", new OpenApiSecurityScheme
+            {
+                Scheme = "Basic",
+                In = ParameterLocation.Header,
+                Name = "Authorization",
+                Description = "Basic Authentication with Base64(username:password)",
+                Type = SecuritySchemeType.Http
+            });
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Id = "Basic",
+                            Type = ReferenceType.SecurityScheme
+                        }
+                    },
+                    new List<string>()
+                }
+            });
         });
-        
-        // Other
-        var useHardCodedIdentity =
-            configuration.GetValue<bool?>($"{nameof(HardCodedIdentityConfiguration)}:UseHardCodedIdentity");
-        var hardCodedIdentityConfiguration =
-            configuration.GetSection<HardCodedIdentityConfiguration>(withValidation: useHardCodedIdentity == true);
-        
-        services.AddSingleton(hardCodedIdentityConfiguration);
-        
-        var basicAuthenticationConfiguration = configuration.GetSection<BasicAuthenticationConfiguration>();
-        
-        services.AddSingleton(basicAuthenticationConfiguration);
     }
 }

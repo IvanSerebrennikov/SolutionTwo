@@ -8,7 +8,7 @@ namespace SolutionTwo.Api.Middlewares;
 
 public class BasicAuthenticationMiddleware
 {
-    private const string AuthenticationHeaderKey = "BasicAuthentication";
+    private const string CustomAuthenticationHeaderKey = "BasicAuthentication";
     private const string AuthenticationScheme = "basic";
     
     private readonly RequestDelegate _next;
@@ -51,12 +51,17 @@ public class BasicAuthenticationMiddleware
 
     private bool IsAuthenticated(HttpContext context)
     {
-        var containsKey = context.Request.Headers.ContainsKey(AuthenticationHeaderKey);
-        if (!containsKey)
-            return false;
+        var authHeader = context.Request.Headers
+            .FirstOrDefault(x =>
+                string.Equals(x.Key, CustomAuthenticationHeaderKey, StringComparison.InvariantCultureIgnoreCase)).Value
+            .ToString();
         
-        var authHeader = context.Request.Headers.FirstOrDefault(x => x.Key == AuthenticationHeaderKey).Value.ToString();
-        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith(AuthenticationScheme))
+        if (string.IsNullOrWhiteSpace(authHeader))
+        {
+            authHeader = context.Request.Headers.Authorization;
+        }
+
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.ToLower().StartsWith(AuthenticationScheme.ToLower()))
             return false;
         
         var authSchemeWithSpace = $"{AuthenticationScheme} ";
@@ -65,7 +70,7 @@ public class BasicAuthenticationMiddleware
         if (string.IsNullOrEmpty(credentialsString))
             return false;
 
-        var credentials = Encoding.ASCII.GetString(Convert.FromBase64String(credentialsString)).Split(':');
+        var credentials = Encoding.UTF8.GetString(Convert.FromBase64String(credentialsString)).Split(':');
 
         return credentials.Length == 2 && 
                credentials[0] == _basicAuthenticationConfiguration.Username &&

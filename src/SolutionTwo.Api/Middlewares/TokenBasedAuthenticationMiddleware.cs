@@ -89,7 +89,7 @@ public class TokenBasedAuthenticationMiddleware
         string authHeader = context.Request.Headers.Authorization;
         var authSchemeWithSpace = $"{AuthenticationScheme} ";
 
-        if (authHeader == null || !authHeader.StartsWith(authSchemeWithSpace))
+        if (authHeader == null || !authHeader.ToLower().StartsWith(authSchemeWithSpace.ToLower()))
         {
             return null;
         }
