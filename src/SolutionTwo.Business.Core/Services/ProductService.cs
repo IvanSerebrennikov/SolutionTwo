@@ -104,13 +104,13 @@ public class ProductService : IProductService
                         "Product was not found");
                 }
 
-                if (productEntity.CurrentActiveUsagesCount == 0)
+                if (productEntity.ProductUsages.Count == 0)
                 {
                     return ServiceResult.Error(
                         "Product hasn't active usages for authorized User");
                 }
                 
-                if (productEntity.CurrentActiveUsagesCount > 1)
+                if (productEntity.ProductUsages.Count > 1)
                 {
                     throw new ApplicationException(
                         "Product can't have more than 1 active usage per User");

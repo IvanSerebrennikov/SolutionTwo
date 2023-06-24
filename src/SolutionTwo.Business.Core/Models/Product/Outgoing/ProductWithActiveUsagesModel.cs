@@ -9,6 +9,7 @@ public class ProductWithActiveUsagesModel
         Id = productEntity.Id;
         Name = productEntity.Name;
         MaxActiveUsagesCount = productEntity.MaxActiveUsagesCount;
+        CurrentActiveUsagesCount = productEntity.CurrentActiveUsagesCount;
         CurrentUsages = productEntity.ProductUsages.Select(x => new ProductUsageModel(x)).ToList();
     }
     
@@ -17,6 +18,8 @@ public class ProductWithActiveUsagesModel
     public string Name { get; set; }
 
     public int MaxActiveUsagesCount { get; set; }
+    
+    public int CurrentActiveUsagesCount { get; set; }
 
     public List<ProductUsageModel> CurrentUsages { get; set; }
 }

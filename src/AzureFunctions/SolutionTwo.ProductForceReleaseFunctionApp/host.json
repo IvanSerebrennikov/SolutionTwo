@@ -1,11 +1,30 @@
 {
-    "version": "2.0",
-    "logging": {
-        "applicationInsights": {
-            "samplingSettings": {
-                "isEnabled": true,
-                "excludedTypes": "Request"
-            }
-        }
+  "version": "2.0",
+  "logging": {
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Information",
+      "Microsoft": "Information",
+      "Microsoft.AspNetCore": "Warning",
+      "Microsoft.EntityFrameworkCore": "None"
+    },
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "excludedTypes": "Request"
+      }
+    },
+    "Debug": {
+      "LogLevel": {
+        "Microsoft.EntityFrameworkCore": "Debug"
+      }
+    },
+    "Console": {
+      "IncludeScopes": false,
+      "LogLevel": {
+        "Microsoft.EntityFrameworkCore.Database.Command": "Information",
+        "Microsoft.EntityFrameworkCore.Database.Transaction": "Debug"
+      }
     }
+  }
 }

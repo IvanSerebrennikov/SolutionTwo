@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMemoryCache();
 
-// Common MultiTenancy DI
+// Common DI
 builder.Services.AddCommonServices();
 
 // Api DI
