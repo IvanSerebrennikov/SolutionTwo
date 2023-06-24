@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
@@ -8,28 +9,32 @@ using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
 namespace SolutionTwo.ProductForceReleaseFunctionApp;
 
-public class ProductForceRelease
+public class ProductForceReleaseFunction
 {
     private readonly IMainDatabase _mainDatabase;
     private readonly DateTime _minUsageStartDateTimeUtc;
     
-    public ProductForceRelease(ITenantAccessSetter tenantAccessSetter, IMainDatabase mainDatabase)
+    public ProductForceReleaseFunction(ITenantAccessSetter tenantAccessSetter, IMainDatabase mainDatabase)
     {
         tenantAccessSetter.SetAccessToAllTenants();
         _mainDatabase = mainDatabase;
-        _minUsageStartDateTimeUtc = DateTime.UtcNow.AddMinutes(-20);
+        _minUsageStartDateTimeUtc = DateTime.UtcNow.AddMinutes(-1);
     }
 
-    [FunctionName("ProductForceRelease")]
+    [FunctionName("ProductForceReleaseFunction")]
     public async Task RunAsync([TimerTrigger("0 * * * * *")] TimerInfo myTimer, ILogger log)
     {
         log.LogInformation($"C# ProductForceRelease Timer trigger function execution started at: {DateTime.UtcNow}");
 
         try
         {
-            var releasedProductsCount = await ReleaseProductsAsync();
-            
-            log.LogInformation("Released products count: {count}", releasedProductsCount);
+            await foreach (var releasedProductId in ReleaseProductsAsync())
+            {
+                if (releasedProductId != null)
+                {
+                    log.LogInformation("Released product: {id}", releasedProductId);
+                }
+            }
         }
         catch (Exception e)
         {
@@ -39,28 +44,21 @@ public class ProductForceRelease
         log.LogInformation($"C# ProductForceRelease Timer trigger function execution finished at: {DateTime.UtcNow}");
     }
 
-    private async Task<int> ReleaseProductsAsync()
+    private async IAsyncEnumerable<Guid?> ReleaseProductsAsync()
     {
         var productsToReleasePreliminaryList = await _mainDatabase.Products.GetAsync(x =>
             x.ProductUsages.Any(u =>
                 u.ReleasedDateTimeUtc == null && u.UsageStartDateTimeUtc < _minUsageStartDateTimeUtc));
 
-        var releasedProductsCount = 0;
-        
         foreach (var productToRelease in productsToReleasePreliminaryList)
         {
-            var released = await ReleaseProductAsync(productToRelease.Id);
-
-            if (released)
-                releasedProductsCount++;
+            yield return await ReleaseProductAsync(productToRelease.Id);
         }
-
-        return releasedProductsCount;
     }
 
-    private async Task<bool> ReleaseProductAsync(Guid productId)
+    private async Task<Guid?> ReleaseProductAsync(Guid productId)
     {
-        var result = await _mainDatabase.ExecuteInTransactionWithRetryAsync(async () =>
+        var result = await _mainDatabase.ExecuteInTransactionWithRetryAsync<Guid?>(async () =>
             {
                 var productEntity = await _mainDatabase.Products.GetByIdAsync(productId,
                     include: x =>
@@ -70,12 +68,12 @@ public class ProductForceRelease
                 
                 if (productEntity == null)
                 {
-                    return false;
+                    return null;
                 }
 
                 if (productEntity.ProductUsages.Count == 0)
                 {
-                    return false;
+                    return null;
                 }
 
                 foreach (var usageEntity in productEntity.ProductUsages)
@@ -91,7 +89,7 @@ public class ProductForceRelease
                 
                 await _mainDatabase.CommitChangesAsync();
                 
-                return true;
+                return productEntity.Id;
             },
             // default isolation level ReadCommitted is enough here because of Optimistic Concurrency
             delayBetweenRetries: TimeSpan.FromMilliseconds(300));

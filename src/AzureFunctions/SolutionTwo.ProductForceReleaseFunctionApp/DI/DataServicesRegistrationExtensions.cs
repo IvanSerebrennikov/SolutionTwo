@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SolutionTwo.Common.Extensions;
 using SolutionTwo.Data.Common.Configuration;
 using SolutionTwo.Data.Common.Features.Audit;
@@ -35,6 +36,13 @@ public static class DataServicesRegistrationExtensions
             {
                 o.UseSqlServer(connectionStrings.MainDatabaseConnection!);
 
+                o.UseLoggerFactory(LoggerFactory.Create(builder =>
+                    {
+                        builder.AddDebug();
+                        builder.AddConsole();
+                    }
+                ));
+                
                 // Make sure that "Microsoft.EntityFrameworkCore" category is set to "None" 
                 // for all production logging providers
                 o.EnableSensitiveDataLogging();
