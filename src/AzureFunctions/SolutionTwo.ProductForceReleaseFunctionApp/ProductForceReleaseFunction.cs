@@ -18,7 +18,7 @@ public class ProductForceReleaseFunction
     {
         tenantAccessSetter.SetAccessToAllTenants();
         _mainDatabase = mainDatabase;
-        _minUsageStartDateTimeUtc = DateTime.UtcNow.AddMinutes(-1);
+        _minUsageStartDateTimeUtc = DateTime.UtcNow.AddMinutes(-20);
     }
 
     [FunctionName("ProductForceReleaseFunction")]
