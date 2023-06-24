@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.Business.MultiT
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InMemoryDb", "InMemoryDb", "{7DBA6C01-009E-458A-8B5F-163200125B6E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzureFunctions", "AzureFunctions", "{B23C994F-477B-4D6F-A207-4F7F94E8425F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -8,11 +8,6 @@ namespace SolutionTwo.Data.MainDatabase.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "MaxNumberOfSimultaneousUsages",
-                table: "Products",
-                newName: "MaxActiveUsagesCount");
-
             migrationBuilder.AddColumn<int>(
                 name: "CurrentActiveUsagesCount",
                 table: "Products",
@@ -26,11 +21,6 @@ namespace SolutionTwo.Data.MainDatabase.Migrations
             migrationBuilder.DropColumn(
                 name: "CurrentActiveUsagesCount",
                 table: "Products");
-
-            migrationBuilder.RenameColumn(
-                name: "MaxActiveUsagesCount",
-                table: "Products",
-                newName: "MaxNumberOfSimultaneousUsages");
         }
     }
 }
