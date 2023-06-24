@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InMemoryDb", "InMemoryDb", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzureFunctions", "AzureFunctions", "{B23C994F-477B-4D6F-A207-4F7F94E8425F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.ProductForceReleaseFunctionApp", "AzureFunctions\SolutionTwo.ProductForceReleaseFunctionApp\SolutionTwo.ProductForceReleaseFunctionApp.csproj", "{31B17E9D-42DC-4E7E-8978-30E59F60E93E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,10 @@ Global
 		{3AA278DB-32C1-41E8-BEF5-247CC08D69C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AA278DB-32C1-41E8-BEF5-247CC08D69C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AA278DB-32C1-41E8-BEF5-247CC08D69C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31B17E9D-42DC-4E7E-8978-30E59F60E93E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31B17E9D-42DC-4E7E-8978-30E59F60E93E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31B17E9D-42DC-4E7E-8978-30E59F60E93E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31B17E9D-42DC-4E7E-8978-30E59F60E93E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{2E4C39F0-142B-461A-9FB0-42A3800F9BAE} = {C3814B18-592C-448A-A732-4BD75B581390}
@@ -87,5 +93,6 @@ Global
 		{7DBA6C01-009E-458A-8B5F-163200125B6E} = {2E4C39F0-142B-461A-9FB0-42A3800F9BAE}
 		{6E7AA595-14E6-4E9A-BEDA-C6EE345EA1CA} = {7DBA6C01-009E-458A-8B5F-163200125B6E}
 		{A0E8CC04-E549-44F3-AD97-F1F042AA299F} = {7DBA6C01-009E-458A-8B5F-163200125B6E}
+		{31B17E9D-42DC-4E7E-8978-30E59F60E93E} = {B23C994F-477B-4D6F-A207-4F7F94E8425F}
 	EndGlobalSection
 EndGlobal
