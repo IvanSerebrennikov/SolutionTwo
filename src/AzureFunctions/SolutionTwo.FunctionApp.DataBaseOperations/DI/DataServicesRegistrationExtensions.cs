@@ -14,7 +14,7 @@ using SolutionTwo.Data.MainDatabase.Repositories.Interfaces;
 using SolutionTwo.Data.MainDatabase.UnitOfWork;
 using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
-namespace SolutionTwo.ProductForceReleaseFunctionApp.DI;
+namespace SolutionTwo.FunctionApp.DataBaseOperations.DI;
 
 public static class DataServicesRegistrationExtensions
 {

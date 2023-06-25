@@ -85,11 +85,11 @@
    - ...
 
 ### Maintenance
- - [ ] Azure timer-based function to remove expired refresh tokens 
+ - [x] Azure timer-based function to remove expired refresh tokens 
    - ...
  - [x] Azure timer-based function to handle some business logic 
    - ...
- - [ ] Ability to denay access to some end-points some time before/after deployment/maintenance
+ - [ ] Ability to deny access to some end-points some time before/after deployment/maintenance
    - ...
 
 ## Some helpers

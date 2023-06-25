@@ -30,7 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InMemoryDb", "InMemoryDb", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzureFunctions", "AzureFunctions", "{B23C994F-477B-4D6F-A207-4F7F94E8425F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.ProductForceReleaseFunctionApp", "AzureFunctions\SolutionTwo.ProductForceReleaseFunctionApp\SolutionTwo.ProductForceReleaseFunctionApp.csproj", "{31B17E9D-42DC-4E7E-8978-30E59F60E93E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionTwo.FunctionApp.DataBaseOperations", "AzureFunctions\SolutionTwo.FunctionApp.DataBaseOperations\SolutionTwo.FunctionApp.DataBaseOperations.csproj", "{31B17E9D-42DC-4E7E-8978-30E59F60E93E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

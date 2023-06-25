@@ -7,23 +7,23 @@ namespace SolutionTwo.Data.Common.UnitOfWork;
 
 public class BaseUnitOfWork : IBaseUnitOfWork
 {
-    private readonly DbContext _context;
+    protected readonly DbContext Context;
     private readonly ILogger _logger;
 
     protected BaseUnitOfWork(DbContext context, ILogger logger)
     {
-        _context = context;
+        Context = context;
         _logger = logger;
     }
     
     public async Task CommitChangesAsync()
     {
-        await _context.SaveChangesAsync();
+        await Context.SaveChangesAsync();
     }
 
     public void CommitChanges()
     {
-        _context.SaveChanges();
+        Context.SaveChanges();
     }
     
     public TResult? ExecuteInTransactionWithRetry<TResult>(
@@ -39,7 +39,7 @@ public class BaseUnitOfWork : IBaseUnitOfWork
         
         while (!success && attempt <= maxRetryCount)
         {
-            using var transaction = _context.Database.BeginTransaction(isolationLevel);
+            using var transaction = Context.Database.BeginTransaction(isolationLevel);
             
             try
             {
@@ -62,7 +62,7 @@ public class BaseUnitOfWork : IBaseUnitOfWork
                 if (attempt == maxRetryCount)
                     throw;
                 
-                _context.ChangeTracker.Clear();
+                Context.ChangeTracker.Clear();
 
                 if (delayBetweenRetries != default)
                     Thread.Sleep(delayBetweenRetries);
@@ -87,7 +87,7 @@ public class BaseUnitOfWork : IBaseUnitOfWork
         
         while (!success && attempt <= maxRetryCount)
         {
-            await using var transaction = await _context.Database.BeginTransactionAsync(isolationLevel);
+            await using var transaction = await Context.Database.BeginTransactionAsync(isolationLevel);
             
             try
             {
@@ -110,7 +110,7 @@ public class BaseUnitOfWork : IBaseUnitOfWork
                 if (attempt == maxRetryCount)
                     throw;
                 
-                _context.ChangeTracker.Clear();
+                Context.ChangeTracker.Clear();
                 
                 if (delayBetweenRetries != default)
                     await Task.Delay(delayBetweenRetries);
@@ -120,5 +120,10 @@ public class BaseUnitOfWork : IBaseUnitOfWork
         }
 
         return result;
+    }
+
+    public async Task<int> ExecuteSqlRawAsync(string rawSql, params object[] parameters)
+    {
+        return await Context.Database.ExecuteSqlRawAsync(rawSql, parameters);
     }
 }

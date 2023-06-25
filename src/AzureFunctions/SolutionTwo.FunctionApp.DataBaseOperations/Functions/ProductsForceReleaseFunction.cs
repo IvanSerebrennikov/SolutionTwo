@@ -7,24 +7,25 @@ using Microsoft.Extensions.Logging;
 using SolutionTwo.Common.TenantAccessor.Interfaces;
 using SolutionTwo.Data.MainDatabase.UnitOfWork.Interfaces;
 
-namespace SolutionTwo.ProductForceReleaseFunctionApp;
+namespace SolutionTwo.FunctionApp.DataBaseOperations.Functions;
 
-public class ProductForceReleaseFunction
+public class ProductsForceReleaseFunction
 {
     private readonly IMainDatabase _mainDatabase;
     private readonly DateTime _minUsageStartDateTimeUtc;
     
-    public ProductForceReleaseFunction(ITenantAccessSetter tenantAccessSetter, IMainDatabase mainDatabase)
+    public ProductsForceReleaseFunction(ITenantAccessSetter tenantAccessSetter, IMainDatabase mainDatabase)
     {
         tenantAccessSetter.SetAccessToAllTenants();
         _mainDatabase = mainDatabase;
         _minUsageStartDateTimeUtc = DateTime.UtcNow.AddMinutes(-20);
     }
 
-    [FunctionName("ProductForceReleaseFunction")]
+    // every minute
+    [FunctionName("ProductsForceReleaseFunction")]
     public async Task RunAsync([TimerTrigger("0 * * * * *")] TimerInfo myTimer, ILogger log)
     {
-        log.LogInformation($"C# ProductForceRelease Timer trigger function execution started at: {DateTime.UtcNow}");
+        log.LogInformation($"C# ProductsForceRelease Timer trigger function execution started at: {DateTime.UtcNow}");
 
         try
         {
@@ -41,14 +42,15 @@ public class ProductForceReleaseFunction
             log.LogError(e, "Exception occured during products releasing");
         }
 
-        log.LogInformation($"C# ProductForceRelease Timer trigger function execution finished at: {DateTime.UtcNow}");
+        log.LogInformation($"C# ProductsForceRelease Timer trigger function execution finished at: {DateTime.UtcNow}");
     }
 
     private async IAsyncEnumerable<Guid?> ReleaseProductsAsync()
     {
         var productsToReleasePreliminaryList = await _mainDatabase.Products.GetAsync(x =>
             x.ProductUsages.Any(u =>
-                u.ReleasedDateTimeUtc == null && u.UsageStartDateTimeUtc < _minUsageStartDateTimeUtc));
+                u.ReleasedDateTimeUtc == null && 
+                u.UsageStartDateTimeUtc < _minUsageStartDateTimeUtc));
 
         foreach (var productToRelease in productsToReleasePreliminaryList)
         {

@@ -7,7 +7,7 @@ using SolutionTwo.Common.MaintenanceStatusAccessor.Interfaces;
 using SolutionTwo.Common.TenantAccessor;
 using SolutionTwo.Common.TenantAccessor.Interfaces;
 
-namespace SolutionTwo.ProductForceReleaseFunctionApp.DI;
+namespace SolutionTwo.FunctionApp.DataBaseOperations.DI;
 
 public static class CommonServicesRegistrationExtensions
 {

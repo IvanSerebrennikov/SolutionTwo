@@ -1,8 +1,8 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using SolutionTwo.ProductForceReleaseFunctionApp.DI;
+using SolutionTwo.FunctionApp.DataBaseOperations.DI;
 
-[assembly: FunctionsStartup(typeof(SolutionTwo.ProductForceReleaseFunctionApp.Startup))]
-namespace SolutionTwo.ProductForceReleaseFunctionApp;
+[assembly: FunctionsStartup(typeof(SolutionTwo.FunctionApp.DataBaseOperations.Startup))]
+namespace SolutionTwo.FunctionApp.DataBaseOperations;
 
 public class Startup : FunctionsStartup
 {

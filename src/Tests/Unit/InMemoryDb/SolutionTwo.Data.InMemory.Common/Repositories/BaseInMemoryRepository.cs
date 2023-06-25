@@ -19,7 +19,7 @@ namespace SolutionTwo.Data.InMemory.Common;
 public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
     where TEntity : class, IIdentifiablyEntity<TId>
 {
-    private readonly HashSet<TEntity> _entities = new(new IdentifiablyEntityComparer<TId>());
+    protected readonly HashSet<TEntity> Entities = new(new IdentifiablyEntityComparer<TId>());
 
     public async Task<TEntity?> GetByIdAsync(
         TId id, 
@@ -83,7 +83,7 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
 
     public void Create(TEntity entity)
     {
-        _entities.Add(entity);
+        Entities.Add(entity);
     }
 
     public void Update(TEntity entity, params Expression<Func<TEntity, object?>>[] updatedProperties)
@@ -92,7 +92,7 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
 
     public void Delete(TEntity entity)
     {
-        _entities.Remove(entity);
+        Entities.Remove(entity);
     }
 
     public async Task DeleteAsync(TId id)
@@ -111,7 +111,7 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
         int? take = null,
         bool withTracking = false)
     {
-        IEnumerable<TEntity> query = _entities;
+        IEnumerable<TEntity> query = Entities;
 
         if (filter != null) query = query.Where(filter.Compile());
 

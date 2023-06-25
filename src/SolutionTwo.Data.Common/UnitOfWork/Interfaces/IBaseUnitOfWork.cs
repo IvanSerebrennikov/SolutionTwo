@@ -19,4 +19,6 @@ public interface IBaseUnitOfWork
         IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
         int maxRetryCount = 3,
         TimeSpan delayBetweenRetries = default);
+
+    Task<int> ExecuteSqlRawAsync(string rawSql, params object[] parameters);
 }
