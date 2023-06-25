@@ -9,22 +9,6 @@ using SolutionTwo.Common.MaintenanceStatusAccessor.Enums;
 
 namespace SolutionTwo.Api.Controllers;
 
-// TODO:
-// чекать ApplicationManagingController.CheckProductsThatAreCurrentlyInActiveUse
-// через какой-то интервал, в цикле или каким-то скедулинком/ретраем в пайплайне. 
-
-// добавить бейзик аус (мидлвеа, атрибут и так далее) для всех Internal контроллеров
-// и сконфигурить так же сваггер чтобы бейзик можно было
-
-// на примере этого всего еще можно будет поиграться и сделать скедулер который будет релизить продукт юсейджи
-// которые уже слишком давно заюзаны но так и не зарелизелись (допустим потенциально такое могло произойти из-за
-// косяка самого юзера, стороннего сервиса, UI приложения, etc).
-// но при релизе скедулером пусть еще проставляется параметр типо IsForceRelease = true
-
-// заодно скедулер для удаления старых рефреш токенов можно сделать за компанию
-
-// скедулер делать как таймер-бейсд ажур функцию
-
 /// <summary>
 /// <see cref="UseProduct"/> and <see cref="ReleaseProduct"/> simulates some business flow
 /// where if one action executed, another also should be 100% executed in the nearest future (after 0-1-2-5-10 minutes).

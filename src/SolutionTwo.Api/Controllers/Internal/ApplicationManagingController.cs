@@ -57,6 +57,10 @@ public class ApplicationManagingController : ApiControllerBase
         return Ok($"New maintenance status: {newMaintenanceStatusString}");
     }
 
+    // TODO:
+    // чекать ApplicationManagingController.CheckProductsThatAreCurrentlyInActiveUse в деплой пайплайне
+    // через какой-то интервал, в цикле или каким-то скедулинком/ретраем 
+    
     [HttpGet("[action]")]
     public async Task<ActionResult<IEnumerable<ProductWithActiveUsagesModel>>> CheckProductsThatAreCurrentlyInActiveUse()
     {
