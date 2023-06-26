@@ -46,5 +46,5 @@ jobs:
     displayName: 'Run Unit Tests'
     inputs:
       command: test
-      projects: 'src/Tests/Unit/*.csproj'
+      projects: 'src/Tests/Unit/**/*.csproj'
       arguments: '--configuration Release'
