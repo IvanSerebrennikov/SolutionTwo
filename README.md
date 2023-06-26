@@ -4,7 +4,7 @@
 
 ### Base Generic Repository
  - [x] Maximum flexibility (projection, filter, orderBy, includeMany, include, skip, take, withTracking)
- - [x] No Tracking by default
+ - [x] without tracking by default (AsNoTrackingWithIdentityResolution)
  - [x] No SaveChanges
  - [x] Update with possibility to set IsModified only to provided properties
  - [x] Async
@@ -30,21 +30,21 @@
 
  - [x] Audit
    - retrieve logged in user info with injected by DI ILoggedInUserGetter
-   - BeforeSaveChanges: automatically set CreatedBy and CreatedDateTimeUtc properties for entities that implement IAuditableOnCreateEntity iterface
-   - BeforeSaveChanges: automatically set LastModifiedBy and LastModifiedDateTimeUtc properties for entities that implement IAuditableOnUpdateEntity iterface
+   - BeforeSaveChanges: automatically set CreatedBy and CreatedDateTimeUtc properties for entities that implement IAuditableOnCreateEntity interface
+   - BeforeSaveChanges: automatically set LastModifiedBy and LastModifiedDateTimeUtc properties for entities that implement IAuditableOnUpdateEntity interface
    - BeforeSaveChanges: do not set audit properties if all modified properties marked by [IgnoreAudit] attribute
  - [x] Multi Tenancy
    - retrieve tenant info (TenantId or AllTenantsAccessible) with injected by DI ITenantAccessGetter
    - AddGlobalQueryFilter: additionally filter all queries by user's TenantId for all entities that implement IOwnedByTenantEntity interface if not AllTenantsAccessible 
-   - BeforeSaveChanges: automatically set TenantId property for entities that implement IOwnedByTenantEntity iterface if not AllTenantsAccessible 
+   - BeforeSaveChanges: automatically set TenantId property for entities that implement IOwnedByTenantEntity interface if not AllTenantsAccessible 
  - [x] Optimistic Concurrency
-   - BeforeSaveChanges: automatically set ConcurrencyVersion property for entities that implement IConcurrencyVersionedEntity iterface if any of modified properties marked by [ChangeConcurrencyVersionOnUpdate] attribute
+   - BeforeSaveChanges: automatically set ConcurrencyVersion property for entities that implement IConcurrencyVersionedEntity interface if any of modified properties marked by [ChangeConcurrencyVersionOnUpdate] attribute
    - realized from IConcurrencyVersionedEntity interface ConcurrencyVersion property should be marked by data annotation [ConcurrencyCheck] attribute
    - this solution is alternative concurrency handling solution and better from performance and application accessibility point of view then RepeatableRead transactions 
  - [x] Soft Deletion
    - retrieve logged in user info with injected by DI ILoggedInUserGetter
    - AddGlobalQueryFilter: additionally filter all queries by DeletedDateTimeUtc for all entities that implement ISoftDeletableEntity interface
-   - BeforeSaveChanges: automatically set DeletedBy and DeletedDateTimeUtc properties for entities that implement ISoftDeletableEntity iterface
+   - BeforeSaveChanges: automatically set DeletedBy and DeletedDateTimeUtc properties for entities that implement ISoftDeletableEntity interface
 
 ## API related features
 

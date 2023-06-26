@@ -10,13 +10,13 @@ public interface IBaseRepository<TEntity, TId>
         TId id, 
         string? includeMany = null,
         Expression<Func<TEntity, object>>? include = null,
-        bool withTracking = false);
+        bool withoutTracking = true);
 
     Task<TEntity?> GetSingleAsync(
         Expression<Func<TEntity, bool>> filter,
         string? includeMany = null,
         Expression<Func<TEntity, object>>? include = null,
-        bool withTracking = false);
+        bool withoutTracking = true);
 
     Task<IReadOnlyList<TEntity>> GetAsync(
         Expression<Func<TEntity, bool>>? filter = null,
@@ -25,7 +25,7 @@ public interface IBaseRepository<TEntity, TId>
         Expression<Func<TEntity, object>>? include = null,
         int? skip = null,
         int? take = null, 
-        bool withTracking = false);
+        bool withoutTracking = true);
 
     Task<IReadOnlyList<TProjection>> GetProjectionsAsync<TProjection>(
         Expression<Func<TEntity, TProjection>> projection,
@@ -35,7 +35,7 @@ public interface IBaseRepository<TEntity, TId>
         Expression<Func<TEntity, object>>? include = null,
         int? skip = null,
         int? take = null, 
-        bool withTracking = false);
+        bool withoutTracking = true);
 
     Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> filter);
     

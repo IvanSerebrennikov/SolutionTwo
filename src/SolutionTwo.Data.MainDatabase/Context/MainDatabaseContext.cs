@@ -12,7 +12,7 @@ namespace SolutionTwo.Data.MainDatabase.Context;
 public class MainDatabaseContext : BaseDbContext
 {
     public MainDatabaseContext(
-        DbContextOptions options,
+        DbContextOptions<MainDatabaseContext> options,
         ISoftDeletionContextBehavior softDeletionContextBehavior,
         IAuditContextBehavior auditContextBehavior,
         IOptimisticConcurrencyContextBehavior optimisticConcurrencyContextBehavior,

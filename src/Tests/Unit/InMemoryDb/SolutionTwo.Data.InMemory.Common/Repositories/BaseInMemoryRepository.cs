@@ -9,7 +9,7 @@ namespace SolutionTwo.Data.InMemory.Common;
 
 // includeMany/include is not supported, entities are returned with all nested data
 
-// withTracking is not supported, behavior like all entities are tracked 
+// withoutTracking is not supported, behavior like all entities are tracked 
 // Update method does nothing, because behavior like all entities are tracked
 
 // orderBy is not supported
@@ -25,11 +25,11 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
         TId id, 
         string? includeMany = null, 
         Expression<Func<TEntity, object>>? include = null,
-        bool withTracking = false)
+        bool withoutTracking = true)
 
     {
         var result = GetEnumerable(x => x.Id!.Equals(id), null, includeMany, include, null, null,
-                withTracking)
+                withoutTracking)
             .FirstOrDefault();
         return await Task.FromResult(result);
     }
@@ -38,9 +38,9 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
         Expression<Func<TEntity, bool>> filter, 
         string? includeMany = null,
         Expression<Func<TEntity, object>>? include = null,
-        bool withTracking = false)
+        bool withoutTracking = true)
     {
-        var result = GetEnumerable(filter, null, includeMany, include, null, null, withTracking)
+        var result = GetEnumerable(filter, null, includeMany, include, null, null, withoutTracking)
             .SingleOrDefault();
         return await Task.FromResult(result);
     }
@@ -52,9 +52,9 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
         Expression<Func<TEntity, object>>? include = null,
         int? skip = null,
         int? take = null, 
-        bool withTracking = false)
+        bool withoutTracking = true)
     {
-        var result = GetEnumerable(filter, orderBy, includeMany, include, skip, take, withTracking)
+        var result = GetEnumerable(filter, orderBy, includeMany, include, skip, take, withoutTracking)
             .ToList();
         return await Task.FromResult(result);
     }
@@ -67,9 +67,9 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
         Expression<Func<TEntity, object>>? include = null,
         int? skip = null, 
         int? take = null, 
-        bool withTracking = false)
+        bool withoutTracking = true)
     {
-        var result = GetEnumerable(filter, orderBy, includeMany, include, skip, take, withTracking)
+        var result = GetEnumerable(filter, orderBy, includeMany, include, skip, take, withoutTracking)
             .Select(projection.Compile())
             .ToList();
         return await Task.FromResult(result);
@@ -109,7 +109,7 @@ public class BaseInMemoryRepository<TEntity, TId> : IBaseRepository<TEntity, TId
         Expression<Func<TEntity, object>>? include = null,
         int? skip = null,
         int? take = null,
-        bool withTracking = false)
+        bool withoutTracking = true)
     {
         IEnumerable<TEntity> query = Entities;
 
