@@ -500,3 +500,4 @@ $RECYCLE.BIN/
 **/.idea/**/modules.xml
 
 appsettings.Development.json
+appsettings.IntegrationTesting.json

@@ -23,4 +23,7 @@
         <ProjectReference Include="..\SolutionTwo.Common\SolutionTwo.Common.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="SolutionTwo.Api.Tests" />
+    </ItemGroup>
 </Project>

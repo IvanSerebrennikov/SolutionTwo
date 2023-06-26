@@ -24,7 +24,7 @@ public class ApplicationSetUpController : ApiControllerBase
     }
 
     [HttpPost("[action]")]
-    public async Task<ActionResult<Guid>> CreateRoles()
+    public async Task<ActionResult<int>> CreateRoles()
     {
         var roles = new[]
         {
